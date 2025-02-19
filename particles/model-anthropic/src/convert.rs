@@ -1,4 +1,4 @@
-use n9_core::{ActionableMessage, Message as ModelMessage, Role as ModelRole};
+use n9_core::{ActionableMessage, Message as ModelMessage, Reason, Role as ModelRole};
 
 #[derive(serde::Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -47,6 +47,8 @@ pub fn choice(from: &serde_json::Value) -> Option<ActionableMessage> {
     let message = ModelMessage { role, content };
     let actionable = ActionableMessage {
         message,
+        // TODO: Convert the reason properly
+        reason: Reason::Stop,
         tool_calls: Vec::new(),
     };
     Some(actionable)

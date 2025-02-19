@@ -1,6 +1,8 @@
 use anyhow::Result;
 use async_openai::types::*;
-use n9_core::{ActionableMessage, Message as MessageN9, Role as RoleN9, ToolCall, ToolInfo};
+use n9_core::{
+    ActionableMessage, Message as MessageN9, Reason, Role as RoleN9, ToolCall, ToolInfo,
+};
 use schemars::schema::RootSchema;
 use serde_json::Value;
 
@@ -71,9 +73,24 @@ pub fn choice(from: ChatChoice) -> Option<ActionableMessage> {
     let tool_calls: Result<Vec<_>> = calls.into_iter().map(tool_call_convert).collect();
     let actionable = ActionableMessage {
         message,
+        reason: reason(from.finish_reason),
         tool_calls: tool_calls.ok()?,
     };
     Some(actionable)
+}
+
+fn reason(finish_reason: Option<FinishReason>) -> Reason {
+    if let Some(reason) = finish_reason {
+        match reason {
+            FinishReason::Stop => Reason::Stop,
+            FinishReason::Length => Reason::Stop,
+            FinishReason::ContentFilter => Reason::Stop,
+            FinishReason::ToolCalls => Reason::Call,
+            FinishReason::FunctionCall => Reason::Call,
+        }
+    } else {
+        Reason::Stop
+    }
 }
 
 fn tool_call_convert(call: ChatCompletionMessageToolCall) -> Result<ToolCall> {

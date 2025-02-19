@@ -11,8 +11,14 @@ pub enum Role {
     Tool,
 }
 
+pub enum Reason {
+    Stop,
+    Call,
+}
+
 pub struct ActionableMessage {
     pub message: Message,
+    pub reason: Reason,
     pub tool_calls: Vec<ToolCall>,
 }
 
@@ -105,7 +111,6 @@ impl ToolingChatRequest {
     }
 }
 
-#[derive(Default)]
 pub struct ToolingChatResponse {
     pub messages: Vec<ActionableMessage>,
 }

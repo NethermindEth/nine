@@ -4746,7 +4746,9 @@ dependencies = [
  "async-trait",
  "crb",
  "n9-core",
+ "schemars",
  "serde",
+ "serde_json",
  "ui9",
  "ui9-dui",
 ]

@@ -1,5 +1,9 @@
 use async_openai::types::*;
 use n9_core::{Message as MessageN9, Role as RoleN9, ToolInfo};
+use schemars::schema::RootSchema;
+use serde_json::Value;
+
+// REQUESTS
 
 /// From N9 to OpenAI
 pub fn message(from: MessageN9) -> ChatCompletionRequestMessage {
@@ -31,7 +35,27 @@ pub fn message(from: MessageN9) -> ChatCompletionRequestMessage {
     }
 }
 
+pub fn tool(info: ToolInfo) -> ChatCompletionTool {
+    ChatCompletionTool {
+        r#type: ChatCompletionToolType::Function,
+        function: FunctionObject {
+            name: info.id,
+            description: info.meta.description,
+            parameters: info.meta.parameters.map(schema),
+            strict: None,
+        },
+    }
+}
+
+pub fn schema(from: RootSchema) -> Value {
+    // println!("SCHEMA: {from:?}");
+    Value::Null
+}
+
+// RESPONSES
+
 pub fn choice(from: ChatChoice) -> Option<MessageN9> {
+    // println!("CHOICE: {from:?}");
     let role = match from.message.role {
         Role::System => RoleN9::Developer,
         Role::User => RoleN9::User,
@@ -44,16 +68,4 @@ pub fn choice(from: ChatChoice) -> Option<MessageN9> {
     let content = from.message.content?;
     let message = MessageN9 { role, content };
     Some(message)
-}
-
-pub fn tool(info: ToolInfo) -> ChatCompletionTool {
-    ChatCompletionTool {
-        r#type: ChatCompletionToolType::Function,
-        function: FunctionObject {
-            name: info.id,
-            description: info.meta.description,
-            parameters: info.meta.parameters,
-            strict: None,
-        },
-    }
 }

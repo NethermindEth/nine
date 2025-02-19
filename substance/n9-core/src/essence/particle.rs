@@ -64,7 +64,7 @@ impl<A: Agent> SubstanceBond<A> {
         let meta = ToolMeta {
             name: tool.name(),
             description: tool.description(),
-            parameters: None,
+            parameters: tool.parameters(),
         };
         self.substance.router.add_tool(address, meta).await?;
         Ok(())

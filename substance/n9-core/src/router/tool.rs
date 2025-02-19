@@ -8,7 +8,7 @@ use crb::superagent::{
     Fetcher, InteractExt, Interaction, Interplay, OnRequest, Request, Responder,
 };
 use derive_more::{Deref, DerefMut};
-use schemars::{schema_for, JsonSchema};
+use schemars::{schema::RootSchema, schema_for, JsonSchema};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::any::type_name;
@@ -38,10 +38,9 @@ where
         None
     }
 
-    fn parameters(&self) -> Option<Value> {
+    fn parameters(&self) -> Option<RootSchema> {
         let schema = schema_for!(P);
-        let json_schema = serde_json::to_value(&schema).ok()?;
-        Some(json_schema)
+        Some(schema)
     }
 
     async fn handle_request(

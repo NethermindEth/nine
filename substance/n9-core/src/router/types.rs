@@ -1,4 +1,5 @@
 use crb::superagent::Request;
+use schemars::schema::RootSchema;
 use serde_json::Value;
 
 pub enum Role {
@@ -113,5 +114,5 @@ pub struct ToolInfo {
 pub struct ToolMeta {
     pub name: String,
     pub description: Option<String>,
-    pub parameters: Option<Value>,
+    pub parameters: Option<RootSchema>,
 }

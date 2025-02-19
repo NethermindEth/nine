@@ -1,4 +1,3 @@
-use super::tool::ToolResponse;
 use crb::superagent::Request;
 use schemars::schema::RootSchema;
 use serde::{Deserialize, Serialize};
@@ -165,4 +164,8 @@ pub struct ToolMeta {
     pub name: String,
     pub description: Option<String>,
     pub parameters: Option<RootSchema>,
+}
+
+pub struct ToolResponse {
+    pub content: String,
 }

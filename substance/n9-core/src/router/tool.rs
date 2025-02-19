@@ -1,4 +1,4 @@
-use super::types::{ToolId, ToolInfo, ToolMeta};
+use super::types::{ToolId, ToolInfo, ToolMeta, ToolResponse};
 use super::{ReasoningRouter, RouterLink};
 use anyhow::{anyhow, Error, Result};
 use async_trait::async_trait;
@@ -71,10 +71,6 @@ where
     async fn call_tool(&mut self, _input: P, _ctx: &mut Context<Self>) -> Result<ToolResponse> {
         Err(anyhow!("Not implemented"))
     }
-}
-
-pub struct ToolResponse {
-    pub content: String,
 }
 
 #[derive(Deref, DerefMut, Clone)]

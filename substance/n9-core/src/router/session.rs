@@ -1,10 +1,12 @@
-use super::types::{ChatRequest, ChatResponse, Message, Reason};
+use super::tool::ToolLink;
+use super::types::{ChatRequest, ChatResponse, Message, Reason, Role, ToolResponse};
 use super::RouterLink;
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};
 use crb::superagent::{Fetcher, InteractExt, OnRequest};
-use derive_more::{Deref, DerefMut};
+use derive_more::{Deref, DerefMut, From};
+use serde_json::Value;
 use ui9_dui::Operation;
 
 #[derive(Deref, DerefMut)]
@@ -70,9 +72,12 @@ impl OnRequest<ChatRequest> for ReasoningSession {
                         let tool_id = tool_call.id.clone();
                         let op = Operation::start(&format!("Calling the tool {tool_id}"));
                         let tool_fetcher = self.router.get_tool(tool_call.id);
-                        let tool_link = tool_fetcher.await?;
-                        let tool_response = tool_link.call_tool(tool_call.args).await?;
-                        let message = Message::from(tool_response);
+                        let caller = Caller {
+                            tool_fetcher,
+                            args: tool_call.args,
+                        };
+                        let message = caller.call().await;
+                        // TODO: Report to operation if failed
                         extra_messages.push(message);
                         op.end(&format!("Tool call {tool_id} completed"));
                     }
@@ -93,5 +98,29 @@ impl OnRequest<ChatRequest> for ReasoningSession {
             messages: extra_messages,
         };
         Ok(response)
+    }
+}
+
+struct Caller {
+    tool_fetcher: Fetcher<ToolLink>,
+    args: Value,
+}
+
+impl Caller {
+    async fn call(self) -> Message {
+        match self.call_or_fail().await {
+            Ok(message) => message,
+            Err(err) => Message {
+                role: Role::Tool,
+                content: format!("Tool failed: {err}"),
+            },
+        }
+    }
+
+    async fn call_or_fail(self) -> Result<Message> {
+        let link = self.tool_fetcher.await?;
+        let response = link.call_tool(self.args).await?;
+        let message = Message::from(response);
+        Ok(message)
     }
 }

@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};
 use crb::superagent::{Fetcher, InteractExt, OnRequest};
 use derive_more::{Deref, DerefMut};
+use ui9_dui::Operation;
 
 #[derive(Deref, DerefMut)]
 pub struct SessionLink {
@@ -67,11 +68,13 @@ impl OnRequest<ChatRequest> for ReasoningSession {
                         one_more_step = true;
                         // TODO: Wrap that into a closure
                         let tool_id = tool_call.id.clone();
-                        let tool_fetcher = self.router.get_tool(tool_id);
+                        let op = Operation::start(&format!("Calling the tool {tool_id}"));
+                        let tool_fetcher = self.router.get_tool(tool_call.id);
                         let tool_link = tool_fetcher.await?;
                         let tool_response = tool_link.call_tool(tool_call.args).await?;
                         let message = Message::from(tool_response);
                         extra_messages.push(message);
+                        op.end(&format!("Tool call {tool_id} completed"));
                     }
                 } else {
                     extra_messages.push(message.into());

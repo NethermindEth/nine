@@ -1,5 +1,6 @@
 use crate::router::tool::ToolInfo;
 use crb::superagent::Request;
+use serde_json::Value;
 
 pub enum Role {
     /// System
@@ -99,4 +100,11 @@ impl ToolingChatResponse {
             messages: self.messages,
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct ToolMeta {
+    pub name: String,
+    pub description: Option<String>,
+    pub parameters: Option<Value>,
 }

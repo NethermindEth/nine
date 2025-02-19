@@ -3,7 +3,8 @@ use crate::keeper::subscription::ConfigSegmentUpdates;
 use crate::keeper::{subscription::UpdateConfig, Config};
 use crate::router::{
     model::Model,
-    tool::{CallParameters, Tool, ToolMeta},
+    tool::{CallParameters, Tool},
+    types::ToolMeta,
 };
 use anyhow::Result;
 use crb::agent::{Address, Agent, ToAddress};

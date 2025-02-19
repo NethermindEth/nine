@@ -103,8 +103,8 @@ impl OnRequest<ToolingChatRequest> for OpenAIParticle {
         let messages = response
             .choices
             .into_iter()
-            .filter_map(convert::choice)
-            .collect();
+            .map(convert::choice)
+            .collect::<Result<_>>()?;
         let response = ToolingChatResponse { messages };
         op.end("A request to OpenAI completed");
         Ok(response)

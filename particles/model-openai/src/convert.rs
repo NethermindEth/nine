@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_openai::types::*;
 use n9_core::{
     ActionableMessage, Message as MessageN9, Reason, Role as RoleN9, ToolCall, ToolInfo,
@@ -56,27 +56,30 @@ pub fn schema(root_schema: RootSchema) -> Value {
 
 // RESPONSES
 
-pub fn choice(from: ChatChoice) -> Option<ActionableMessage> {
+pub fn choice(from: ChatChoice) -> Result<ActionableMessage> {
     let role = match from.message.role {
         Role::System => RoleN9::Developer,
         Role::User => RoleN9::User,
         Role::Assistant => RoleN9::Assistant,
         Role::Tool => RoleN9::Tool,
-        _ => {
-            return None;
+        other => {
+            return Err(anyhow!("Unsupported role: {other}"));
         }
     };
-    let content = from.message.content?;
+    let content = from.message.content.unwrap_or_default();
     let message = MessageN9 { role, content };
     let calls = from.message.tool_calls.unwrap_or_default();
     // TODO: Return error if failed
-    let tool_calls: Result<Vec<_>> = calls.into_iter().map(tool_call_convert).collect();
+    let tool_calls = calls
+        .into_iter()
+        .map(tool_call_convert)
+        .collect::<Result<_>>()?;
     let actionable = ActionableMessage {
         message,
         reason: reason(from.finish_reason),
-        tool_calls: tool_calls.ok()?,
+        tool_calls,
     };
-    Some(actionable)
+    Ok(actionable)
 }
 
 fn reason(finish_reason: Option<FinishReason>) -> Reason {

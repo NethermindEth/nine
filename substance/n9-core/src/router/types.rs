@@ -1,9 +1,10 @@
 use super::tool::ToolResponse;
 use crb::superagent::Request;
 use schemars::schema::RootSchema;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Role {
     /// System
     Developer,
@@ -13,7 +14,7 @@ pub enum Role {
     Tool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Reason {
     Stop,
     Call,
@@ -25,18 +26,20 @@ impl Reason {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActionableMessage {
     pub message: Message,
     pub reason: Reason,
     pub tool_calls: Vec<ToolCall>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ToolCall {
     pub id: ToolId,
     pub args: Value,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Message {
     pub role: Role,
     pub content: String,
@@ -110,7 +113,7 @@ impl ChatResponse {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct ToolingChatRequest {
     pub messages: Vec<Message>,
     pub tools: Vec<ToolInfo>,
@@ -130,6 +133,7 @@ impl ToolingChatRequest {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct ToolingChatResponse {
     pub messages: Vec<ActionableMessage>,
 }

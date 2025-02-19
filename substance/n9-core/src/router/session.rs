@@ -51,8 +51,8 @@ impl OnRequest<ChatRequest> for ReasoningSession {
         mut request: ChatRequest,
         ctx: &mut Context<Self>,
     ) -> Result<ChatResponse> {
+        let op = Operation::start("Chat session in progress...");
         let mut extra_messages = Vec::new();
-
         // The reasoning loop for calling tools
         loop {
             let mut one_more_step = false;
@@ -87,6 +87,7 @@ impl OnRequest<ChatRequest> for ReasoningSession {
                 break;
             }
         }
+        op.end("Chat session completed");
 
         let response = ChatResponse {
             messages: extra_messages,

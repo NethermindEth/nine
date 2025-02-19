@@ -65,6 +65,7 @@ impl UpdateConfig<DyDxConfig> for DyDxParticle {
 
 #[derive(Deserialize, JsonSchema)]
 pub struct Price {
+    /// A name of a ticker
     ticker: String,
 }
 

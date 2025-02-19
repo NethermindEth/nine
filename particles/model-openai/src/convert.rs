@@ -47,15 +47,13 @@ pub fn tool(info: ToolInfo) -> ChatCompletionTool {
     }
 }
 
-pub fn schema(from: RootSchema) -> Value {
-    // println!("SCHEMA: {from:?}");
-    Value::Null
+pub fn schema(root_schema: RootSchema) -> Value {
+    serde_json::to_value(&root_schema.schema).unwrap_or_default()
 }
 
 // RESPONSES
 
 pub fn choice(from: ChatChoice) -> Option<MessageN9> {
-    // println!("CHOICE: {from:?}");
     let role = match from.message.role {
         Role::System => RoleN9::Developer,
         Role::User => RoleN9::User,

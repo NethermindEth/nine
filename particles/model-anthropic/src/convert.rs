@@ -6,6 +6,7 @@ pub enum AnthropicRole {
     User,
     Assistant,
     System,
+    Tool,
 }
 
 #[derive(serde::Serialize)]
@@ -19,6 +20,7 @@ pub fn message(from: ModelMessage) -> AnthropicMessage {
         ModelRole::User => AnthropicRole::User,
         ModelRole::Assistant => AnthropicRole::Assistant,
         ModelRole::Developer => AnthropicRole::System,
+        ModelRole::Tool => AnthropicRole::Tool,
     };
 
     AnthropicMessage {
@@ -33,6 +35,7 @@ pub fn choice(from: &serde_json::Value) -> Option<ModelMessage> {
         "user" => ModelRole::User,
         "assistant" => ModelRole::Assistant,
         "system" => ModelRole::Developer,
+        "tool" => ModelRole::Tool,
         _ => return None,
     };
 

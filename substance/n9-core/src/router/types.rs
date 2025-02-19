@@ -2,9 +2,12 @@ use crate::router::tool::ToolInfo;
 use crb::superagent::Request;
 
 pub enum Role {
+    /// System
     Developer,
     User,
     Assistant,
+    /// Function
+    Tool,
 }
 
 pub struct Message {

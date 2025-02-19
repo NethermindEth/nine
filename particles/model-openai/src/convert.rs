@@ -1,39 +1,47 @@
 use async_openai::types::*;
-use n9_core::{Message as ModelMessage, Role as ModelRole};
+use n9_core::{Message as MessageN9, Role as RoleN9};
 
-pub fn message(from: ModelMessage) -> ChatCompletionRequestMessage {
+/// From N9 to OpenAI
+pub fn message(from: MessageN9) -> ChatCompletionRequestMessage {
     match from.role {
-        ModelRole::Developer => {
+        RoleN9::Developer => {
             let mut message = ChatCompletionRequestSystemMessage::default();
             let content = ChatCompletionRequestSystemMessageContent::Text(from.content);
             message.content = content;
             ChatCompletionRequestMessage::from(message)
         }
-        ModelRole::User => {
+        RoleN9::User => {
             let mut message = ChatCompletionRequestUserMessage::default();
             let content = ChatCompletionRequestUserMessageContent::Text(from.content);
             message.content = content;
             ChatCompletionRequestMessage::from(message)
         }
-        ModelRole::Assistant => {
+        RoleN9::Assistant => {
             let mut message = ChatCompletionRequestAssistantMessage::default();
             let content = ChatCompletionRequestAssistantMessageContent::Text(from.content);
             message.content = Some(content);
             ChatCompletionRequestMessage::from(message)
         }
+        RoleN9::Tool => {
+            let mut message = ChatCompletionRequestToolMessage::default();
+            let content = ChatCompletionRequestToolMessageContent::Text(from.content);
+            message.content = content;
+            ChatCompletionRequestMessage::from(message)
+        }
     }
 }
 
-pub fn choice(from: ChatChoice) -> Option<ModelMessage> {
+pub fn choice(from: ChatChoice) -> Option<MessageN9> {
     let role = match from.message.role {
-        Role::System => ModelRole::Developer,
-        Role::User => ModelRole::User,
-        Role::Assistant => ModelRole::Assistant,
+        Role::System => RoleN9::Developer,
+        Role::User => RoleN9::User,
+        Role::Assistant => RoleN9::Assistant,
+        Role::Tool => RoleN9::Tool,
         _ => {
             return None;
         }
     };
     let content = from.message.content?;
-    let message = ModelMessage { role, content };
+    let message = MessageN9 { role, content };
     Some(message)
 }

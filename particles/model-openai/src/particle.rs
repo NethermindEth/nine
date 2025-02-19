@@ -90,6 +90,7 @@ impl OnRequest<ToolingChatRequest> for OpenAIParticle {
         // TODO: Sequental, but could be executed in the reactor
         let messages: Vec<_> = request.messages.into_iter().map(convert::message).collect();
         let request = CreateChatCompletionRequestArgs::default()
+            // TODO: Use the model name from the config
             .model("gpt-4o")
             .messages(messages)
             .build()?;

@@ -87,12 +87,17 @@ impl OnRequest<ToolingChatRequest> for OpenAIParticle {
     ) -> Result<ToolingChatResponse> {
         let op = Operation::start("Sending a request to OpenAI");
         let client = self.client.get_mut()?;
+
         // TODO: Sequental, but could be executed in the reactor
         let messages: Vec<_> = request.messages.into_iter().map(convert::message).collect();
+
+        let tools: Vec<_> = request.tools.into_iter().map(convert::tool).collect();
+
         let request = CreateChatCompletionRequestArgs::default()
             // TODO: Use the model name from the config
             .model("gpt-4o")
             .messages(messages)
+            .tools(tools)
             .build()?;
         let response = client.chat().create(request).await?;
         let messages = response

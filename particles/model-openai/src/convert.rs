@@ -1,5 +1,5 @@
 use async_openai::types::*;
-use n9_core::{Message as MessageN9, Role as RoleN9};
+use n9_core::{Message as MessageN9, Role as RoleN9, ToolInfo};
 
 /// From N9 to OpenAI
 pub fn message(from: MessageN9) -> ChatCompletionRequestMessage {
@@ -44,4 +44,16 @@ pub fn choice(from: ChatChoice) -> Option<MessageN9> {
     let content = from.message.content?;
     let message = MessageN9 { role, content };
     Some(message)
+}
+
+pub fn tool(info: ToolInfo) -> ChatCompletionTool {
+    ChatCompletionTool {
+        r#type: ChatCompletionToolType::Function,
+        function: FunctionObject {
+            name: info.id,
+            description: info.meta.description,
+            parameters: info.meta.parameters,
+            strict: None,
+        },
+    }
 }

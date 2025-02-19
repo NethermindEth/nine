@@ -13,6 +13,6 @@ pub use keeper::{Config, Keeper, KeeperLink};
 pub use router::model::{Model, ModelLink};
 pub use router::tool::{Tool, ToolLink, ToolResponse};
 pub use router::types::{
-    ChatRequest, ChatResponse, Message, Role, ToolInfo, ToolMeta, ToolingChatRequest,
-    ToolingChatResponse,
+    ActionableMessage, ChatRequest, ChatResponse, Message, Role, ToolInfo, ToolMeta,
+    ToolingChatRequest, ToolingChatResponse,
 };

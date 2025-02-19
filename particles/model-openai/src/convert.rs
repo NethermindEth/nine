@@ -1,5 +1,5 @@
 use async_openai::types::*;
-use n9_core::{Message as MessageN9, Role as RoleN9, ToolInfo};
+use n9_core::{ActionableMessage, Message as MessageN9, Role as RoleN9, ToolInfo};
 use schemars::schema::RootSchema;
 use serde_json::Value;
 
@@ -53,7 +53,7 @@ pub fn schema(root_schema: RootSchema) -> Value {
 
 // RESPONSES
 
-pub fn choice(from: ChatChoice) -> Option<MessageN9> {
+pub fn choice(from: ChatChoice) -> Option<ActionableMessage> {
     let role = match from.message.role {
         Role::System => RoleN9::Developer,
         Role::User => RoleN9::User,
@@ -65,7 +65,11 @@ pub fn choice(from: ChatChoice) -> Option<MessageN9> {
     };
     let content = from.message.content?;
     let message = MessageN9 { role, content };
-    Some(message)
+    let actionable = ActionableMessage {
+        message,
+        tool_calls: Vec::new(),
+    };
+    Some(actionable)
 }
 
 /*

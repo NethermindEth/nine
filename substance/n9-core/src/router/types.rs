@@ -11,9 +11,25 @@ pub enum Role {
     Tool,
 }
 
+pub struct ActionableMessage {
+    pub message: Message,
+    pub tool_calls: Vec<ToolCall>,
+}
+
+pub struct ToolCall {
+    pub id: ToolId,
+    pub args: Value,
+}
+
 pub struct Message {
     pub role: Role,
     pub content: String,
+}
+
+impl From<ActionableMessage> for Message {
+    fn from(message: ActionableMessage) -> Self {
+        message.message
+    }
 }
 
 #[derive(Default)]
@@ -51,6 +67,14 @@ pub struct ChatResponse {
     pub messages: Vec<Message>,
 }
 
+impl From<ToolingChatResponse> for ChatResponse {
+    fn from(response: ToolingChatResponse) -> Self {
+        Self {
+            messages: response.messages.into_iter().map(Message::from).collect(),
+        }
+    }
+}
+
 impl ChatResponse {
     pub fn squash(&self) -> String {
         let mut text = String::new();
@@ -83,22 +107,20 @@ impl ToolingChatRequest {
 
 #[derive(Default)]
 pub struct ToolingChatResponse {
-    pub messages: Vec<Message>,
+    pub messages: Vec<ActionableMessage>,
 }
 
 impl ToolingChatResponse {
     pub fn squash(&self) -> String {
         let mut text = String::new();
         for msg in &self.messages {
-            text.push_str(&msg.content);
+            text.push_str(&msg.message.content);
         }
         text
     }
 
     pub fn without_tools(self) -> ChatResponse {
-        ChatResponse {
-            messages: self.messages,
-        }
+        self.into()
     }
 }
 

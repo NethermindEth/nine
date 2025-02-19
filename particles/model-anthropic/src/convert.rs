@@ -1,4 +1,4 @@
-use n9_core::{Message as ModelMessage, Role as ModelRole};
+use n9_core::{ActionableMessage, Message as ModelMessage, Role as ModelRole};
 
 #[derive(serde::Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -29,7 +29,7 @@ pub fn message(from: ModelMessage) -> AnthropicMessage {
     }
 }
 
-pub fn choice(from: &serde_json::Value) -> Option<ModelMessage> {
+pub fn choice(from: &serde_json::Value) -> Option<ActionableMessage> {
     let role_str = from.get("role")?.as_str()?;
     let role = match role_str {
         "user" => ModelRole::User,
@@ -45,5 +45,9 @@ pub fn choice(from: &serde_json::Value) -> Option<ModelMessage> {
         .to_string();
 
     let message = ModelMessage { role, content };
-    Some(message)
+    let actionable = ActionableMessage {
+        message,
+        tool_calls: Vec::new(),
+    };
+    Some(actionable)
 }

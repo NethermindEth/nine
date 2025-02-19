@@ -23,6 +23,7 @@ pub struct Operation {
 impl Drop for Operation {
     fn drop(&mut self) {
         if let Some(message) = self.task.take() {
+            self.send_end(format!("Failed: {message}"));
             // Operations must be explicitly completed
             let data = FailureData { message };
             self.act_failure(data);

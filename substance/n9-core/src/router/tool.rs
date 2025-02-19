@@ -124,8 +124,12 @@ impl RouterLink {
         Ok(response.info.id.clone())
     }
 
-    pub async fn get_tools(&mut self) -> Result<Vec<ToolInfo>> {
-        self.interact(GetTools).await.map_err(Error::from)
+    pub fn get_tools(&mut self) -> Fetcher<Vec<ToolInfo>> {
+        self.interact(GetTools)
+    }
+
+    pub fn get_tool(&mut self, id: ToolId) -> Fetcher<ToolLink> {
+        self.interact(GetTool { id })
     }
 }
 
@@ -203,5 +207,23 @@ impl OnRequest<GetTools> for ReasoningRouter {
             .values()
             .map(|record| record.info.clone())
             .collect())
+    }
+}
+
+struct GetTool {
+    id: ToolId,
+}
+
+impl Request for GetTool {
+    type Response = ToolLink;
+}
+
+#[async_trait]
+impl OnRequest<GetTool> for ReasoningRouter {
+    async fn on_request(&mut self, msg: GetTool, ctx: &mut Context<Self>) -> Result<ToolLink> {
+        self.tools
+            .get(&msg.id)
+            .map(|record| record.link.clone())
+            .ok_or_else(|| anyhow!("Tool {} is not available.", msg.id))
     }
 }

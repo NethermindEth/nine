@@ -1,7 +1,9 @@
+use super::tool::ToolResponse;
 use crb::superagent::Request;
 use schemars::schema::RootSchema;
 use serde_json::Value;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Role {
     /// System
     Developer,
@@ -11,9 +13,16 @@ pub enum Role {
     Tool,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Reason {
     Stop,
     Call,
+}
+
+impl Reason {
+    pub fn is_call(&self) -> bool {
+        *self == Reason::Call
+    }
 }
 
 pub struct ActionableMessage {
@@ -27,6 +36,7 @@ pub struct ToolCall {
     pub args: Value,
 }
 
+#[derive(Debug, Clone)]
 pub struct Message {
     pub role: Role,
     pub content: String,
@@ -38,7 +48,16 @@ impl From<ActionableMessage> for Message {
     }
 }
 
-#[derive(Default)]
+impl From<ToolResponse> for Message {
+    fn from(response: ToolResponse) -> Self {
+        Self {
+            role: Role::Tool,
+            content: response.content,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct ChatRequest {
     pub messages: Vec<Message>,
 }
@@ -91,7 +110,7 @@ impl ChatResponse {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct ToolingChatRequest {
     pub messages: Vec<Message>,
     pub tools: Vec<ToolInfo>,

@@ -11,9 +11,9 @@ use derive_more::{Deref, DerefMut, From, Into};
 use model::ModelLink;
 use session::{ReasoningSession, SessionLink};
 use std::collections::HashMap;
-use tool::{ToolId, ToolRecord};
+use tool::ToolRecord;
 use typed_slab::TypedSlab;
-use types::{ChatRequest, ChatResponse};
+use types::{ChatRequest, ChatResponse, ToolId};
 
 #[derive(From, Into)]
 pub struct ReqId(usize);

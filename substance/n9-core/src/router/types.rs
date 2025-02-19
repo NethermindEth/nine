@@ -1,4 +1,3 @@
-use crate::router::tool::ToolInfo;
 use crb::superagent::Request;
 use serde_json::Value;
 
@@ -100,6 +99,14 @@ impl ToolingChatResponse {
             messages: self.messages,
         }
     }
+}
+
+pub type ToolId = String;
+
+#[derive(Clone, Debug)]
+pub struct ToolInfo {
+    pub id: ToolId,
+    pub meta: ToolMeta,
 }
 
 #[derive(Debug, Clone)]

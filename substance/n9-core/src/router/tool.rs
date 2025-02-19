@@ -1,4 +1,5 @@
-use super::{types::ToolMeta, ReasoningRouter, RouterLink};
+use super::types::{ToolId, ToolInfo, ToolMeta};
+use super::{ReasoningRouter, RouterLink};
 use anyhow::{anyhow, Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, MessageFor};
@@ -129,8 +130,6 @@ impl RouterLink {
     }
 }
 
-pub type ToolId = String;
-
 pub struct AddTool {
     link: ToolLink,
     meta: ToolMeta,
@@ -144,17 +143,6 @@ impl Request for AddTool {
     type Response = ToolAdded;
 }
 
-#[derive(Debug, Clone)]
-pub struct ToolMetaWithId {
-    pub id: ToolId,
-    pub meta: ToolMeta,
-}
-
-#[derive(Deref, DerefMut, Clone, Debug)]
-pub struct ToolInfo {
-    pub meta: ToolMetaWithId,
-}
-
 pub struct ToolRecord {
     pub link: ToolLink,
     pub info: ToolInfo,
@@ -164,11 +152,10 @@ pub struct ToolRecord {
 impl OnRequest<AddTool> for ReasoningRouter {
     async fn on_request(&mut self, msg: AddTool, _ctx: &mut Context<Self>) -> Result<ToolAdded> {
         let id = ToolId::from(format!("{}_{}", msg.meta.name, self.tools.len()));
-        let meta = ToolMetaWithId {
+        let info = ToolInfo {
             id: id.clone(),
             meta: msg.meta,
         };
-        let info = ToolInfo { meta };
         let record = ToolRecord {
             link: msg.link,
             info: info.clone(),

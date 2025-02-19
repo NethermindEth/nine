@@ -49,6 +49,8 @@ impl DoAsync<Initialize> for DyDxParticle {
         self.update_config(config, ctx).await?;
 
         bond.add_tool::<Price>(self).await?;
+        bond.add_tool::<Trade>(self).await?;
+
         self.bond.fill(bond)?;
         Ok(Next::events())
     }

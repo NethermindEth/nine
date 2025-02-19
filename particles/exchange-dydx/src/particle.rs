@@ -65,7 +65,7 @@ impl UpdateConfig<DyDxConfig> for DyDxParticle {
 
 #[derive(Deserialize, JsonSchema)]
 pub struct Price {
-    /// A name of a ticker
+    /// The unique symbol representing the asset whose price is being queried (e.g., "BTC", "ETH").
     ticker: String,
 }
 
@@ -76,9 +76,7 @@ impl Tool<Price> for DyDxParticle {
 
     fn description(&self) -> Option<String> {
         Some(
-            "Connects to the dYdX exchange AI interface to retrieve real-time price data for
-        any token available on the platform. The function accepts the token symbol as input
-        and returns the current price along with relevant market details."
+        "This function fetches the current market price of a specified asset from a decentralized exchange (DEX). By providing a valid asset ticker, the function queries the DEX's pricing endpoint to retrieve real-time price information, ensuring up-to-date market data for further processing or display."
                 .into(),
         )
     }

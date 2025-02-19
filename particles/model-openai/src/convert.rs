@@ -67,3 +67,9 @@ pub fn choice(from: ChatChoice) -> Option<MessageN9> {
     let message = MessageN9 { role, content };
     Some(message)
 }
+
+/*
+let file = std::fs::File::create("output.json").unwrap();
+let writer = std::io::BufWriter::new(file);
+serde_json::to_writer_pretty(writer, &value).unwrap();
+*/

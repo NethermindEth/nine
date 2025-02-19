@@ -7,15 +7,16 @@ use crb::superagent::{
     Fetcher, InteractExt, Interaction, Interplay, OnRequest, Request, Responder,
 };
 use derive_more::{Deref, DerefMut};
+use schemars::{schema_for, JsonSchema};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::any::type_name;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub trait CallParameters: DeserializeOwned + Send + 'static {}
+pub trait CallParameters: JsonSchema + DeserializeOwned + Send + 'static {}
 
-impl<T> CallParameters for T where T: DeserializeOwned + Send + 'static {}
+impl<T> CallParameters for T where T: JsonSchema + DeserializeOwned + Send + 'static {}
 
 #[async_trait]
 pub trait Tool<P>
@@ -34,6 +35,12 @@ where
 
     fn description(&self) -> Option<String> {
         None
+    }
+
+    fn parameters(&self) -> Option<Value> {
+        let schema = schema_for!(P);
+        let json_schema = serde_json::to_value(&schema).ok()?;
+        Some(json_schema)
     }
 
     async fn handle_request(

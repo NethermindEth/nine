@@ -15,6 +15,7 @@ dotenvy.workspace = true
 envy.workspace = true
 log.workspace = true
 n9-std.workspace = true
+schemars.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 toml.workspace = true

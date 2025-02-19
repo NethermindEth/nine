@@ -5,6 +5,7 @@ use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
 use crb::core::Slot;
 use crb::superagent::{Entry, Supervisor, SupervisorSession};
 use n9_core::{ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, UpdateConfig};
+use schemars::JsonSchema;
 use serde::Deserialize;
 
 pub struct DyDxParticle {
@@ -60,7 +61,7 @@ impl UpdateConfig<DyDxConfig> for DyDxParticle {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 pub struct Price {
     ticker: String,
 }
@@ -80,7 +81,7 @@ impl Tool<Price> for DyDxParticle {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 pub struct Trade {
     ticker: String,
 }

@@ -27,7 +27,7 @@ impl Drop for Operation {
 }
 
 impl Operation {
-    pub fn wrap_fn<F, T>(task: &str, func: F) -> Result<T>
+    pub fn scoped_fn<F, T>(task: &str, func: F) -> Result<T>
     where
         F: Fn() -> Result<T>,
     {
@@ -44,7 +44,7 @@ impl Operation {
         }
     }
 
-    pub async fn wrap_fut<F, T>(task: &str, fut: F) -> Result<T>
+    pub async fn scoped_fut<F, T>(task: &str, fut: F) -> Result<T>
     where
         F: Future<Output = Result<T>>,
     {

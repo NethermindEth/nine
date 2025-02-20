@@ -60,29 +60,33 @@ impl OnRequest<ChatRequest> for ReasoningSession {
         loop {
             let mut one_more_step = false;
 
-            let model = self.router.get_model().await?;
-            let tools = self.router.get_tools().await?;
-            let request_with_tools = request.clone().with_tools(tools);
-            let response = model.chat(request_with_tools).await?;
+            Operation::scoped_fut("Calling the model...", async {
+                let model = self.router.get_model().await?;
+                let tools = self.router.get_tools().await?;
+                let request_with_tools = request.clone().with_tools(tools);
+                let response = model.chat(request_with_tools).await?;
 
-            for message in response.messages {
-                if message.reason.is_call() {
-                    let mut callers = Vec::new();
-                    for tool_call in message.tool_calls {
-                        // One more stop to process results with a model
-                        one_more_step = true;
-                        let caller = Caller {
-                            router: self.router.clone(),
-                            tool_call,
-                        };
-                        callers.push(caller.call());
+                for message in response.messages {
+                    if message.reason.is_call() {
+                        let mut callers = Vec::new();
+                        for tool_call in message.tool_calls {
+                            // One more stop to process results with a model
+                            one_more_step = true;
+                            let caller = Caller {
+                                router: self.router.clone(),
+                                tool_call,
+                            };
+                            callers.push(caller.call());
+                        }
+                        let messages = join_all(callers).await;
+                        extra_messages.extend(messages);
+                    } else {
+                        extra_messages.push(message.into());
                     }
-                    let messages = join_all(callers).await;
-                    extra_messages.extend(messages);
-                } else {
-                    extra_messages.push(message.into());
                 }
-            }
+                Ok(())
+            })
+            .await;
 
             if one_more_step {
                 request.messages.extend(extra_messages.drain(..));

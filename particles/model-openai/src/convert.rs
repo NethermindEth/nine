@@ -67,17 +67,19 @@ pub fn choice(from: ChatChoice) -> Result<ActionableMessage> {
         }
     };
     let content = from.message.content.unwrap_or_default();
-    let message = MessageN9 { role, content };
     let calls = from.message.tool_calls.unwrap_or_default();
-    // TODO: Return error if failed
     let tool_calls = calls
         .into_iter()
         .map(tool_call_convert)
         .collect::<Result<_>>()?;
+    let message = MessageN9 {
+        role,
+        content,
+        tool_calls,
+    };
     let actionable = ActionableMessage {
         message,
         reason: reason(from.finish_reason),
-        tool_calls,
     };
     Ok(actionable)
 }

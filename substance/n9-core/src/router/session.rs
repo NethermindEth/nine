@@ -109,9 +109,10 @@ impl RequestPerformer {
         let response = model.chat(request_with_tools).await?;
 
         for message in response.messages {
+            let mut callers = Vec::new();
+
             if message.reason.is_call() {
-                let mut callers = Vec::new();
-                for tool_call in message.tool_calls {
+                for tool_call in message.message.tool_calls.clone() {
                     // One more stop to process results with a model
                     self.one_more_step = true;
                     let caller = Caller {
@@ -120,11 +121,13 @@ impl RequestPerformer {
                     };
                     callers.push(caller.call());
                 }
-                let messages = join_all(callers).await;
-                self.extra_messages.extend(messages);
-            } else {
-                self.extra_messages.push(message.into());
             }
+
+            // TODO: Should I keep the order?
+            self.extra_messages.push(message.into());
+
+            let messages = join_all(callers).await;
+            self.extra_messages.extend(messages);
         }
         Ok(())
     }
@@ -142,6 +145,7 @@ impl Caller {
             Err(err) => Message {
                 role: Role::Tool,
                 content: format!("Tool failed: {err}"),
+                tool_calls: Vec::new(),
             },
         }
     }

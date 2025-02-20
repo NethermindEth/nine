@@ -44,12 +44,15 @@ pub fn choice(from: &serde_json::Value) -> Option<ActionableMessage> {
         .and_then(serde_json::Value::as_str)?
         .to_string();
 
-    let message = ModelMessage { role, content };
+    let message = ModelMessage {
+        role,
+        content,
+        tool_calls: Vec::new(),
+    };
     let actionable = ActionableMessage {
         message,
         // TODO: Convert the reason properly
         reason: Reason::Stop,
-        tool_calls: Vec::new(),
     };
     Some(actionable)
 }

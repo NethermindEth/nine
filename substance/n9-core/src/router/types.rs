@@ -29,7 +29,6 @@ impl Reason {
 pub struct ActionableMessage {
     pub message: Message,
     pub reason: Reason,
-    pub tool_calls: Vec<ToolCall>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -42,6 +41,7 @@ pub struct ToolCall {
 pub struct Message {
     pub role: Role,
     pub content: String,
+    pub tool_calls: Vec<ToolCall>,
 }
 
 impl From<ActionableMessage> for Message {
@@ -55,6 +55,7 @@ impl From<ToolResponse> for Message {
         Self {
             role: Role::Tool,
             content: response.content,
+            tool_calls: Vec::new(),
         }
     }
 }
@@ -78,6 +79,7 @@ impl ChatRequest {
         let message = Message {
             role: Role::User,
             content: text.to_string(),
+            tool_calls: Vec::new(),
         };
         Self {
             messages: vec![message],

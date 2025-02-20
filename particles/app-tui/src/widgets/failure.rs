@@ -1,12 +1,9 @@
 use super::liner::Liner;
 use crate::widgets::{Component, Reason};
-use crb::core::time::Duration;
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
-    style::{Color, Style},
-    text::{Line, Span},
-    widgets::{List, ListItem, Paragraph, Widget, Wrap},
+    widgets::{Paragraph, Widget, Wrap},
 };
 use ui9_app::SubState;
 use ui9_dui::tracers::failure::Failure;

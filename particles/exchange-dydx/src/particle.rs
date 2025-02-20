@@ -87,8 +87,9 @@ impl Tool<Price> for DyDxParticle {
 
     fn description(&self) -> Option<String> {
         Some(
-        "This function fetches the current market price of a specified asset from a decentralized exchange (DEX). By providing a valid asset ticker, the function queries the DEX's pricing endpoint to retrieve real-time price information, ensuring up-to-date market data for further processing or display."
-                .into(),
+            "This function fetches the current market price of a specified asset from a decentralized exchange (DEX).
+            By providing a valid asset ticker, the function queries the DEX's pricing endpoint to retrieve real-time
+            price information, ensuring up-to-date market data for further processing or display.".into()
         )
     }
 

@@ -1,14 +1,12 @@
-use super::tool::ToolLink;
 use super::types::{ChatRequest, ChatResponse, Message, Role, ToolCall};
 use super::RouterLink;
-use anyhow::{Error, Result};
+use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};
 use crb::superagent::{Fetcher, InteractExt, OnRequest};
 use derive_more::{Deref, DerefMut};
 use futures::future::join_all;
-use serde_json::Value;
-use ui9_dui::{Operate, Operation};
+use ui9_dui::Operate;
 
 #[derive(Deref, DerefMut)]
 pub struct SessionLink {

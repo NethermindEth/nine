@@ -1,7 +1,4 @@
-use ratatui::{
-    style::{Modifier, Style},
-    text::{Line, Span, Text},
-};
+use ratatui::text::{Line, Span, Text};
 
 pub struct Liner<'a> {
     all_lines: Vec<Line<'a>>,

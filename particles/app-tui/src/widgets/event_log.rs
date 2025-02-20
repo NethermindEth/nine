@@ -34,6 +34,7 @@ impl Component for EventLog {
         let items: Vec<ListItem> = state
             .events
             .iter()
+            .rev()
             .map(|event| {
                 ListItem::new(vec![
                     Line::from(vec![Span::styled(

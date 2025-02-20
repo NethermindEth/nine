@@ -54,57 +54,79 @@ impl OnRequest<ChatRequest> for ReasoningSession {
         mut request: ChatRequest,
         ctx: &mut Context<Self>,
     ) -> Result<ChatResponse> {
-        let mut extra_messages = Vec::new();
-
-        "Chat session"
-            .in_fut(async {
-                // The reasoning loop for calling tools
-                loop {
-                    let mut one_more_step = false;
-
-                    "Calling the model..."
-                        .in_fut(async {
-                            let model = self.router.get_model().await?;
-                            let tools = self.router.get_tools().await?;
-                            let request_with_tools = request.clone().with_tools(tools);
-                            let response = model.chat(request_with_tools).await?;
-
-                            for message in response.messages {
-                                if message.reason.is_call() {
-                                    let mut callers = Vec::new();
-                                    for tool_call in message.tool_calls {
-                                        // One more stop to process results with a model
-                                        one_more_step = true;
-                                        let caller = Caller {
-                                            router: self.router.clone(),
-                                            tool_call,
-                                        };
-                                        callers.push(caller.call());
-                                    }
-                                    let messages = join_all(callers).await;
-                                    extra_messages.extend(messages);
-                                } else {
-                                    extra_messages.push(message.into());
-                                }
-                            }
-                            Ok(())
-                        })
-                        .await;
-
-                    if one_more_step {
-                        request.messages.extend(extra_messages.drain(..));
-                    } else {
-                        break;
-                    }
-                }
-                Ok(())
-            })
+        let extra_messages = RequestPerformer::new(self.router.clone(), request)
+            .entrypoint()
             .await;
-
         let response = ChatResponse {
             messages: extra_messages,
         };
         Ok(response)
+    }
+}
+
+struct RequestPerformer {
+    router: RouterLink,
+    extra_messages: Vec<Message>,
+    request: ChatRequest,
+    one_more_step: bool,
+}
+
+impl RequestPerformer {
+    fn new(router: RouterLink, request: ChatRequest) -> Self {
+        Self {
+            router,
+            extra_messages: Vec::new(),
+            request,
+            one_more_step: false,
+        }
+    }
+
+    async fn entrypoint(mut self) -> Vec<Message> {
+        "Chat session".in_fut(self.chat_session()).await;
+        self.extra_messages
+    }
+
+    async fn chat_session(&mut self) -> Result<()> {
+        // The reasoning loop for calling tools
+        loop {
+            self.one_more_step = false;
+
+            "Calling the model...".in_fut(self.calling_model()).await;
+
+            if self.one_more_step {
+                self.request.messages.extend(self.extra_messages.drain(..));
+            } else {
+                break;
+            }
+        }
+        Ok(())
+    }
+
+    async fn calling_model(&mut self) -> Result<()> {
+        let model = self.router.get_model().await?;
+        let tools = self.router.get_tools().await?;
+        let request_with_tools = self.request.clone().with_tools(tools);
+        let response = model.chat(request_with_tools).await?;
+
+        for message in response.messages {
+            if message.reason.is_call() {
+                let mut callers = Vec::new();
+                for tool_call in message.tool_calls {
+                    // One more stop to process results with a model
+                    self.one_more_step = true;
+                    let caller = Caller {
+                        router: self.router.clone(),
+                        tool_call,
+                    };
+                    callers.push(caller.call());
+                }
+                let messages = join_all(callers).await;
+                self.extra_messages.extend(messages);
+            } else {
+                self.extra_messages.push(message.into());
+            }
+        }
+        Ok(())
     }
 }
 

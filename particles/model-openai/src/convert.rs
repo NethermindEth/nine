@@ -108,6 +108,7 @@ fn reason(finish_reason: Option<FinishReason>) -> Reason {
 fn tool_call_convert(call: ChatCompletionMessageToolCall) -> Result<ToolCall> {
     let args = serde_json::from_str(&call.function.arguments)?;
     Ok(ToolCall {
+        call_id: call.id,
         tool_id: call.function.name.into(),
         args,
     })
@@ -116,7 +117,7 @@ fn tool_call_convert(call: ChatCompletionMessageToolCall) -> Result<ToolCall> {
 fn tool_call_to_chat(tool_call: ToolCall) -> Result<ChatCompletionMessageToolCall> {
     let arguments = serde_json::to_string(&tool_call.args)?;
     Ok(ChatCompletionMessageToolCall {
-        id: tool_call.tool_id.clone(),
+        id: tool_call.call_id,
         r#type: ChatCompletionToolType::Function,
         function: FunctionCall {
             name: tool_call.tool_id,

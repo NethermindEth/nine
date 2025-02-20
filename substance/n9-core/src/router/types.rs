@@ -33,9 +33,7 @@ pub struct ActionableMessage {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ToolCall {
-    // TODO:
-    // CallId
-    // ToolId
+    pub call_id: CallId,
     pub tool_id: ToolId,
     pub args: Value,
 }
@@ -155,6 +153,8 @@ impl ToolingChatResponse {
         self.into()
     }
 }
+
+pub type CallId = String;
 
 pub type ToolId = String;
 

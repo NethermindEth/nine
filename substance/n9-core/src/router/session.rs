@@ -106,23 +106,28 @@ struct Caller {
 
 impl Caller {
     async fn call(self) -> Message {
+        let id = self.tool_call.id.clone();
+        let op = Operation::start(&format!("Calling the tool {id}"));
         match self.call_or_fail().await {
-            Ok(message) => message,
-            Err(err) => Message {
-                role: Role::Tool,
-                content: format!("Tool failed: {err}"),
-            },
+            Ok(message) => {
+                op.end(&format!("Tool call {id} completed"));
+                message
+            }
+            Err(err) => {
+                op.failed(&format!("Tool call {id} failed: {err}"));
+                Message {
+                    role: Role::Tool,
+                    content: format!("Tool failed: {err}"),
+                }
+            }
         }
     }
 
     async fn call_or_fail(mut self) -> Result<Message> {
-        let id = self.tool_call.id.clone();
-        let op = Operation::start(&format!("Calling the tool {id}"));
         let fetcher = self.router.get_tool(self.tool_call.id);
         let link = fetcher.await?;
         let response = link.call_tool(self.tool_call.args).await?;
         let message = Message::from(response);
-        op.end(&format!("Tool call {id} completed"));
         Ok(message)
     }
 }

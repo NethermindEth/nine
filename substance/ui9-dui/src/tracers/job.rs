@@ -51,16 +51,8 @@ impl Flow for Job {
     fn apply(&mut self, event: Self::Event) {
         match event {
             JobData::Begin { id, task } => {
-                let record = OperationRecord {
-                    task: task.into(),
-                    failures: Vec::new(),
-                };
+                let record = OperationRecord { task: task.into() };
                 self.operations.insert(id, record);
-            }
-            JobData::Failure { id, reason } => {
-                if let Some(record) = self.operations.get_mut(&id) {
-                    record.failures.push(reason);
-                }
             }
             JobData::End { id } => {
                 self.operations.remove(&id);
@@ -72,7 +64,6 @@ impl Flow for Job {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum JobData {
     Begin { id: OperationId, task: String },
-    Failure { id: OperationId, reason: String },
     End { id: OperationId },
 }
 
@@ -90,5 +81,4 @@ impl OperationId {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OperationRecord {
     pub task: String,
-    pub failures: Vec<String>,
 }

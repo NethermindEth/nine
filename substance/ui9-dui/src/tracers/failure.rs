@@ -59,5 +59,5 @@ impl Flow for Failure {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FailureData {
-    pub message: String,
+    pub reason: String,
 }

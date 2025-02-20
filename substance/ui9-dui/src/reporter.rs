@@ -23,10 +23,8 @@ pub struct Operation {
 impl Drop for Operation {
     fn drop(&mut self) {
         if let Some(message) = self.task.take() {
-            self.send_end(format!("Failed: {message}"));
             // Operations must be explicitly completed
-            let data = FailureData { message };
-            self.act_failure(data);
+            self.send_failure(&format!("Failed: {message}"));
         }
     }
 }
@@ -47,22 +45,32 @@ impl Operation {
         this
     }
 
-    pub fn failure(&mut self, reason: &str) {
-        self.act_job(JobData::Failure {
-            id: self.id,
-            reason: reason.into(),
-        });
+    pub fn failed(mut self, message: &str) {
+        self.task.take();
+        self.send_end();
+        self.send_failure(message);
     }
 
     pub fn end(mut self, message: &str) {
         self.task.take();
-        self.send_end(message.into());
+        self.send_end();
+
+        let duration = self.started.elapsed();
+        self.act_event(EventData {
+            message: message.into(),
+            duration,
+        });
     }
 
-    fn send_end(&mut self, message: String) {
-        let duration = self.started.elapsed();
+    fn send_failure(&mut self, reason: &str) {
+        let data = FailureData {
+            reason: reason.into(),
+        };
+        self.act_failure(data);
+    }
+
+    fn send_end(&mut self) {
         self.act_job(JobData::End { id: self.id });
-        self.act_event(EventData { message, duration });
     }
 
     fn act_job(&mut self, action: JobData) {

@@ -1,6 +1,7 @@
 mod component;
 mod dialog;
 mod event_log;
+mod failure;
 mod focus;
 mod job_list;
 mod markdown;
@@ -11,6 +12,7 @@ mod reason;
 pub use component::{Component, Render};
 pub use dialog::Dialog;
 pub use event_log::EventLog;
+pub use failure::FailureLog;
 pub use focus::FocusControl;
 pub use job_list::JobList;
 pub use peers_list::PeerList;

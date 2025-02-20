@@ -1,5 +1,7 @@
 use crate::layouts::{AutoLayout, TabLayout};
-use crate::widgets::{Component, Dialog, EventLog, FocusControl, JobList, Prompt, Render};
+use crate::widgets::{
+    Component, Dialog, EventLog, FailureLog, FocusControl, JobList, Prompt, Render,
+};
 use crossterm::event::KeyEvent;
 use ratatui::prelude::Direction;
 use ratatui::Frame;
@@ -18,7 +20,11 @@ impl AppState {
 
         let right_panel = AutoLayout::new(
             Direction::Vertical,
-            [(JobList::new().widget(), 1), (EventLog::new().widget(), 1)],
+            [
+                (JobList::new().widget(), 1),
+                (EventLog::new().widget(), 1),
+                (FailureLog::new().widget(), 1),
+            ],
         );
 
         let tab_main = AutoLayout::new(

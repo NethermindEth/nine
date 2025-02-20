@@ -1,4 +1,5 @@
 use crb::superagent::Request;
+use derive_more::From;
 use schemars::schema::RootSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -175,6 +176,7 @@ pub struct ToolMeta {
     pub parameters: Option<RootSchema>,
 }
 
+#[derive(Debug, Clone, From)]
 pub struct ToolResponse {
     pub content: String,
 }

@@ -4,7 +4,9 @@ use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
 use crb::core::Slot;
 use crb::superagent::{Entry, Supervisor, SupervisorSession};
-use n9_core::{ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, UpdateConfig};
+use n9_core::{
+    ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, ToolResponse, UpdateConfig,
+};
 use schemars::JsonSchema;
 use serde::Deserialize;
 
@@ -69,6 +71,7 @@ pub struct Price {
     ticker: String,
 }
 
+#[async_trait]
 impl Tool<Price> for DyDxParticle {
     fn name(&self) -> String {
         "dydx_price".into()
@@ -79,6 +82,10 @@ impl Tool<Price> for DyDxParticle {
         "This function fetches the current market price of a specified asset from a decentralized exchange (DEX). By providing a valid asset ticker, the function queries the DEX's pricing endpoint to retrieve real-time price information, ensuring up-to-date market data for further processing or display."
                 .into(),
         )
+    }
+
+    async fn call_tool(&mut self, input: Price, _ctx: &mut Context<Self>) -> Result<ToolResponse> {
+        Ok("1234.56".to_string().into())
     }
 }
 

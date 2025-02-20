@@ -36,7 +36,7 @@ pub struct ToolCall {
     // TODO:
     // CallId
     // ToolId
-    pub id: ToolId,
+    pub tool_id: ToolId,
     pub args: Value,
 }
 

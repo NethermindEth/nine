@@ -151,10 +151,10 @@ impl Caller {
     }
 
     async fn call_or_fail(mut self) -> Result<Message> {
-        let id = self.tool_call.id.clone();
+        let id = self.tool_call.tool_id.clone();
         format!("Calling the tool {id}")
             .in_fut(async {
-                let fetcher = self.router.get_tool(self.tool_call.id);
+                let fetcher = self.router.get_tool(self.tool_call.tool_id);
                 let link = fetcher.await?;
                 let response = link.call_tool(self.tool_call.args).await?;
                 let message = Message::from(response);

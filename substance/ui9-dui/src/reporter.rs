@@ -23,6 +23,7 @@ pub struct Operation {
 impl Drop for Operation {
     fn drop(&mut self) {
         if let Some(message) = self.task.take() {
+            self.close();
             // Operations must be explicitly completed
             self.send_failure(&format!("Failed: {message}"));
         }
@@ -46,14 +47,13 @@ impl Operation {
     }
 
     pub fn failed(mut self, message: &str) {
-        self.task.take();
-        self.send_end();
+        self.close();
+
         self.send_failure(message);
     }
 
     pub fn end(mut self, message: &str) {
-        self.task.take();
-        self.send_end();
+        self.close();
 
         let duration = self.started.elapsed();
         self.act_event(EventData {
@@ -69,7 +69,8 @@ impl Operation {
         self.act_failure(data);
     }
 
-    fn send_end(&mut self) {
+    fn close(&mut self) {
+        self.task.take();
         self.act_job(JobData::End { id: self.id });
     }
 

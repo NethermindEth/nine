@@ -1,3 +1,4 @@
+use super::liner::Liner;
 use crate::widgets::{Component, Reason};
 use crb::core::time::Duration;
 use ratatui::{
@@ -5,7 +6,7 @@ use ratatui::{
     layout::Rect,
     style::{Color, Style},
     text::{Line, Span},
-    widgets::{List, ListItem, Widget},
+    widgets::{List, ListItem, Paragraph, Widget, Wrap},
 };
 use ui9_app::SubState;
 use ui9_dui::tracers::failure::Failure;
@@ -31,20 +32,16 @@ impl Component for FailureLog {
         let ported = self.state.borrow();
         let state = ported.state()?;
 
-        let items: Vec<ListItem> = state
-            .events
-            .iter()
-            .rev()
-            .map(|failure| {
-                ListItem::new(vec![Line::from(vec![Span::styled(
-                    &failure.reason,
-                    Style::default().fg(Color::Red),
-                )])])
-            })
-            .collect();
+        let mut liner = Liner::new();
 
-        let list = List::new(items);
-        list.render(area, buf);
+        let mut log = String::new();
+        let items = state.events.iter().rev().for_each(|failure| {
+            liner.add_line(&failure.reason);
+        });
+
+        let paragraph = Paragraph::new(liner.text()).wrap(Wrap { trim: true });
+
+        paragraph.render(area, buf);
 
         Ok(())
     }

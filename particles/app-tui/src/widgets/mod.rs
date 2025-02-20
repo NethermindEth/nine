@@ -4,6 +4,7 @@ mod event_log;
 mod failure;
 mod focus;
 mod job_list;
+mod liner;
 mod markdown;
 mod peers_list;
 mod prompt;

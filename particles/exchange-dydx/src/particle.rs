@@ -10,6 +10,7 @@ use n9_core::{
 };
 use schemars::JsonSchema;
 use serde::Deserialize;
+use ui9_dui::Operation;
 
 pub struct DyDxParticle {
     substance: SubstanceLinks,
@@ -63,7 +64,11 @@ impl DoAsync<Initialize> for DyDxParticle {
 
 #[async_trait]
 impl UpdateConfig<DyDxConfig> for DyDxParticle {
-    async fn update_config(&mut self, _: DyDxConfig, _ctx: &mut Context<Self>) -> Result<()> {
+    async fn update_config(&mut self, config: DyDxConfig, _ctx: &mut Context<Self>) -> Result<()> {
+        let op = Operation::start("Configuring dYdX");
+        let indexer = IndexerClient::new(config.config.indexer);
+        self.indexer.refill(indexer);
+        op.end("dYdX configured");
         Ok(())
     }
 }
@@ -88,7 +93,17 @@ impl Tool<Price> for DyDxParticle {
     }
 
     async fn call_tool(&mut self, input: Price, _ctx: &mut Context<Self>) -> Result<ToolResponse> {
-        Ok("1234.56".to_string().into())
+        let ticker = input.ticker.into();
+        let price = self
+            .indexer
+            .get()?
+            .markets()
+            .get_perpetual_market(&ticker)
+            .await?
+            .oracle_price
+            .map(|x| x.to_string())
+            .unwrap_or_else(|| "No oracle price for the ticker.".to_string());
+        Ok(price.into())
     }
 }
 

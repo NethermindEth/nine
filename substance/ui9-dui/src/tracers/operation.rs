@@ -4,9 +4,59 @@ use crate::tracers::failure::{Failure, FailureData};
 use crate::tracers::job::{Job, JobData, OperationId};
 use crate::Act;
 use anyhow::Result;
+use async_trait::async_trait;
 use chrono::{DateTime, Local};
 use crb::core::time::Instant;
 use futures::Future;
+
+pub trait Operate {
+    fn in_fn<F, T>(self, func: F) -> Result<T>
+    where
+        F: Fn() -> Result<T>;
+
+    async fn in_fut<F, T>(self, fut: F) -> Result<T>
+    where
+        F: Future<Output = Result<T>>;
+}
+
+impl<O> Operate for O
+where
+    O: AsRef<str>,
+{
+    fn in_fn<F, T>(self, func: F) -> Result<T>
+    where
+        F: Fn() -> Result<T>,
+    {
+        let op = Operation::start(self.as_ref());
+        match func() {
+            Ok(value) => {
+                op.end(self.as_ref());
+                Ok(value)
+            }
+            Err(err) => {
+                op.failed(&err.to_string());
+                Err(err)
+            }
+        }
+    }
+
+    async fn in_fut<F, T>(self, fut: F) -> Result<T>
+    where
+        F: Future<Output = Result<T>>,
+    {
+        let op = Operation::start(self.as_ref());
+        match fut.await {
+            Ok(value) => {
+                op.end(self.as_ref());
+                Ok(value)
+            }
+            Err(err) => {
+                op.failed(&err.to_string());
+                Err(err)
+            }
+        }
+    }
+}
 
 pub struct Operation {
     timestamp: DateTime<Local>,
@@ -27,40 +77,6 @@ impl Drop for Operation {
 }
 
 impl Operation {
-    pub fn scoped_fn<F, T>(task: &str, func: F) -> Result<T>
-    where
-        F: Fn() -> Result<T>,
-    {
-        let op = Operation::start(task);
-        match func() {
-            Ok(value) => {
-                op.end(task);
-                Ok(value)
-            }
-            Err(err) => {
-                op.failed(&err.to_string());
-                Err(err)
-            }
-        }
-    }
-
-    pub async fn scoped_fut<F, T>(task: &str, fut: F) -> Result<T>
-    where
-        F: Future<Output = Result<T>>,
-    {
-        let op = Operation::start(task);
-        match fut.await {
-            Ok(value) => {
-                op.end(task);
-                Ok(value)
-            }
-            Err(err) => {
-                op.failed(&err.to_string());
-                Err(err)
-            }
-        }
-    }
-
     pub fn start(task: &str) -> Self {
         let id = OperationId::new();
         let mut this = Self {

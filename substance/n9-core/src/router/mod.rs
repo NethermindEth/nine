@@ -13,7 +13,7 @@ use session::{ReasoningSession, SessionLink};
 use std::collections::HashMap;
 use tool::ToolRecord;
 use typed_slab::TypedSlab;
-use types::{ChatRequest, ChatResponse, ToolId};
+use types::{ChatResponse, ToolId};
 
 #[derive(From, Into)]
 pub struct ReqId(usize);

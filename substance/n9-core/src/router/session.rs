@@ -1,11 +1,12 @@
 use super::tool::ToolLink;
-use super::types::{ChatRequest, ChatResponse, Message, Reason, Role, ToolResponse};
+use super::types::{ChatRequest, ChatResponse, Message, Role, ToolCall};
 use super::RouterLink;
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};
 use crb::superagent::{Fetcher, InteractExt, OnRequest};
-use derive_more::{Deref, DerefMut, From};
+use derive_more::{Deref, DerefMut};
+use futures::future::join_all;
 use serde_json::Value;
 use ui9_dui::Operation;
 
@@ -66,21 +67,18 @@ impl OnRequest<ChatRequest> for ReasoningSession {
 
             for message in response.messages {
                 if message.reason.is_call() {
+                    let mut callers = Vec::new();
                     for tool_call in message.tool_calls {
+                        // One more stop to process results with a model
                         one_more_step = true;
-                        // TODO: Wrap that into a closure
-                        let tool_id = tool_call.id.clone();
-                        let op = Operation::start(&format!("Calling the tool {tool_id}"));
-                        let tool_fetcher = self.router.get_tool(tool_call.id);
                         let caller = Caller {
-                            tool_fetcher,
-                            args: tool_call.args,
+                            router: self.router.clone(),
+                            tool_call,
                         };
-                        let message = caller.call().await;
-                        // TODO: Report to operation if failed
-                        extra_messages.push(message);
-                        op.end(&format!("Tool call {tool_id} completed"));
+                        callers.push(caller.call());
                     }
+                    let messages = join_all(callers).await;
+                    extra_messages.extend(messages);
                 } else {
                     extra_messages.push(message.into());
                 }
@@ -102,8 +100,8 @@ impl OnRequest<ChatRequest> for ReasoningSession {
 }
 
 struct Caller {
-    tool_fetcher: Fetcher<ToolLink>,
-    args: Value,
+    router: RouterLink,
+    tool_call: ToolCall,
 }
 
 impl Caller {
@@ -117,10 +115,14 @@ impl Caller {
         }
     }
 
-    async fn call_or_fail(self) -> Result<Message> {
-        let link = self.tool_fetcher.await?;
-        let response = link.call_tool(self.args).await?;
+    async fn call_or_fail(mut self) -> Result<Message> {
+        let id = self.tool_call.id.clone();
+        let op = Operation::start(&format!("Calling the tool {id}"));
+        let fetcher = self.router.get_tool(self.tool_call.id);
+        let link = fetcher.await?;
+        let response = link.call_tool(self.tool_call.args).await?;
         let message = Message::from(response);
+        op.end(&format!("Tool call {id} completed"));
         Ok(message)
     }
 }

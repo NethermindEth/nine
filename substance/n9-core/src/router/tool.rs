@@ -1,6 +1,6 @@
 use super::types::{ToolId, ToolInfo, ToolMeta, ToolResponse};
 use super::{ReasoningRouter, RouterLink};
-use anyhow::{anyhow, Error, Result};
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, MessageFor};
 use crb::send::{Recipient, Sender};

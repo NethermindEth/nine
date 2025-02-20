@@ -89,7 +89,11 @@ impl OnRequest<ToolingChatRequest> for OpenAIParticle {
         let client = self.client.get_mut()?;
 
         // TODO: Sequental, but could be executed in the reactor
-        let messages: Vec<_> = request.messages.into_iter().map(convert::message).collect();
+        let messages: Vec<_> = request
+            .messages
+            .into_iter()
+            .map(convert::message)
+            .collect::<Result<_>>()?;
 
         let tools: Vec<_> = request.tools.into_iter().map(convert::tool).collect();
 

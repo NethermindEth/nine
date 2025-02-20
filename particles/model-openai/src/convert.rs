@@ -9,8 +9,8 @@ use serde_json::Value;
 // REQUESTS
 
 /// From N9 to OpenAI
-pub fn message(from: MessageN9) -> ChatCompletionRequestMessage {
-    match from.role {
+pub fn message(from: MessageN9) -> Result<ChatCompletionRequestMessage> {
+    let msg = match from.role {
         RoleN9::Developer => {
             let mut message = ChatCompletionRequestSystemMessage::default();
             let content = ChatCompletionRequestSystemMessageContent::Text(from.content);
@@ -27,6 +27,12 @@ pub fn message(from: MessageN9) -> ChatCompletionRequestMessage {
             let mut message = ChatCompletionRequestAssistantMessage::default();
             let content = ChatCompletionRequestAssistantMessageContent::Text(from.content);
             message.content = Some(content);
+            let calls = from
+                .tool_calls
+                .into_iter()
+                .map(tool_call_to_chat)
+                .collect::<Result<_>>()?;
+            message.tool_calls = Some(calls);
             ChatCompletionRequestMessage::from(message)
         }
         RoleN9::Tool => {
@@ -35,7 +41,8 @@ pub fn message(from: MessageN9) -> ChatCompletionRequestMessage {
             message.content = content;
             ChatCompletionRequestMessage::from(message)
         }
-    }
+    };
+    Ok(msg)
 }
 
 pub fn tool(info: ToolInfo) -> ChatCompletionTool {
@@ -103,6 +110,18 @@ fn tool_call_convert(call: ChatCompletionMessageToolCall) -> Result<ToolCall> {
     Ok(ToolCall {
         id: call.function.name.into(),
         args,
+    })
+}
+
+fn tool_call_to_chat(tool_call: ToolCall) -> Result<ChatCompletionMessageToolCall> {
+    let arguments = serde_json::to_string(&tool_call.args)?;
+    Ok(ChatCompletionMessageToolCall {
+        id: tool_call.id.clone(),
+        r#type: ChatCompletionToolType::Function,
+        function: FunctionCall {
+            name: tool_call.id,
+            arguments,
+        },
     })
 }
 

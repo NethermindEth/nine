@@ -33,6 +33,9 @@ pub struct ActionableMessage {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ToolCall {
+    // TODO:
+    // CallId
+    // ToolId
     pub id: ToolId,
     pub args: Value,
 }

@@ -4,7 +4,6 @@ use crate::tracers::failure::{Failure, FailureData};
 use crate::tracers::job::{Job, JobData, OperationId};
 use crate::Act;
 use anyhow::Result;
-use async_trait::async_trait;
 use chrono::{DateTime, Local};
 use crb::core::time::Instant;
 use futures::Future;

@@ -54,48 +54,52 @@ impl OnRequest<ChatRequest> for ReasoningSession {
         mut request: ChatRequest,
         ctx: &mut Context<Self>,
     ) -> Result<ChatResponse> {
-        let op = Operation::start("Chat session in progress...");
         let mut extra_messages = Vec::new();
-        // The reasoning loop for calling tools
-        loop {
-            let mut one_more_step = false;
 
-            "Calling the model..."
-                .in_fut(async {
-                    let model = self.router.get_model().await?;
-                    let tools = self.router.get_tools().await?;
-                    let request_with_tools = request.clone().with_tools(tools);
-                    let response = model.chat(request_with_tools).await?;
+        "Chat session"
+            .in_fut(async {
+                // The reasoning loop for calling tools
+                loop {
+                    let mut one_more_step = false;
 
-                    for message in response.messages {
-                        if message.reason.is_call() {
-                            let mut callers = Vec::new();
-                            for tool_call in message.tool_calls {
-                                // One more stop to process results with a model
-                                one_more_step = true;
-                                let caller = Caller {
-                                    router: self.router.clone(),
-                                    tool_call,
-                                };
-                                callers.push(caller.call());
+                    "Calling the model..."
+                        .in_fut(async {
+                            let model = self.router.get_model().await?;
+                            let tools = self.router.get_tools().await?;
+                            let request_with_tools = request.clone().with_tools(tools);
+                            let response = model.chat(request_with_tools).await?;
+
+                            for message in response.messages {
+                                if message.reason.is_call() {
+                                    let mut callers = Vec::new();
+                                    for tool_call in message.tool_calls {
+                                        // One more stop to process results with a model
+                                        one_more_step = true;
+                                        let caller = Caller {
+                                            router: self.router.clone(),
+                                            tool_call,
+                                        };
+                                        callers.push(caller.call());
+                                    }
+                                    let messages = join_all(callers).await;
+                                    extra_messages.extend(messages);
+                                } else {
+                                    extra_messages.push(message.into());
+                                }
                             }
-                            let messages = join_all(callers).await;
-                            extra_messages.extend(messages);
-                        } else {
-                            extra_messages.push(message.into());
-                        }
-                    }
-                    Ok(())
-                })
-                .await;
+                            Ok(())
+                        })
+                        .await;
 
-            if one_more_step {
-                request.messages.extend(extra_messages.drain(..));
-            } else {
-                break;
-            }
-        }
-        op.end("Chat session completed");
+                    if one_more_step {
+                        request.messages.extend(extra_messages.drain(..));
+                    } else {
+                        break;
+                    }
+                }
+                Ok(())
+            })
+            .await;
 
         let response = ChatResponse {
             messages: extra_messages,
@@ -111,28 +115,25 @@ struct Caller {
 
 impl Caller {
     async fn call(self) -> Message {
-        let id = self.tool_call.id.clone();
-        let op = Operation::start(&format!("Calling the tool {id}"));
         match self.call_or_fail().await {
-            Ok(message) => {
-                op.end(&format!("Tool call {id} completed"));
-                message
-            }
-            Err(err) => {
-                op.failed(&format!("Tool call {id} failed: {err}"));
-                Message {
-                    role: Role::Tool,
-                    content: format!("Tool failed: {err}"),
-                }
-            }
+            Ok(message) => message,
+            Err(err) => Message {
+                role: Role::Tool,
+                content: format!("Tool failed: {err}"),
+            },
         }
     }
 
     async fn call_or_fail(mut self) -> Result<Message> {
-        let fetcher = self.router.get_tool(self.tool_call.id);
-        let link = fetcher.await?;
-        let response = link.call_tool(self.tool_call.args).await?;
-        let message = Message::from(response);
-        Ok(message)
+        let id = self.tool_call.id.clone();
+        format!("Calling the tool {id}")
+            .in_fut(async {
+                let fetcher = self.router.get_tool(self.tool_call.id);
+                let link = fetcher.await?;
+                let response = link.call_tool(self.tool_call.args).await?;
+                let message = Message::from(response);
+                Ok(message)
+            })
+            .await
     }
 }

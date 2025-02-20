@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
 use crb::core::Slot;
 use crb::superagent::{Entry, Supervisor, SupervisorSession};
+use dydx::indexer::IndexerClient;
 use n9_core::{
     ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, ToolResponse, UpdateConfig,
 };
@@ -14,6 +15,7 @@ pub struct DyDxParticle {
     substance: SubstanceLinks,
     config_updates: Option<Entry<ConfigSegmentUpdates>>,
     bond: Slot<SubstanceBond<Self>>,
+    indexer: Slot<IndexerClient>,
 }
 
 impl Supervisor for DyDxParticle {
@@ -27,6 +29,7 @@ impl Particle for DyDxParticle {
             substance,
             config_updates: None,
             bond: Slot::empty(),
+            indexer: Slot::empty(),
         }
     }
 }

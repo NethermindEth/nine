@@ -7923,6 +7923,7 @@ dependencies = [
  "chrono",
  "crb",
  "derive_more 2.0.1",
+ "futures",
  "log",
  "serde",
  "tokio-stream",

@@ -8,6 +8,7 @@ use chrono::{DateTime, Local};
 use crb::agent::{Agent, Context, DoAsync, Next, OnEvent};
 use crb::core::time::Instant;
 use crb::superagent::{AgentBridge, StreamSession};
+use futures::Future;
 use std::sync::LazyLock;
 
 static LOG_BRIDGE: LazyLock<AgentBridge<Reporter>> = LazyLock::new(|| AgentBridge::new());
@@ -31,6 +32,40 @@ impl Drop for Operation {
 }
 
 impl Operation {
+    pub fn wrap_fn<F, T>(task: &str, func: F) -> Result<T>
+    where
+        F: Fn() -> Result<T>,
+    {
+        let op = Operation::start(task);
+        match func() {
+            Ok(value) => {
+                op.end(task);
+                Ok(value)
+            }
+            Err(err) => {
+                op.failed(&err.to_string());
+                Err(err)
+            }
+        }
+    }
+
+    pub async fn wrap_fut<F, T>(task: &str, fut: F) -> Result<T>
+    where
+        F: Future<Output = Result<T>>,
+    {
+        let op = Operation::start(task);
+        match fut.await {
+            Ok(value) => {
+                op.end(task);
+                Ok(value)
+            }
+            Err(err) => {
+                op.failed(&err.to_string());
+                Err(err)
+            }
+        }
+    }
+
     pub fn start(task: &str) -> Self {
         let id = OperationId::new();
         let mut this = Self {

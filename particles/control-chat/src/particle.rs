@@ -75,6 +75,7 @@ impl DoAsync<SendRequest> for ChatParticle {
     }
 
     async fn fallback(&mut self, err: Error) -> Next<Self> {
+        self.chat.thinking(false);
         // TODO: Operation failure reporting here
         Next::events()
     }
@@ -96,6 +97,7 @@ impl DoAsync<WaitResponse> for ChatParticle {
     }
 
     async fn fallback(&mut self, err: Error) -> Next<Self> {
+        self.chat.thinking(false);
         // TODO: Operation failure reporting here
         Next::events()
     }

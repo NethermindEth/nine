@@ -1,5 +1,5 @@
 use crate::flow::{Chat, ChatAction, Role};
-use anyhow::Result;
+use anyhow::{Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
 use crb::superagent::{Fetcher, StreamSession, Supervisor};
@@ -73,6 +73,11 @@ impl DoAsync<SendRequest> for ChatParticle {
         let state = WaitResponse { req };
         Ok(Next::do_async(state))
     }
+
+    async fn fallback(&mut self, err: Error) -> Next<Self> {
+        // TODO: Operation failure reporting here
+        Next::events()
+    }
 }
 
 struct WaitResponse {
@@ -88,5 +93,10 @@ impl DoAsync<WaitResponse> for ChatParticle {
         self.chat.thinking(false);
         op.end("Response received");
         Ok(Next::events())
+    }
+
+    async fn fallback(&mut self, err: Error) -> Next<Self> {
+        // TODO: Operation failure reporting here
+        Next::events()
     }
 }

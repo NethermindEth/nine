@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use ui9::names::Fqn;
 
-static LIMIT: usize = 10;
+static LIMIT: usize = 64;
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct EventSub {

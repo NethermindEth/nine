@@ -41,7 +41,9 @@ pub struct ToolCall {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Message {
     pub role: Role,
+    // TODO: Use enum here, since options are different
     pub content: String,
+    pub call_id: Option<CallId>,
     pub tool_calls: Vec<ToolCall>,
 }
 
@@ -51,11 +53,12 @@ impl From<ActionableMessage> for Message {
     }
 }
 
-impl From<ToolResponse> for Message {
-    fn from(response: ToolResponse) -> Self {
+impl From<(CallId, ToolResponse)> for Message {
+    fn from((call_id, response): (CallId, ToolResponse)) -> Self {
         Self {
             role: Role::Tool,
             content: response.content,
+            call_id: Some(call_id),
             tool_calls: Vec::new(),
         }
     }
@@ -80,6 +83,7 @@ impl ChatRequest {
         let message = Message {
             role: Role::User,
             content: text.to_string(),
+            call_id: None,
             tool_calls: Vec::new(),
         };
         Self {

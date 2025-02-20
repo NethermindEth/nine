@@ -47,6 +47,7 @@ pub fn choice(from: &serde_json::Value) -> Option<ActionableMessage> {
     let message = ModelMessage {
         role,
         content,
+        call_id: None,
         tool_calls: Vec::new(),
     };
     let actionable = ActionableMessage {

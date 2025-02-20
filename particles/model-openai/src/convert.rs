@@ -39,6 +39,8 @@ pub fn message(from: MessageN9) -> Result<ChatCompletionRequestMessage> {
             let mut message = ChatCompletionRequestToolMessage::default();
             let content = ChatCompletionRequestToolMessageContent::Text(from.content);
             message.content = content;
+            // TODO: Use enum instead
+            message.tool_call_id = from.call_id.unwrap_or_default();
             ChatCompletionRequestMessage::from(message)
         }
     };
@@ -82,6 +84,7 @@ pub fn choice(from: ChatChoice) -> Result<ActionableMessage> {
     let message = MessageN9 {
         role,
         content,
+        call_id: None,
         tool_calls,
     };
     let actionable = ActionableMessage {

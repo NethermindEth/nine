@@ -140,11 +140,13 @@ struct Caller {
 
 impl Caller {
     async fn call(self) -> Message {
+        let call_id = self.tool_call.call_id.clone();
         match self.call_or_fail().await {
             Ok(message) => message,
             Err(err) => Message {
                 role: Role::Tool,
                 content: format!("Tool failed: {err}"),
+                call_id: Some(call_id),
                 tool_calls: Vec::new(),
             },
         }
@@ -157,7 +159,7 @@ impl Caller {
                 let fetcher = self.router.get_tool(self.tool_call.tool_id);
                 let link = fetcher.await?;
                 let response = link.call_tool(self.tool_call.args).await?;
-                let message = Message::from(response);
+                let message = Message::from((self.tool_call.call_id, response));
                 Ok(message)
             })
             .await

@@ -15,15 +15,19 @@ use std::any::type_name;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub trait CallParameters: JsonSchema + DeserializeOwned + Send + 'static {}
+pub trait ToolInput: ToolData {
+    type ToolOutput: ToolData;
+}
 
-impl<T> CallParameters for T where T: JsonSchema + DeserializeOwned + Send + 'static {}
+pub trait ToolData: JsonSchema + DeserializeOwned + Send + 'static {}
+
+impl<T> ToolData for T where T: JsonSchema + DeserializeOwned + Send + 'static {}
 
 #[async_trait]
 pub trait Tool<P>
 where
     Self: Agent,
-    P: CallParameters,
+    P: ToolData,
 {
     fn name(&self) -> String {
         // TODO: Use `const_str!`
@@ -88,7 +92,7 @@ struct ToolLinkRaw<P> {
 
 impl<P> ToolAddress for ToolLinkRaw<P>
 where
-    P: CallParameters,
+    P: ToolData,
 {
     fn call_tool(&self, value: Value) -> Fetcher<ToolResponse> {
         let request = ToolRequest { value };
@@ -107,7 +111,7 @@ impl RouterLink {
     pub async fn add_tool<A, P>(&mut self, addr: Address<A>, meta: ToolMeta) -> Result<ToolId>
     where
         A: Tool<P>,
-        P: CallParameters,
+        P: ToolData,
     {
         let raw_link = ToolLinkRaw {
             recipient: addr.sender(),
@@ -181,7 +185,7 @@ struct CallTool<P> {
 impl<A, P> MessageFor<A> for CallTool<P>
 where
     A: Tool<P>,
-    P: CallParameters,
+    P: ToolData,
 {
     async fn handle(self: Box<Self>, agent: &mut A, ctx: &mut Context<A>) -> Result<()> {
         agent.handle_request(self.interaction, ctx).await

@@ -8,7 +8,7 @@ use dydx::indexer::IndexerClient;
 use n9_core::{
     ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, ToolResponse, UpdateConfig,
 };
-use n9_exchange::nominals::Price;
+use n9_exchange::nominals::{Price, Tickers};
 use schemars::JsonSchema;
 use serde::Deserialize;
 use ui9_dui::Operation;
@@ -100,6 +100,21 @@ impl Tool<Price> for DyDxParticle {
             .map(|x| x.to_string())
             .unwrap_or_else(|| "No oracle price for the ticker.".to_string());
         Ok(price.into())
+    }
+}
+
+#[async_trait]
+impl Tool<Tickers> for DyDxParticle {
+    fn name(&self) -> String {
+        "dydx_tickers".into()
+    }
+
+    fn description(&self) -> Option<String> {
+        Some(
+            "This function retrieves a list of all available stock or cryptocurrency tickers from a specified exchange.
+            It allows an AI system to access up-to-date market symbols for various financial instruments,
+            such as pairs of cryptocurrencies or futures.".into()
+        )
     }
 }
 

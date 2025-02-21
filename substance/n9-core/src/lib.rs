@@ -11,7 +11,7 @@ pub use essence::SubstanceLinks;
 pub use keeper::subscription::{ConfigSegmentUpdates, UpdateConfig};
 pub use keeper::{Config, Keeper, KeeperLink};
 pub use router::model::{Model, ModelLink};
-pub use router::tool::{Tool, ToolLink};
+pub use router::tool::{Tool, ToolInput, ToolLink};
 pub use router::types::{
     ActionableMessage, ChatRequest, ChatResponse, Message, Reason, Role, ToolCall, ToolInfo,
     ToolMeta, ToolResponse, ToolingChatRequest, ToolingChatResponse,

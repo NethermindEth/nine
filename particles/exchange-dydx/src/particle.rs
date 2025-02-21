@@ -6,7 +6,8 @@ use crb::core::Slot;
 use crb::superagent::{Entry, Supervisor, SupervisorSession};
 use dydx::indexer::IndexerClient;
 use n9_core::{
-    ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, ToolResponse, UpdateConfig,
+    ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, ToolInput, ToolResponse,
+    UpdateConfig,
 };
 use n9_exchange::nominals::{Price, Tickers};
 use schemars::JsonSchema;
@@ -121,6 +122,10 @@ impl Tool<Tickers> for DyDxParticle {
 #[derive(Deserialize, JsonSchema)]
 pub struct Trade {
     ticker: String,
+}
+
+impl ToolInput for Trade {
+    type ToolOutput = ();
 }
 
 impl Tool<Trade> for DyDxParticle {}

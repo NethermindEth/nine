@@ -3,7 +3,7 @@ use crate::keeper::subscription::ConfigSegmentUpdates;
 use crate::keeper::{subscription::UpdateConfig, Config};
 use crate::router::{
     model::Model,
-    tool::{Tool, ToolData},
+    tool::{Tool, ToolInput},
     types::ToolMeta,
 };
 use anyhow::Result;
@@ -58,7 +58,7 @@ impl<A: Agent> SubstanceBond<A> {
     pub async fn add_tool<P>(&mut self, tool: &A) -> Result<()>
     where
         A: Tool<P>,
-        P: ToolData,
+        P: ToolInput,
     {
         let address = self.address.clone();
         let meta = ToolMeta {

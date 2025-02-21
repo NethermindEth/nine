@@ -15,8 +15,8 @@ use std::any::type_name;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub trait ToolInput: ToolData {
-    type ToolOutput: ToolData;
+pub trait Prompt: ToolData {
+    type Output: ToolData;
 }
 
 pub trait ToolData: JsonSchema + Serialize + DeserializeOwned + Send + 'static {}
@@ -27,7 +27,7 @@ impl<T> ToolData for T where T: JsonSchema + Serialize + DeserializeOwned + Send
 pub trait Tool<P>
 where
     Self: Agent,
-    P: ToolInput,
+    P: Prompt,
 {
     fn name(&self) -> String {
         // TODO: Use `const_str!`
@@ -74,7 +74,7 @@ where
         responder.send_result(Ok(res))
     }
 
-    async fn call_tool(&mut self, _input: P, _ctx: &mut Context<Self>) -> Result<P::ToolOutput> {
+    async fn call_tool(&mut self, _input: P, _ctx: &mut Context<Self>) -> Result<P::Output> {
         Err(anyhow!("Not implemented"))
     }
 }
@@ -94,7 +94,7 @@ struct ToolLinkRaw<P> {
 
 impl<P> ToolAddress for ToolLinkRaw<P>
 where
-    P: ToolInput,
+    P: Prompt,
 {
     fn call_tool(&self, value: Value) -> Fetcher<ToolResponse> {
         let request = ToolRequest { value };
@@ -113,7 +113,7 @@ impl RouterLink {
     pub async fn add_tool<A, P>(&mut self, addr: Address<A>, meta: ToolMeta) -> Result<ToolId>
     where
         A: Tool<P>,
-        P: ToolInput,
+        P: Prompt,
     {
         let raw_link = ToolLinkRaw {
             recipient: addr.sender(),
@@ -187,7 +187,7 @@ struct CallTool<P> {
 impl<A, P> MessageFor<A> for CallTool<P>
 where
     A: Tool<P>,
-    P: ToolInput,
+    P: Prompt,
 {
     async fn handle(self: Box<Self>, agent: &mut A, ctx: &mut Context<A>) -> Result<()> {
         agent.handle_request(self.interaction, ctx).await

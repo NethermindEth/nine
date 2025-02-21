@@ -1,12 +1,12 @@
-use n9_core::ToolInput;
+use n9_core::Prompt;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct Tickers;
 
-impl ToolInput for Tickers {
-    type ToolOutput = Vec<String>;
+impl Prompt for Tickers {
+    type Output = Vec<String>;
 }
 
 #[derive(Deserialize, Serialize, JsonSchema)]
@@ -16,7 +16,7 @@ pub struct Price {
     pub ticker: String,
 }
 
-impl ToolInput for Price {
+impl Prompt for Price {
     // TODO: Use BigDecimal instead
-    type ToolOutput = String;
+    type Output = String;
 }

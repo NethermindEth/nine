@@ -6,7 +6,7 @@ use crb::core::Slot;
 use crb::superagent::{Entry, Supervisor, SupervisorSession};
 use dydx::indexer::IndexerClient;
 use n9_core::{
-    ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, ToolInput, ToolResponse,
+    ConfigSegmentUpdates, Particle, Prompt, SubstanceBond, SubstanceLinks, Tool, ToolResponse,
     UpdateConfig,
 };
 use n9_exchange::nominals::{Price, Tickers};
@@ -124,8 +124,8 @@ pub struct Trade {
     ticker: String,
 }
 
-impl ToolInput for Trade {
-    type ToolOutput = ();
+impl Prompt for Trade {
+    type Output = ();
 }
 
 impl Tool<Trade> for DyDxParticle {}

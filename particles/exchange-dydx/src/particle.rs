@@ -11,7 +11,7 @@ use n9_core::{
 };
 use n9_exchange::nominals::{Price, Tickers};
 use schemars::JsonSchema;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use ui9_dui::Operation;
 
 pub struct DyDxParticle {
@@ -119,7 +119,7 @@ impl Tool<Tickers> for DyDxParticle {
     }
 }
 
-#[derive(Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 pub struct Trade {
     ticker: String,
 }

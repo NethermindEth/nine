@@ -9,7 +9,7 @@ use crb::superagent::{
 };
 use derive_more::{Deref, DerefMut};
 use schemars::{schema::RootSchema, schema_for, JsonSchema};
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Serialize};
 use serde_json::Value;
 use std::any::type_name;
 use std::marker::PhantomData;
@@ -19,9 +19,9 @@ pub trait ToolInput: ToolData {
     type ToolOutput: ToolData;
 }
 
-pub trait ToolData: JsonSchema + DeserializeOwned + Send + 'static {}
+pub trait ToolData: JsonSchema + Serialize + DeserializeOwned + Send + 'static {}
 
-impl<T> ToolData for T where T: JsonSchema + DeserializeOwned + Send + 'static {}
+impl<T> ToolData for T where T: JsonSchema + Serialize + DeserializeOwned + Send + 'static {}
 
 #[async_trait]
 pub trait Tool<P>

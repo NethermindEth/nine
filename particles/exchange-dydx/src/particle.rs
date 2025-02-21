@@ -89,7 +89,7 @@ impl Tool<Price> for DyDxParticle {
         )
     }
 
-    async fn call_tool(&mut self, input: Price, _ctx: &mut Context<Self>) -> Result<ToolResponse> {
+    async fn call_tool(&mut self, input: Price, _ctx: &mut Context<Self>) -> Result<String> {
         let ticker = input.ticker.into();
         let price = self
             .indexer
@@ -100,7 +100,7 @@ impl Tool<Price> for DyDxParticle {
             .oracle_price
             .map(|x| x.to_string())
             .unwrap_or_else(|| "No oracle price for the ticker.".to_string());
-        Ok(price.into())
+        Ok(price)
     }
 }
 

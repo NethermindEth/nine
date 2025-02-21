@@ -68,11 +68,13 @@ where
         responder: Responder<ToolResponse>,
         ctx: &mut Context<Self>,
     ) -> Result<()> {
-        let res = self.call_tool(msg, ctx).await;
-        responder.send_result(res)
+        let output = self.call_tool(msg, ctx).await?;
+        let content = serde_json::to_string(&output)?;
+        let res = ToolResponse { content };
+        responder.send_result(Ok(res))
     }
 
-    async fn call_tool(&mut self, _input: P, _ctx: &mut Context<Self>) -> Result<ToolResponse> {
+    async fn call_tool(&mut self, _input: P, _ctx: &mut Context<Self>) -> Result<P::ToolOutput> {
         Err(anyhow!("Not implemented"))
     }
 }

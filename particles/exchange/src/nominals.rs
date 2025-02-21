@@ -17,5 +17,6 @@ pub struct Price {
 }
 
 impl ToolInput for Price {
+    // TODO: Use BigDecimal instead
     type ToolOutput = String;
 }

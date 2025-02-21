@@ -4735,6 +4735,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-kit"
+version = "0.0.1"
+dependencies = [
+ "crb",
+]
+
+[[package]]
 name = "n9-model-anthropic"
 version = "0.0.1"
 dependencies = [

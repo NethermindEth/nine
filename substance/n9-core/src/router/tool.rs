@@ -196,7 +196,7 @@ impl Request for GetTools {
 
 #[async_trait]
 impl OnRequest<GetTools> for ReasoningRouter {
-    async fn on_request(&mut self, _: GetTools, ctx: &mut Context<Self>) -> Result<Vec<ToolInfo>> {
+    async fn on_request(&mut self, _: GetTools, _ctx: &mut Context<Self>) -> Result<Vec<ToolInfo>> {
         // TODO: Keep info in `Arc`s
         Ok(self
             .tools
@@ -216,7 +216,7 @@ impl Request for GetTool {
 
 #[async_trait]
 impl OnRequest<GetTool> for ReasoningRouter {
-    async fn on_request(&mut self, msg: GetTool, ctx: &mut Context<Self>) -> Result<ToolLink> {
+    async fn on_request(&mut self, msg: GetTool, _ctx: &mut Context<Self>) -> Result<ToolLink> {
         self.tools
             .get(&msg.id)
             .map(|record| record.link.clone())

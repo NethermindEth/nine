@@ -49,12 +49,12 @@ impl Agent for ReasoningSession {
 impl OnRequest<ChatRequest> for ReasoningSession {
     async fn on_request(
         &mut self,
-        mut request: ChatRequest,
-        ctx: &mut Context<Self>,
+        request: ChatRequest,
+        _ctx: &mut Context<Self>,
     ) -> Result<ChatResponse> {
         let extra_messages = RequestPerformer::new(self.router.clone(), request)
             .entrypoint()
-            .await;
+            .await?;
         let response = ChatResponse {
             messages: extra_messages,
         };
@@ -79,9 +79,9 @@ impl RequestPerformer {
         }
     }
 
-    async fn entrypoint(mut self) -> Vec<Message> {
-        "Chat session".in_fut(self.chat_session()).await;
-        self.extra_messages
+    async fn entrypoint(mut self) -> Result<Vec<Message>> {
+        "Chat session".in_fut(self.chat_session()).await?;
+        Ok(self.extra_messages)
     }
 
     async fn chat_session(&mut self) -> Result<()> {
@@ -89,7 +89,7 @@ impl RequestPerformer {
         loop {
             self.one_more_step = false;
 
-            "Calling the model...".in_fut(self.calling_model()).await;
+            "Calling the model...".in_fut(self.calling_model()).await?;
 
             if self.one_more_step {
                 self.request.messages.extend(self.extra_messages.drain(..));

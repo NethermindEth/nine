@@ -70,7 +70,7 @@ impl Request for GetModel {
 
 #[async_trait]
 impl OnRequest<GetModel> for ReasoningRouter {
-    async fn on_request(&mut self, _: GetModel, ctx: &mut Context<Self>) -> Result<ModelLink> {
+    async fn on_request(&mut self, _: GetModel, _ctx: &mut Context<Self>) -> Result<ModelLink> {
         self.models
             .first()
             .cloned()

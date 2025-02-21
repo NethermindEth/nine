@@ -17,7 +17,7 @@ impl<'a> Liner<'a> {
         self.all_lines.push(Line::from(line));
     }
 
-    pub fn text(mut self) -> Text<'a> {
+    pub fn text(self) -> Text<'a> {
         Text::from(self.all_lines)
     }
 }

@@ -4725,6 +4725,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-exchange-nominal"
+version = "0.0.1"
+dependencies = [
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "n9-model-anthropic"
 version = "0.0.1"
 dependencies = [

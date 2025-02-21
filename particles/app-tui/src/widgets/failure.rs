@@ -31,7 +31,6 @@ impl Component for FailureLog {
 
         let mut liner = Liner::new();
 
-        let mut log = String::new();
         let items = state.events.iter().rev().for_each(|failure| {
             liner.add_line(&failure.reason);
         });

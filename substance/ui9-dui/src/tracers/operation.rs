@@ -8,6 +8,7 @@ use chrono::{DateTime, Local};
 use crb::core::time::Instant;
 use futures::Future;
 
+#[allow(async_fn_in_trait)]
 pub trait Operate {
     fn in_fn<F, T>(self, func: F) -> Result<T>
     where

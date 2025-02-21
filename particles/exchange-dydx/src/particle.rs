@@ -8,6 +8,7 @@ use dydx::indexer::IndexerClient;
 use n9_core::{
     ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Tool, ToolResponse, UpdateConfig,
 };
+use n9_exchange::nominals::Price;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use ui9_dui::Operation;
@@ -71,12 +72,6 @@ impl UpdateConfig<DyDxConfig> for DyDxParticle {
         op.end("dYdX configured");
         Ok(())
     }
-}
-
-#[derive(Deserialize, JsonSchema)]
-pub struct Price {
-    /// The unique symbol representing the asset whose price is being queried (e.g., "BTC", "ETH").
-    ticker: String,
 }
 
 #[async_trait]

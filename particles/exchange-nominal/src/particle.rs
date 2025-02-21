@@ -1,2 +1,1 @@
-pub struct NominalExchangeParticle {
-}
+pub struct NominalExchangeParticle {}

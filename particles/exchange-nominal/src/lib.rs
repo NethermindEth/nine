@@ -1,5 +1,5 @@
 mod config;
+pub mod nominals;
 mod particle;
-mod nominals;
 
 pub use particle::NominalExchangeParticle;

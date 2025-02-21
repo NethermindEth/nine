@@ -4709,6 +4709,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-exchange"
+version = "0.0.1"
+dependencies = [
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "n9-exchange-dydx"
 version = "0.0.1"
 dependencies = [
@@ -4718,18 +4726,11 @@ dependencies = [
  "derive_more 2.0.1",
  "dydx",
  "n9-core",
+ "n9-exchange",
  "schemars",
  "serde",
  "toml",
  "ui9-dui",
-]
-
-[[package]]
-name = "n9-exchange-nominal"
-version = "0.0.1"
-dependencies = [
- "schemars",
- "serde",
 ]
 
 [[package]]

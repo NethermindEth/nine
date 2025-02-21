@@ -4712,7 +4712,9 @@ dependencies = [
 name = "n9-exchange"
 version = "0.0.1"
 dependencies = [
+ "crb",
  "n9-core",
+ "n9-kit",
  "schemars",
  "serde",
 ]

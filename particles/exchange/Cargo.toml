@@ -8,6 +8,8 @@ rust-version.workspace = true
 keywords.workspace = true
 
 [dependencies]
+crb.workspace = true
 schemars.workspace = true
 serde.workspace = true
 n9-core.workspace = true
+n9-kit.workspace = true

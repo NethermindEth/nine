@@ -3,27 +3,26 @@ use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
 use crb::core::Slot;
 use n9_core::{Particle, Prompt, SubstanceBond, SubstanceLinks, Tool};
+use std::marker::PhantomData;
 
-pub trait Toolkit: Default + Send + 'static {
-    fn add_tools<P>(&mut self, bond: &mut SubstanceBond<P>)
-    where
-        P: Agent;
+pub trait Toolkit<P: Agent>: Default + Send + 'static {
+    fn add_tools(&mut self, particle: &mut P, bond: &mut SubstanceBond<P>);
 }
 
-pub struct LiquidParticle<K: Toolkit> {
+pub struct LiquidParticle<K: Toolkit<Self>> {
     substance: SubstanceLinks,
-    toolkit: K,
+    toolkit: PhantomData<K>,
     bond: Slot<SubstanceBond<Self>>,
 }
 
 impl<K> Particle for LiquidParticle<K>
 where
-    K: Toolkit,
+    K: Toolkit<Self>,
 {
     fn construct(substance: SubstanceLinks) -> Self {
         Self {
             substance,
-            toolkit: K::default(),
+            toolkit: PhantomData,
             bond: Slot::empty(),
         }
     }
@@ -31,7 +30,7 @@ where
 
 impl<K> Agent for LiquidParticle<K>
 where
-    K: Toolkit,
+    K: Toolkit<Self>,
 {
     type Context = AgentSession<Self>;
 
@@ -45,11 +44,12 @@ struct Initialize;
 #[async_trait]
 impl<K> DoAsync<Initialize> for LiquidParticle<K>
 where
-    K: Toolkit,
+    K: Toolkit<Self>,
 {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let mut bond = self.substance.bond(&ctx);
-        self.toolkit.add_tools(&mut bond);
+        let mut toolkit = K::default();
+        toolkit.add_tools(self, &mut bond);
         self.bond.fill(bond)?;
         Ok(Next::events())
     }
@@ -58,7 +58,7 @@ where
 #[async_trait]
 impl<K, P> Tool<P> for LiquidParticle<K>
 where
-    K: Toolkit,
+    K: Toolkit<Self>,
     P: Prompt,
 {
     async fn call_tool(&mut self, input: P, _ctx: &mut Context<Self>) -> Result<P::Output> {

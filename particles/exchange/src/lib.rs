@@ -2,4 +2,4 @@ mod config;
 pub mod nominals;
 mod particle;
 
-pub use particle::NominalExchangeParticle;
+pub use particle::ExchangeParticle;

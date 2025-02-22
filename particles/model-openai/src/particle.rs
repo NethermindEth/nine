@@ -95,14 +95,16 @@ impl OnRequest<ToolingChatRequest> for OpenAIParticle {
             .map(convert::message)
             .collect::<Result<_>>()?;
 
-        let tools: Vec<_> = request.tools.into_iter().map(convert::tool).collect();
+        let mut args = CreateChatCompletionRequestArgs::default();
+        // TODO: Use the model name from the config
+        args.model("gpt-4o").messages(messages);
 
-        let request = CreateChatCompletionRequestArgs::default()
-            // TODO: Use the model name from the config
-            .model("gpt-4o")
-            .messages(messages)
-            .tools(tools)
-            .build()?;
+        if !request.tools.is_empty() {
+            let tools: Vec<_> = request.tools.into_iter().map(convert::tool).collect();
+            args.tools(tools);
+        }
+
+        let request = args.build()?;
         let response = client.chat().create(request).await?;
         let messages = response
             .choices

@@ -17,6 +17,8 @@ use std::sync::Arc;
 
 pub trait Prompt: ToolData {
     type Output: ToolData;
+
+    fn description() -> &'static str;
 }
 
 pub trait ToolData: JsonSchema + Serialize + DeserializeOwned + Send + 'static {}
@@ -39,7 +41,7 @@ where
     }
 
     fn description(&self) -> Option<String> {
-        None
+        Some(P::description().into())
     }
 
     fn parameters(&self) -> Option<RootSchema> {

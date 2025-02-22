@@ -57,7 +57,7 @@ impl DoAsync<Initialize> for DyDxParticle {
         self.update_config(config, ctx).await?;
 
         bond.add_tool::<Price>(self).await?;
-        bond.add_tool::<Trade>(self).await?;
+        bond.add_tool::<Tickers>(self).await?;
 
         self.bond.fill(bond)?;
         Ok(Next::events())
@@ -81,14 +81,6 @@ impl Tool<Price> for DyDxParticle {
         "dydx_price".into()
     }
 
-    fn description(&self) -> Option<String> {
-        Some(
-            "This function fetches the current market price of a specified asset from a decentralized exchange (DEX).
-            By providing a valid asset ticker, the function queries the DEX's pricing endpoint to retrieve real-time
-            price information, ensuring up-to-date market data for further processing or display.".into()
-        )
-    }
-
     async fn call_tool(&mut self, input: Price, _ctx: &mut Context<Self>) -> Result<String> {
         let ticker = input.ticker.into();
         let price = self
@@ -109,23 +101,4 @@ impl Tool<Tickers> for DyDxParticle {
     fn name(&self) -> String {
         "dydx_tickers".into()
     }
-
-    fn description(&self) -> Option<String> {
-        Some(
-            "This function retrieves a list of all available stock or cryptocurrency tickers from a specified exchange.
-            It allows an AI system to access up-to-date market symbols for various financial instruments,
-            such as pairs of cryptocurrencies or futures.".into()
-        )
-    }
 }
-
-#[derive(Serialize, Deserialize, JsonSchema)]
-pub struct Trade {
-    ticker: String,
-}
-
-impl Prompt for Trade {
-    type Output = ();
-}
-
-impl Tool<Trade> for DyDxParticle {}

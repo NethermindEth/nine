@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
 use crb::core::Slot;
-use n9_core::{Particle, Prompt, SubstanceBond, SubstanceLinks, Tool};
+use n9_core::{ChatRequest, Message, Particle, Prompt, Role, SubstanceBond, SubstanceLinks, Tool};
 use std::marker::PhantomData;
 
 pub trait Toolkit<P: Agent>: Default + Send + 'static {
@@ -55,6 +55,44 @@ where
     }
 }
 
+const TEMPLATE: &str = r#"
+**Universal JSON Schema Tool**
+
+- **Query Schema Placeholder:**
+  Accepts a JSON schema for a query defined below.
+
+- **Response Schema Placeholder:**
+  Accepts a JSON schema for a response defined below.
+
+- **Query Simulation:**
+  Produces a valid JSON value that conforms to the defined query schema.
+
+- **Random Response Generation:**
+  Generates a random answer that adheres to the provided JSON schema for the response.
+
+- **Schema Consistency:**
+  Ensures that both input (query) and output (response) strictly follow their defined JSON schemas, promoting robust and predictable data exchange.
+
+- **Tool Versatility:**
+  Useful for testing, prototyping, and validating API endpoints and other systems that communicate using JSON.
+
+## Tool description (simulating behaviour)
+
+{description}
+
+## Query (prompt, input) schema
+
+```json
+{input}
+```
+
+## Response (reply, output) schema
+
+```json
+{output}
+```
+"#;
+
 #[async_trait]
 impl<K, P> Tool<P> for LiquidParticle<K>
 where
@@ -62,6 +100,15 @@ where
     P: Prompt,
 {
     async fn call_tool(&mut self, input: P, _ctx: &mut Context<Self>) -> Result<P::Output> {
+        let model = self.substance.router.get_model().await?;
+        let req = TEMPLATE
+            .replace("{description}", "")
+            .replace("{input}", "")
+            .replace("{output}", "")
+            .to_string();
+        let message = Message::content(Role::Developer, req);
+        let request = ChatRequest::from(message);
+        let response = model.chat(request.into()).await?;
         Err(anyhow!("Not implemented"))
     }
 }

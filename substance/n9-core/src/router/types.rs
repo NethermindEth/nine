@@ -48,6 +48,17 @@ pub struct Message {
     pub tool_calls: Vec<ToolCall>,
 }
 
+impl Message {
+    pub fn content(role: Role, content: impl Into<String>) -> Self {
+        Self {
+            role,
+            content: content.into(),
+            call_id: None,
+            tool_calls: Vec::new(),
+        }
+    }
+}
+
 impl From<ActionableMessage> for Message {
     fn from(message: ActionableMessage) -> Self {
         message.message
@@ -68,6 +79,14 @@ impl From<(CallId, ToolResponse)> for Message {
 #[derive(Debug, Clone, Default)]
 pub struct ChatRequest {
     pub messages: Vec<Message>,
+}
+
+impl From<Message> for ChatRequest {
+    fn from(message: Message) -> Self {
+        Self {
+            messages: vec![message],
+        }
+    }
 }
 
 impl ChatRequest {
@@ -137,6 +156,15 @@ impl ToolingChatRequest {
             text.push_str(&msg.content);
         }
         text
+    }
+}
+
+impl From<ChatRequest> for ToolingChatRequest {
+    fn from(request: ChatRequest) -> Self {
+        Self {
+            messages: request.messages,
+            tools: Vec::new(),
+        }
     }
 }
 

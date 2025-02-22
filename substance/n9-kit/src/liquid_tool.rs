@@ -7,11 +7,15 @@ use schemars::{schema_for, JsonSchema};
 use serde_json::Value;
 use std::marker::PhantomData;
 
-pub trait Toolkit<P: Agent>: Default + Send + 'static {
-    fn add_tools(&mut self, particle: &mut P, bond: &mut SubstanceBond<P>);
+pub trait Toolkit: Default + Send + 'static {
+    fn add_tools(
+        &mut self,
+        particle: &mut LiquidParticle<Self>,
+        bond: &mut SubstanceBond<LiquidParticle<Self>>,
+    );
 }
 
-pub struct LiquidParticle<K: Toolkit<Self>> {
+pub struct LiquidParticle<K: Toolkit> {
     substance: SubstanceLinks,
     toolkit: PhantomData<K>,
     bond: Slot<SubstanceBond<Self>>,
@@ -19,7 +23,7 @@ pub struct LiquidParticle<K: Toolkit<Self>> {
 
 impl<K> Particle for LiquidParticle<K>
 where
-    K: Toolkit<Self>,
+    K: Toolkit,
 {
     fn construct(substance: SubstanceLinks) -> Self {
         Self {
@@ -32,7 +36,7 @@ where
 
 impl<K> Agent for LiquidParticle<K>
 where
-    K: Toolkit<Self>,
+    K: Toolkit,
 {
     type Context = AgentSession<Self>;
 
@@ -46,7 +50,7 @@ struct Initialize;
 #[async_trait]
 impl<K> DoAsync<Initialize> for LiquidParticle<K>
 where
-    K: Toolkit<Self>,
+    K: Toolkit,
 {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let mut bond = self.substance.bond(&ctx);
@@ -100,7 +104,7 @@ Respond only with a JSON value that conforms to the response schema.
 #[async_trait]
 impl<K, P> Tool<P> for LiquidParticle<K>
 where
-    K: Toolkit<Self>,
+    K: Toolkit,
     P: Prompt,
 {
     async fn call_tool(&mut self, input: P, _ctx: &mut Context<Self>) -> Result<P::Output> {

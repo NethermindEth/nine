@@ -7817,6 +7817,7 @@ dependencies = [
  "n9-chat-telegram",
  "n9-control-chat",
  "n9-core",
+ "n9-exchange",
  "n9-exchange-dydx",
  "n9-model-anthropic",
  "n9-model-openai",

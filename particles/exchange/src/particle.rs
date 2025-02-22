@@ -8,12 +8,12 @@ pub type ExchangeParticle = LiquidParticle<ExchangeToolkit>;
 #[derive(Default)]
 pub struct ExchangeToolkit;
 
-impl<P> Toolkit<P> for ExchangeToolkit
-where
-    P: Agent,
-    P: Tool<Price>,
-{
-    fn add_tools(&mut self, particle: &mut P, bond: &mut SubstanceBond<P>) {
+impl Toolkit for ExchangeToolkit {
+    fn add_tools(
+        &mut self,
+        particle: &mut LiquidParticle<Self>,
+        bond: &mut SubstanceBond<LiquidParticle<Self>>,
+    ) {
         bond.add_tool::<Price>(particle);
     }
 }

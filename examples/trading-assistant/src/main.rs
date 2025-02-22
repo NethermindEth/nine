@@ -6,6 +6,7 @@ use n9_exchange_dydx::DyDxParticle;
 use n9_app_stdio::StdioApp;
 use n9_app_tui::TuiApp;
 use n9_control_chat::ChatParticle;
+use n9_exchange::ExchangeParticle;
 use n9_model_openai::OpenAIParticle;
 use ui9_mesh::Mesh;
 
@@ -19,7 +20,8 @@ async fn main() -> Result<()> {
     // substance.add_particle::<AnthropicParticle>()?;
 
     // TODO: Rename to *Exchange
-    substance.add_particle::<DyDxParticle>()?;
+    // substance.add_particle::<DyDxParticle>()?;
+    substance.add_particle::<ExchangeParticle>()?;
 
     // TODO: Rename to *Control
     substance.add_particle::<ChatParticle>()?;

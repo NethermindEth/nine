@@ -13,3 +13,5 @@ schemars.workspace = true
 serde.workspace = true
 n9-core.workspace = true
 n9-kit.workspace = true
+anyhow.workspace = true
+async-trait.workspace = true

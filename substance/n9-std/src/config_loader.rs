@@ -32,10 +32,7 @@ impl ConfigLayer {
         let content = fs::read_to_string(self.path.as_ref()).await?;
         let config = toml::from_str(&content)?;
         self.config = config;
-        op.end(&format!(
-            "Complete reading the config: {}",
-            self.path.display()
-        ));
+        op.end();
         Ok(())
     }
 }

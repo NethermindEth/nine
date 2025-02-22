@@ -69,7 +69,7 @@ impl DoAsync<SendRequest> for ChatParticle {
         let session = self.substance.router.new_session().await?;
         let req = session.chat(request);
         self.chat.add(msg.question, Role::Request);
-        op.end("Prompt sent");
+        op.end();
         let state = WaitResponse { req };
         Ok(Next::do_async(state))
     }
@@ -92,7 +92,7 @@ impl DoAsync<WaitResponse> for ChatParticle {
         let resp = msg.req.await?.squash();
         self.chat.add(resp, Role::Response);
         self.chat.thinking(false);
-        op.end("Response received");
+        op.end();
         Ok(Next::events())
     }
 

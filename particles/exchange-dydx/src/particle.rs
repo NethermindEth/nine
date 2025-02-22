@@ -70,7 +70,7 @@ impl UpdateConfig<DyDxConfig> for DyDxParticle {
         let op = Operation::start("Configuring dYdX");
         let indexer = IndexerClient::new(config.config.indexer);
         self.indexer.refill(indexer);
-        op.end("dYdX configured");
+        op.end();
         Ok(())
     }
 }

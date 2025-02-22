@@ -73,7 +73,7 @@ impl UpdateConfig<OpenAIConfig> for OpenAIParticle {
         let client = Client::with_config(config.extract());
         let _models = client.models().list().await?; // An alternative to ping
         self.client.fill(client)?;
-        op.end("OpenAI configured");
+        op.end();
         Ok(())
     }
 }
@@ -112,7 +112,7 @@ impl OnRequest<ToolingChatRequest> for OpenAIParticle {
             .map(convert::choice)
             .collect::<Result<_>>()?;
         let response = ToolingChatResponse { messages };
-        op.end("A request to OpenAI completed");
+        op.end();
         Ok(response)
     }
 }

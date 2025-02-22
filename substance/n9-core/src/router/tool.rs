@@ -14,6 +14,7 @@ use serde_json::Value;
 use std::any::type_name;
 use std::marker::PhantomData;
 use std::sync::Arc;
+use ui9_dui::Operation;
 
 pub trait Prompt: ToolData {
     type Output: ToolData;
@@ -33,7 +34,7 @@ where
 {
     fn name(&self) -> String {
         // TODO: Use `const_str!`
-        type_name::<Self>()
+        type_name::<P>()
             .to_lowercase()
             .replace("::", "_")
             .replace('<', "_")
@@ -159,6 +160,7 @@ pub struct ToolRecord {
 impl OnRequest<AddTool> for ReasoningRouter {
     async fn on_request(&mut self, msg: AddTool, _ctx: &mut Context<Self>) -> Result<ToolAdded> {
         let id = ToolId::from(format!("{}_{}", msg.meta.name, self.tools.len()));
+        let op = Operation::start(&format!("Add tool {id}"));
         let info = ToolInfo {
             id: id.clone(),
             meta: msg.meta,
@@ -168,6 +170,7 @@ impl OnRequest<AddTool> for ReasoningRouter {
             info: info.clone(),
         };
         self.tools.insert(id, record);
+        op.end();
         Ok(ToolAdded { info })
     }
 }

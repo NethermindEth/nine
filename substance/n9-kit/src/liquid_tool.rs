@@ -7,12 +7,13 @@ use schemars::{schema_for, JsonSchema};
 use serde_json::Value;
 use std::marker::PhantomData;
 
+#[async_trait]
 pub trait Toolkit: Default + Send + 'static {
-    fn add_tools(
+    async fn add_tools(
         &mut self,
         particle: &mut LiquidParticle<Self>,
         bond: &mut SubstanceBond<LiquidParticle<Self>>,
-    );
+    ) -> Result<()>;
 }
 
 pub struct LiquidParticle<K: Toolkit> {
@@ -55,7 +56,7 @@ where
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let mut bond = self.substance.bond(&ctx);
         let mut toolkit = K::default();
-        toolkit.add_tools(self, &mut bond);
+        toolkit.add_tools(self, &mut bond).await?;
         self.bond.fill(bond)?;
         Ok(Next::events())
     }

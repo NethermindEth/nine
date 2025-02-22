@@ -30,7 +30,7 @@ where
         let op = Operation::start(self.as_ref());
         match func() {
             Ok(value) => {
-                op.end(self.as_ref());
+                op.end();
                 Ok(value)
             }
             Err(err) => {
@@ -47,7 +47,7 @@ where
         let op = Operation::start(self.as_ref());
         match fut.await {
             Ok(value) => {
-                op.end(self.as_ref());
+                op.end();
                 Ok(value)
             }
             Err(err) => {
@@ -95,17 +95,19 @@ impl Operation {
     pub fn failed(mut self, message: &str) {
         self.close();
 
+        // TODO: Consider to use the same message + err here
         self.send_failure(message);
     }
 
-    pub fn end(mut self, message: &str) {
+    pub fn end(mut self) {
+        if let Some(message) = self.task.take() {
+            let duration = self.started.elapsed();
+            self.act_event(EventData {
+                message: message.into(),
+                duration,
+            });
+        }
         self.close();
-
-        let duration = self.started.elapsed();
-        self.act_event(EventData {
-            message: message.into(),
-            duration,
-        });
     }
 
     fn send_failure(&mut self, reason: &str) {

@@ -3,6 +3,8 @@ use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
 use crb::core::Slot;
 use n9_core::{ChatRequest, Message, Particle, Prompt, Role, SubstanceBond, SubstanceLinks, Tool};
+use schemars::{schema_for, JsonSchema};
+use serde_json::Value;
 use std::marker::PhantomData;
 
 pub trait Toolkit<P: Agent>: Default + Send + 'static {
@@ -76,7 +78,7 @@ const TEMPLATE: &str = r#"
 - **Tool Versatility:**
   Useful for testing, prototyping, and validating API endpoints and other systems that communicate using JSON.
 
-## Tool description (simulating behaviour)
+## Tool description (behaviour to simulate as a tool)
 
 {description}
 
@@ -91,6 +93,8 @@ const TEMPLATE: &str = r#"
 ```json
 {output}
 ```
+
+Respond only with a JSON value that conforms to the response schema.
 "#;
 
 #[async_trait]
@@ -101,14 +105,26 @@ where
 {
     async fn call_tool(&mut self, input: P, _ctx: &mut Context<Self>) -> Result<P::Output> {
         let model = self.substance.router.get_model().await?;
+        let input = schema::<P>()?;
+        let output = schema::<P::Output>()?;
         let req = TEMPLATE
-            .replace("{description}", "")
-            .replace("{input}", "")
-            .replace("{output}", "")
+            .replace("{description}", P::description())
+            .replace("{input}", &input)
+            .replace("{output}", &output)
             .to_string();
         let message = Message::content(Role::Developer, req);
         let request = ChatRequest::from(message);
         let response = model.chat(request.into()).await?;
-        Err(anyhow!("Not implemented"))
+        let value = serde_json::from_str(&response.squash())?;
+        Ok(value)
     }
+}
+
+fn schema<T>() -> Result<String>
+where
+    T: JsonSchema,
+{
+    let root_schema = schema_for!(T);
+    let schema = serde_json::to_string(&root_schema.schema)?;
+    Ok(schema)
 }

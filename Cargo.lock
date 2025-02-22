@@ -4744,6 +4744,8 @@ dependencies = [
  "async-trait",
  "crb",
  "n9-core",
+ "schemars",
+ "serde_json",
 ]
 
 [[package]]

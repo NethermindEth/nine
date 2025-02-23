@@ -33,11 +33,19 @@ impl AppState {
         )
         .widget();
 
+        let tab_system = AutoLayout::new(Direction::Horizontal, []).widget();
+
         let mut focus = FocusControl::new();
         focus.set(&*tab_main);
 
-        let app_tabs =
-            TabLayout::new("Nine Dashboard".into(), [(tab_main, "Chat".to_string())]).widget();
+        let app_tabs = TabLayout::new(
+            "Nine Dashboard".into(),
+            [
+                (tab_main, "Chat".to_string()),
+                (tab_system, "System".to_string()),
+            ],
+        )
+        .widget();
 
         Self { app_tabs, focus }
     }

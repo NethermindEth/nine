@@ -14,19 +14,22 @@ impl AutoLayout {
         I: IntoIterator<Item = (Box<dyn Render>, u16)>,
     {
         let comps: Vec<_> = comps.into_iter().collect();
-        let total: u16 = comps.iter().map(|(_, x)| x).sum();
-        let point = 100 / total;
         let mut cols = Vec::new();
-        let mut processed_size = 0;
-        let mut remained = 100;
-        for (_, size) in comps.iter() {
-            processed_size += size;
-            let total_size = point * size;
-            remained -= total_size;
-            if processed_size == total {
-                cols.push(Constraint::Percentage(total_size + remained));
-            } else {
-                cols.push(Constraint::Percentage(total_size));
+        let total: u16 = comps.iter().map(|(_, x)| x).sum();
+
+        if total > 0 {
+            let point = 100 / total;
+            let mut processed_size = 0;
+            let mut remained = 100;
+            for (_, size) in comps.iter() {
+                processed_size += size;
+                let total_size = point * size;
+                remained -= total_size;
+                if processed_size == total {
+                    cols.push(Constraint::Percentage(total_size + remained));
+                } else {
+                    cols.push(Constraint::Percentage(total_size));
+                }
             }
         }
         Self {

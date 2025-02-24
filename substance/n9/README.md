@@ -23,7 +23,7 @@ The project is built using Rust (full-stack) and organized as a workspace consis
 The following cases will have a minimal implementation, and they will be used to track the progress of the framework and its flexibility in building such systems.
 
 - ☑️ **Chatbots** - AI-driven natural language chatbots for customer support, virtual assistants, and automation.
-- ⬜ **AI-governed blockchains (ChaosChain)** - Self-regulating and intelligent blockchain ecosystems with automated decision-making.
+- ☑️ **AI-governed blockchains (ChaosChain)** - Self-regulating and intelligent blockchain ecosystems with automated decision-making.
 - ⬜ **Personal AI Assistant with dynamic UI** - AI that generates adaptive and context-aware user interfaces on demand.
 - ☑️ **AI-powered trading bots** - Autonomous financial agents for high-frequency trading and portfolio management.
 - ⬜ **Intelligent email assistant** - AI for reading, summarizing, filtering, and responding to emails autonomously.

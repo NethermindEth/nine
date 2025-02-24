@@ -1,0 +1,12 @@
+[package]
+name = "n9-system-info"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords.workspace = true
+
+[dependencies]
+crb.workspace = true
+n9-core.workspace = true

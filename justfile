@@ -1,3 +1,6 @@
+chaos:
+    RUST_LOG=none cargo run -p chaos-chain
+
 trade:
     RUST_LOG=none cargo run -p trading-assistant
 

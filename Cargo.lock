@@ -1056,6 +1056,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "chaos-chain"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "crb",
+ "env_logger",
+ "n9-app-tui",
+ "n9-control-chat",
+ "n9-core",
+ "n9-model-openai",
+ "tokio",
+ "ui9-mesh",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7824,7 +7839,6 @@ dependencies = [
  "n9-model-anthropic",
  "n9-model-openai",
  "tokio",
- "ui9-dui",
  "ui9-mesh",
 ]
 

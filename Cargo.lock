@@ -4829,6 +4829,8 @@ version = "0.0.1"
 dependencies = [
  "crb",
  "n9-core",
+ "schemars",
+ "serde",
 ]
 
 [[package]]

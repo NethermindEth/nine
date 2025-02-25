@@ -9,7 +9,7 @@ use n9_core::{
     ConfigSegmentUpdates, Particle, Prompt, SubstanceBond, SubstanceLinks, Tool, ToolResponse,
     UpdateConfig,
 };
-use n9_exchange::nominals::{Price, Tickers};
+use n9_exchange::tools::{Price, Tickers};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ui9_dui::Operation;

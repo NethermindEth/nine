@@ -3,8 +3,8 @@ use async_openai::types::*;
 use n9_core::{
     ActionableMessage, Message as MessageN9, Reason, Role as RoleN9, ToolCall, ToolInfo,
 };
-use schemars::schema::RootSchema;
-use serde_json::Value;
+use schemars::schema::{InstanceType, RootSchema, SingleOrVec};
+use serde_json::{json, Value};
 
 // REQUESTS
 
@@ -60,7 +60,30 @@ pub fn tool(info: ToolInfo) -> ChatCompletionTool {
 }
 
 pub fn schema(root_schema: RootSchema) -> Value {
-    serde_json::to_value(&root_schema.schema).unwrap_or_default()
+    let mut value = serde_json::to_value(&root_schema.schema).unwrap_or_default();
+
+    // OpenAI is sensitive to the schema. It requires:
+    // - `type` is `object`
+    // - `paameters` always exist
+    // But, the problem since the scheme is overriden, if used a unit type,
+    // it will be represented as a struct and parameters won't be deserialized.
+    // In short: `struct`s must be used!
+
+    // Ensure "type" is not null and is an object
+    if let Some(type_value) = value.get("type").and_then(Value::as_str) {
+        if type_value != "object" {
+            value["type"] = json!("object");
+        }
+    } else {
+        value["type"] = json!("object");
+    }
+
+    // Ensure "properties" exists and is an object
+    if !value.get("properties").map_or(false, Value::is_object) {
+        value["properties"] = json!({});
+    }
+
+    value
 }
 
 // RESPONSES

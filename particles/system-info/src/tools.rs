@@ -3,7 +3,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, JsonSchema)]
-pub struct ToolsList;
+pub struct ToolsList {}
 
 impl Prompt for ToolsList {
     type Output = Vec<String>;

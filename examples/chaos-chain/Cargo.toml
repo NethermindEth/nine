@@ -15,5 +15,6 @@ n9-app-tui.workspace = true
 n9-control-chat.workspace = true
 n9-core.workspace = true
 n9-model-openai.workspace = true
+n9-system-info.workspace = true
 tokio.workspace = true
 ui9-mesh.workspace = true

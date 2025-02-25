@@ -1066,6 +1066,7 @@ dependencies = [
  "n9-control-chat",
  "n9-core",
  "n9-model-openai",
+ "n9-system-info",
  "tokio",
  "ui9-mesh",
 ]
@@ -4827,6 +4828,8 @@ dependencies = [
 name = "n9-system-info"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
+ "async-trait",
  "crb",
  "n9-core",
  "schemars",

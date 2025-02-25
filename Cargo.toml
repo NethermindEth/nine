@@ -38,6 +38,7 @@ n9-core = { version = "0.0.1", path = "substance/n9-core" }
 n9-app-tui = { version = "0.0.1", path = "particles/app-tui" }
 n9-control-chat = { version = "0.0.1", path = "particles/control-chat" }
 n9-model-openai = { version = "0.0.1", path = "particles/model-openai" }
+n9-system-info = { version = "0.0.1", path = "particles/system-info" }
 
 n9-kit = { version = "0.0.1", path = "substance/n9-kit" }
 n9-std = { version = "0.0.1", path = "substance/n9-std" }

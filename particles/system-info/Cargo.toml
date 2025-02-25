@@ -8,6 +8,8 @@ rust-version.workspace = true
 keywords.workspace = true
 
 [dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
 schemars.workspace = true
 serde.workspace = true
 crb.workspace = true

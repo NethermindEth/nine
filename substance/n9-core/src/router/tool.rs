@@ -170,6 +170,7 @@ impl OnRequest<AddTool> for ReasoningRouter {
             info: info.clone(),
         };
         self.tools.insert(id, record);
+        self.tools_pub.add_tool(&info);
         op.end();
         Ok(ToolAdded { info })
     }

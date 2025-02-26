@@ -27,12 +27,12 @@ impl Publisher for Tree {
 impl TreePub {
     pub fn add(&mut self, fqn: Fqn, info: TracerInfo) {
         let event = TreeEvent::AddFlow { fqn, info };
-        self.tracer.event(event);
+        self.event(event);
     }
 
     pub fn del(&mut self, fqn: Fqn) {
         let event = TreeEvent::DelFlow { fqn };
-        self.tracer.event(event);
+        self.event(event);
     }
 }
 

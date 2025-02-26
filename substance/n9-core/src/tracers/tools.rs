@@ -1,3 +1,4 @@
+use crate::router::types::ToolInfo;
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -27,6 +28,16 @@ impl Publisher for Tools {
 impl Unified for Tools {
     fn fqn() -> Fqn {
         Fqn::root("@tools")
+    }
+}
+
+impl ToolsPub {
+    pub fn add_tool(&self, info: &ToolInfo) {
+        let event = ToolsEvent::Add {
+            id: info.id.clone(),
+            description: info.meta.description.clone().unwrap_or_default(),
+        };
+        self.event(event);
     }
 }
 

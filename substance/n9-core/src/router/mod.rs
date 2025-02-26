@@ -3,6 +3,7 @@ pub mod session;
 pub mod tool;
 pub mod types;
 
+use crate::tracers::tools::Tools;
 use anyhow::{Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Equip, Next};
@@ -14,6 +15,7 @@ use std::collections::HashMap;
 use tool::ToolRecord;
 use typed_slab::TypedSlab;
 use types::{ChatResponse, ToolId};
+use ui9_dui::Pub;
 
 #[derive(From, Into)]
 pub struct ReqId(usize);
@@ -27,6 +29,7 @@ pub struct ReasoningRouter {
     models: Vec<ModelLink>,
     tools: HashMap<ToolId, ToolRecord>,
     requests: TypedSlab<ReqId, Responder<ChatResponse>>,
+    tools_pub: Pub<Tools>,
 }
 
 impl ReasoningRouter {
@@ -35,6 +38,7 @@ impl ReasoningRouter {
             models: Vec::default(),
             tools: HashMap::default(),
             requests: TypedSlab::default(),
+            tools_pub: Pub::unified(),
         }
     }
 }

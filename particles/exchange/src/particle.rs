@@ -1,4 +1,4 @@
-use crate::tools::Price;
+use crate::tools;
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::Agent;
@@ -17,7 +17,9 @@ impl Toolkit for ExchangeToolkit {
         particle: &mut LiquidParticle<Self>,
         bond: &mut SubstanceBond<LiquidParticle<Self>>,
     ) -> Result<()> {
-        bond.add_tool::<Price>(particle).await?;
+        bond.add_tool::<tools::Price>(particle).await?;
+        bond.add_tool::<tools::Tickers>(particle).await?;
+        bond.add_tool::<tools::Order>(particle).await?;
         Ok(())
     }
 }

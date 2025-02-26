@@ -24,8 +24,8 @@ bytes = "1.10.0"
 chrono = "0.4.39"
 console-subscriber = "0.4.1"
 clap = { version = "4.5.29", features = ["derive"] }
-crb = { version = "0.0.28", git = "https://github.com/runtime-blocks/crb" }
-crb-system = { version = "0.0.28", git = "https://github.com/runtime-blocks/crb" }
+crb = { version = "0.0.29" }
+crb-system = { version = "0.0.29" }
 derive_more = { version = "2.0.1", features = ["full"] }
 dotenvy = "0.15.7"
 eframe = "0.31.0"

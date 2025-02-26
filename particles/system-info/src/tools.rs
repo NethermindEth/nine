@@ -5,8 +5,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct ToolsList {}
 
+#[derive(Deserialize, Serialize, JsonSchema)]
+pub struct ToolInfo {
+    pub name: String,
+    pub description: String,
+}
+
 impl Prompt for ToolsList {
-    type Output = Vec<String>;
+    type Output = Vec<ToolInfo>;
 
     fn description() -> &'static str {
         "The **ToolsList** is a utility that provides a real-time list of available

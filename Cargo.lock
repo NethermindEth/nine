@@ -4834,6 +4834,8 @@ dependencies = [
  "n9-core",
  "schemars",
  "serde",
+ "ui9-app",
+ "ui9-dui",
 ]
 
 [[package]]

@@ -101,4 +101,15 @@ impl Tool<Tickers> for DyDxParticle {
     fn name(&self) -> String {
         "dydx_tickers".into()
     }
+
+    async fn call_tool(&mut self, input: Tickers, _ctx: &mut Context<Self>) -> Result<Vec<String>> {
+        let markets = self
+            .indexer
+            .get()?
+            .markets()
+            .list_perpetual_markets(None)
+            .await?;
+        let tickers = markets.into_iter().map(|(key, _value)| key.0).collect();
+        Ok(tickers)
+    }
 }

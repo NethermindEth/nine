@@ -20,8 +20,8 @@ async fn main() -> Result<()> {
     // substance.add_particle::<AnthropicParticle>()?;
 
     // TODO: Rename to *Exchange
-    // substance.add_particle::<DyDxParticle>()?;
-    substance.add_particle::<ExchangeParticle>()?;
+    substance.add_particle::<DyDxParticle>()?;
+    // substance.add_particle::<ExchangeParticle>()?;
 
     // TODO: Rename to *Control
     substance.add_particle::<ChatParticle>()?;

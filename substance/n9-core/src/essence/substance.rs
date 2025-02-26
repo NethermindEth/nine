@@ -3,7 +3,6 @@ use super::SubstanceLinks;
 use crate::keeper::Keeper;
 use crate::router::ReasoningRouter;
 use crate::space::Space;
-use crate::trace::TracerPack;
 use anyhow::{Error, Result};
 use async_trait::async_trait;
 use crb::agent::{
@@ -35,7 +34,6 @@ impl SubstanceLink {
 }
 
 pub struct Substance {
-    tracer: TracerPack,
     links: Slot<SubstanceLinks>,
 }
 
@@ -55,7 +53,6 @@ impl Standalone for Substance {}
 impl Substance {
     pub fn new() -> Self {
         Self {
-            tracer: TracerPack::root("substance"),
             links: Slot::empty(),
         }
     }
@@ -70,13 +67,10 @@ impl Agent for Substance {
     type Context = SupervisorSession<Self>;
 
     fn begin(&mut self) -> Next<Self> {
-        self.tracer.active();
         Next::do_async(Configure)
     }
 
-    fn end(&mut self) {
-        self.tracer.done();
-    }
+    fn end(&mut self) {}
 }
 
 #[derive(Debug, Clone, PartialOrd, Ord, PartialEq, Eq, Hash)]

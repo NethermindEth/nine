@@ -3,7 +3,7 @@ pub mod keeper;
 pub mod router;
 pub mod sequence;
 pub mod space;
-pub mod trace;
+pub mod tracers;
 
 pub use essence::particle::{Particle, SubstanceBond};
 pub use essence::substance::{Substance, SubstanceLink};

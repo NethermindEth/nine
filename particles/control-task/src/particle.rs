@@ -2,6 +2,7 @@ use crate::tools::{TaskAdd, TaskDel, TaskId, TaskInfo, TasksList};
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
+use crb::superagent::{SupervisorSession, Supervisor};
 use crb::core::Slot;
 use n9_core::{Particle, SubstanceBond, SubstanceLinks, Tool, ToolInfo};
 use ui9_dui::Operation;
@@ -21,8 +22,13 @@ impl Particle for ControlTask {
     }
 }
 
+impl Supervisor for ControlTask {
+    type BasedOn = AgentSession<Self>;
+    type GroupBy = ();
+}
+
 impl Agent for ControlTask {
-    type Context = AgentSession<Self>;
+    type Context = SupervisorSession<Self>;
 
     fn begin(&mut self) -> Next<Self> {
         Next::do_async(Initialize)

@@ -7,6 +7,7 @@ pub type TaskId = u64;
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct TaskInfo {
     pub id: TaskId,
+    pub repeat: bool,
     pub interval_sec: u64,
     pub prompt: String,
 }
@@ -29,6 +30,9 @@ impl Prompt for TasksList {
 /// Task Creation Tool
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct TaskAdd {
+    /// A boolean flag indicating whether the task should repeat after each interval.
+    /// If `false` the task runs only once.
+    pub repeat: bool,
     /// The time interval (in seconds) between each task repetition.
     pub interval_sec: u64,
     /// The request or action that will be sent when the task is triggered.

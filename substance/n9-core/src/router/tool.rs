@@ -34,7 +34,10 @@ where
 {
     fn name(&self) -> String {
         let mut name = String::new();
-        let full_name = type_name::<P>().to_lowercase().replace('<', "_").replace('>', "");
+        let full_name = type_name::<P>()
+            .to_lowercase()
+            .replace('<', "_")
+            .replace('>', "");
         let items: Vec<_> = full_name.split("::").collect();
         if let Some(first) = items.first() {
             name.push_str(first);

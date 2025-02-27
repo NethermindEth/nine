@@ -11,7 +11,6 @@ pub struct TaskInfo {
     pub prompt: String,
 }
 
-
 /// Task List Display Tool
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct TasksList {}
@@ -65,4 +64,3 @@ impl Prompt for TaskDel {
         unnecessary or completed tasks are properly managed and deleted from the system."
     }
 }
-

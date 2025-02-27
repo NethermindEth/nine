@@ -136,4 +136,13 @@ impl Operation {
         let event = Act::<Failure> { action };
         LOG_BRIDGE.event(event);
     }
+
+    pub fn event(msg: impl ToString) {
+        let action = EventData {
+            duration: Default::default(),
+            message: msg.to_string(),
+        };
+        let event = Act::<Event> { action };
+        LOG_BRIDGE.event(event);
+    }
 }

@@ -17,3 +17,4 @@ n9-core.workspace = true
 n9-control-chat.workspace = true
 ui9-app.workspace = true
 ui9-dui.workspace = true
+typed-slab.workspace = true

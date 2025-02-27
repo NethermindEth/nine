@@ -2,14 +2,29 @@ use n9_core::Prompt;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-pub type TaskId = u64;
+pub type TaskId = usize;
+
+#[derive(Deserialize, Serialize, Debug, Clone, JsonSchema)]
+pub struct TaskParameters {
+    pub repeat: bool,
+    pub interval_sec: u64,
+    pub prompt: String,
+}
+
+impl From<TaskAdd> for TaskParameters {
+    fn from(value: TaskAdd) -> Self {
+        Self {
+            repeat: value.repeat,
+            interval_sec: value.interval_sec,
+            prompt: value.prompt,
+        }
+    }
+}
 
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct TaskInfo {
     pub id: TaskId,
-    pub repeat: bool,
-    pub interval_sec: u64,
-    pub prompt: String,
+    pub parameters: TaskParameters,
 }
 
 /// Task List Display Tool

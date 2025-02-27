@@ -1,4 +1,4 @@
-use crate::tools::TaskInfo;
+use crate::tools::TaskParameters;
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Agent, Context, Next, DoAsync, OnEvent, ManagedContext};
@@ -8,15 +8,15 @@ use ui9_dui::Sub;
 use n9_control_chat::Chat;
 
 pub struct ChatTask {
-    task_info: TaskInfo,
+    parameters: TaskParameters,
     timer: Timer,
     chat: Sub<Chat>,
 }
 
 impl ChatTask {
-    pub fn new(task_info: TaskInfo) -> Self {
+    pub fn new(parameters: TaskParameters) -> Self {
         Self {
-            task_info,
+            parameters,
             timer: Timer::new(),
             chat: Sub::local_unified(),
         }
@@ -33,7 +33,7 @@ impl Agent for ChatTask {
 
 impl ChatTask {
     fn schedule(&mut self) -> Result<()> {
-        let duration = Duration::from_secs(self.task_info.interval_sec);
+        let duration = Duration::from_secs(self.parameters.interval_sec);
         self.timer.schedule(duration)?;
         Ok(())
     }
@@ -53,10 +53,10 @@ impl DoAsync<Initialize> for ChatTask {
 #[async_trait]
 impl OnEvent<Timeout> for ChatTask {
     async fn handle(&mut self, _: Timeout, ctx: &mut Context<Self>) -> Result<()> {
-        let prompt = self.task_info.prompt.clone();
+        let prompt = self.parameters.prompt.clone();
         self.chat.request(prompt);
 
-        if self.task_info.repeat {
+        if self.parameters.repeat {
             self.schedule()?;
         } else {
             ctx.shutdown();

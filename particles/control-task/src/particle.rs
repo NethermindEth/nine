@@ -1,15 +1,23 @@
-use crate::tools::{TaskAdd, TaskDel, TaskId, TaskInfo, TasksList};
+use crate::tools::{TaskAdd, TaskDel, TaskId, TaskInfo, TasksList, TaskParameters};
+use super::task::ChatTask;
 use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
+use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, Address, Equip};
 use crb::superagent::{SupervisorSession, Supervisor};
 use crb::core::Slot;
 use n9_core::{Particle, SubstanceBond, SubstanceLinks, Tool, ToolInfo};
 use ui9_dui::Operation;
+use typed_slab::TypedSlab;
+
+pub struct TaskRecord {
+    parameters: TaskParameters,
+    address: Address<ChatTask>,
+}
 
 pub struct ControlTask {
     substance: SubstanceLinks,
     bond: Slot<SubstanceBond<Self>>,
+    tasks: TypedSlab<TaskId, TaskRecord>,
     // TODO: Add tasks flow (tracer) here
 }
 
@@ -18,6 +26,7 @@ impl Particle for ControlTask {
         Self {
             substance,
             bond: Slot::empty(),
+            tasks: TypedSlab::new(),
         }
     }
 }
@@ -56,21 +65,42 @@ impl Tool<TasksList> for ControlTask {
         input: TasksList,
         _ctx: &mut Context<Self>,
     ) -> Result<Vec<TaskInfo>> {
-        Ok(Vec::new())
+        let tasks = self.tasks.iter()
+            .map(|(id, record)| {
+                TaskInfo {
+                    id,
+                    parameters: record.parameters.clone(),
+                }
+            })
+            .collect();
+        Ok(tasks)
     }
 }
 
 #[async_trait]
 impl Tool<TaskAdd> for ControlTask {
-    async fn call_tool(&mut self, input: TaskAdd, _ctx: &mut Context<Self>) -> Result<TaskId> {
-        Operation::event("A task has added");
-        Ok(0)
+    async fn call_tool(&mut self, input: TaskAdd, ctx: &mut Context<Self>) -> Result<TaskId> {
+        let parameters = TaskParameters::from(input);
+        let chat_task = ChatTask::new(parameters.clone());
+        let address = ctx.spawn_agent(chat_task, ()).equip();
+        let record = TaskRecord {
+            parameters,
+            address,
+        };
+        let id = self.tasks.insert(record);
+        Operation::event("A task has added with id: {id}");
+        Ok(id)
     }
 }
 
 #[async_trait]
 impl Tool<TaskDel> for ControlTask {
     async fn call_tool(&mut self, input: TaskDel, _ctx: &mut Context<Self>) -> Result<bool> {
-        Ok(false)
+        if let Some(record) = self.tasks.remove(input.id) {
+            record.address.interrupt();
+            Ok(true)
+        } else {
+            Ok(false)
+        }
     }
 }

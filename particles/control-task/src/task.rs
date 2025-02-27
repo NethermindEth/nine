@@ -1,8 +1,9 @@
 use crate::tools::TaskInfo;
 use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::{Agent, Context, Next, DoAsync, OnEvent};
+use crb::agent::{Agent, Context, Next, DoAsync, OnEvent, ManagedContext};
 use crb::superagent::{Timer, StreamSession, Timeout};
+use crb::core::time::Duration;
 
 pub struct ChatTask {
     task_info: TaskInfo,
@@ -26,20 +27,34 @@ impl Agent for ChatTask {
     }
 }
 
+impl ChatTask {
+    fn schedule(&mut self) -> Result<()> {
+        let duration = Duration::from_secs(self.task_info.interval_sec);
+        self.timer.schedule(duration)?;
+        Ok(())
+    }
+}
+
 struct Initialize;
 
 #[async_trait]
 impl DoAsync<Initialize> for ChatTask {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         ctx.consume(self.timer.events()?);
+        self.schedule()?;
         Ok(Next::events())
     }
 }
 
 #[async_trait]
 impl OnEvent<Timeout> for ChatTask {
-    async fn handle(&mut self, _: Timeout, _ctx: &mut Context<Self>) -> Result<()> {
+    async fn handle(&mut self, _: Timeout, ctx: &mut Context<Self>) -> Result<()> {
+        // TODO: Chat the model
+
         if self.task_info.repeat {
+            self.schedule()?;
+        } else {
+            ctx.shutdown();
         }
         Ok(())
     }

@@ -14,6 +14,15 @@ pub struct TaskRecord {
     address: Address<ChatTask>,
 }
 
+impl From<(usize, &TaskRecord)> for TaskInfo {
+    fn from((id, record): (usize, &TaskRecord)) -> Self {
+        Self {
+            id,
+            parameters: record.parameters.clone(),
+        }
+    }
+}
+
 pub struct ControlTask {
     substance: SubstanceLinks,
     bond: Slot<SubstanceBond<Self>>,
@@ -65,14 +74,7 @@ impl Tool<TasksList> for ControlTask {
         input: TasksList,
         _ctx: &mut Context<Self>,
     ) -> Result<Vec<TaskInfo>> {
-        let tasks = self
-            .tasks
-            .iter()
-            .map(|(id, record)| TaskInfo {
-                id,
-                parameters: record.parameters.clone(),
-            })
-            .collect();
+        let tasks = self.tasks.iter().map(TaskInfo::from).collect();
         Ok(tasks)
     }
 }
@@ -88,7 +90,7 @@ impl Tool<TaskAdd> for ControlTask {
             address,
         };
         let id = self.tasks.insert(record);
-        Operation::event("A task has added with id: {id}");
+        Operation::event(format!("A task has added with id: {id}"));
         Ok(id)
     }
 }
@@ -97,17 +99,17 @@ impl Tool<TaskAdd> for ControlTask {
 impl Tool<TaskDel> for ControlTask {
     async fn call_tool(&mut self, input: TaskDel, _ctx: &mut Context<Self>) -> Result<bool> {
         if let Some(id) = input.id {
-            if let Some(record) = self.tasks.remove(id) {
-                record.address.interrupt().ok();
-                Ok(true)
-            } else {
-                Ok(false)
-            }
+            // Interrupt a specific task
+            let Some(record) = self.tasks.remove(id) else {
+                return Ok(false);
+            };
+            record.address.interrupt().ok();
         } else {
+            // Interrupt all tasks
             for record in self.tasks.drain() {
                 record.address.interrupt().ok();
             }
-            Ok(true)
         }
+        Ok(true)
     }
 }

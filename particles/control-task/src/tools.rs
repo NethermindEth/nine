@@ -27,6 +27,8 @@ pub struct TaskInfo {
     pub parameters: TaskParameters,
 }
 
+impl TaskInfo {}
+
 /// Task List Display Tool
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct TasksList {}

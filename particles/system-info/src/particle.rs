@@ -47,10 +47,6 @@ impl DoAsync<Initialize> for SystemInfo {
 
 #[async_trait]
 impl Tool<ToolsList> for SystemInfo {
-    fn name(&self) -> String {
-        "tools_list".into()
-    }
-
     async fn call_tool(
         &mut self,
         input: ToolsList,

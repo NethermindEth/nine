@@ -1,4 +1,4 @@
-use crate::tools::{TasksList, TaskInfo};
+use crate::tools::{TasksList, TaskInfo, TaskId, TaskAdd, TaskDel};
 use anyhow::Result;
 use async_trait::async_trait;
 use n9_core::{SubstanceLinks, SubstanceBond, Particle, Tool, ToolInfo};
@@ -42,15 +42,33 @@ impl DoAsync<Initialize> for ControlTask {
 
 #[async_trait]
 impl Tool<TasksList> for ControlTask {
-    fn name(&self) -> String {
-        "tasks_list".into()
-    }
-
     async fn call_tool(
         &mut self,
         input: TasksList,
         _ctx: &mut Context<Self>,
     ) -> Result<Vec<TaskInfo>> {
         Ok(Vec::new())
+    }
+}
+
+#[async_trait]
+impl Tool<TaskAdd> for ControlTask {
+    async fn call_tool(
+        &mut self,
+        input: TaskAdd,
+        _ctx: &mut Context<Self>,
+    ) -> Result<TaskId> {
+        Ok(0)
+    }
+}
+
+#[async_trait]
+impl Tool<TaskDel> for ControlTask {
+    async fn call_tool(
+        &mut self,
+        input: TaskDel,
+        _ctx: &mut Context<Self>,
+    ) -> Result<bool> {
+        Ok(false)
     }
 }

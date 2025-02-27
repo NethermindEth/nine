@@ -33,12 +33,19 @@ where
     P: Prompt,
 {
     fn name(&self) -> String {
-        // TODO: Use `const_str!`
-        type_name::<P>()
-            .to_lowercase()
-            .replace("::", "_")
-            .replace('<', "_")
-            .replace('>', "")
+        let mut name = String::new();
+        let full_name = type_name::<P>().to_lowercase().replace('<', "_").replace('>', "");
+        let items: Vec<_> = full_name.split("::").collect();
+        if let Some(first) = items.first() {
+            name.push_str(first);
+        }
+        if let Some(last) = items.last() {
+            if !name.is_empty() {
+                name.push('_');
+            }
+            name.push_str(last);
+        }
+        name
     }
 
     fn description(&self) -> Option<String> {

@@ -69,8 +69,8 @@ impl Prompt for TaskAdd {
 /// Task Removal Tool
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct TaskDel {
-    /// The unique numerical identifier of the task to be deleted from the system.
-    pub id: TaskId,
+    /// The unique numerical identifier of the task to be deleted from the system. If `null`, all tasks will be canceled.
+    pub id: Option<TaskId>,
 }
 
 impl Prompt for TaskDel {
@@ -80,6 +80,7 @@ impl Prompt for TaskDel {
         "This tool allows users to remove tasks from the system. By specifying the task's ID,
         the tool cancels the task, stopping it from repeating and executing any further.
         This feature is crucial for maintaining an organized task list and ensuring that
-        unnecessary or completed tasks are properly managed and deleted from the system."
+        unnecessary or completed tasks are properly managed and deleted from the system.
+        If ID of a cancelling task is not presented, all the active tasks will be canceled."
     }
 }

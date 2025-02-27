@@ -1,11 +1,11 @@
 use crate::tools::TaskParameters;
 use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::{Agent, Context, Next, DoAsync, OnEvent, ManagedContext};
-use crb::superagent::{Timer, StreamSession, Timeout};
+use crb::agent::{Agent, Context, DoAsync, ManagedContext, Next, OnEvent};
 use crb::core::time::Duration;
-use ui9_dui::Sub;
+use crb::superagent::{StreamSession, Timeout, Timer};
 use n9_control_chat::Chat;
+use ui9_dui::Sub;
 
 pub struct ChatTask {
     parameters: TaskParameters,

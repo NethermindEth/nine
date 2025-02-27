@@ -1,5 +1,5 @@
 mod particle;
-mod tools;
 mod task;
+mod tools;
 
 pub use particle::ControlTask;

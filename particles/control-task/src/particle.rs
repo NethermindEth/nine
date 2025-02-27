@@ -1,13 +1,13 @@
-use crate::tools::{TaskAdd, TaskDel, TaskId, TaskInfo, TasksList, TaskParameters};
 use super::task::ChatTask;
+use crate::tools::{TaskAdd, TaskDel, TaskId, TaskInfo, TaskParameters, TasksList};
 use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, Address, Equip};
-use crb::superagent::{SupervisorSession, Supervisor};
+use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next};
 use crb::core::Slot;
+use crb::superagent::{Supervisor, SupervisorSession};
 use n9_core::{Particle, SubstanceBond, SubstanceLinks, Tool, ToolInfo};
-use ui9_dui::Operation;
 use typed_slab::TypedSlab;
+use ui9_dui::Operation;
 
 pub struct TaskRecord {
     parameters: TaskParameters,
@@ -65,12 +65,12 @@ impl Tool<TasksList> for ControlTask {
         input: TasksList,
         _ctx: &mut Context<Self>,
     ) -> Result<Vec<TaskInfo>> {
-        let tasks = self.tasks.iter()
-            .map(|(id, record)| {
-                TaskInfo {
-                    id,
-                    parameters: record.parameters.clone(),
-                }
+        let tasks = self
+            .tasks
+            .iter()
+            .map(|(id, record)| TaskInfo {
+                id,
+                parameters: record.parameters.clone(),
             })
             .collect();
         Ok(tasks)
@@ -96,11 +96,18 @@ impl Tool<TaskAdd> for ControlTask {
 #[async_trait]
 impl Tool<TaskDel> for ControlTask {
     async fn call_tool(&mut self, input: TaskDel, _ctx: &mut Context<Self>) -> Result<bool> {
-        if let Some(record) = self.tasks.remove(input.id) {
-            record.address.interrupt();
-            Ok(true)
+        if let Some(id) = input.id {
+            if let Some(record) = self.tasks.remove(id) {
+                record.address.interrupt().ok();
+                Ok(true)
+            } else {
+                Ok(false)
+            }
         } else {
-            Ok(false)
+            for record in self.tasks.drain() {
+                record.address.interrupt().ok();
+            }
+            Ok(true)
         }
     }
 }

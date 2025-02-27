@@ -56,7 +56,7 @@ pub struct Chat {
 
 impl Unified for Chat {
     fn fqn() -> Fqn {
-        Fqn::root("control-chat")
+        Fqn::root("@control-chat")
     }
 }
 

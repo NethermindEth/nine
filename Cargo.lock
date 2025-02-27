@@ -4715,6 +4715,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "crb",
+ "n9-control-chat",
  "n9-core",
  "schemars",
  "serde",

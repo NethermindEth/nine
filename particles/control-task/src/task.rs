@@ -4,10 +4,13 @@ use async_trait::async_trait;
 use crb::agent::{Agent, Context, Next, DoAsync, OnEvent, ManagedContext};
 use crb::superagent::{Timer, StreamSession, Timeout};
 use crb::core::time::Duration;
+use ui9_dui::Sub;
+use n9_control_chat::Chat;
 
 pub struct ChatTask {
     task_info: TaskInfo,
     timer: Timer,
+    chat: Sub<Chat>,
 }
 
 impl ChatTask {
@@ -15,6 +18,7 @@ impl ChatTask {
         Self {
             task_info,
             timer: Timer::new(),
+            chat: Sub::local_unified(),
         }
     }
 }
@@ -49,7 +53,8 @@ impl DoAsync<Initialize> for ChatTask {
 #[async_trait]
 impl OnEvent<Timeout> for ChatTask {
     async fn handle(&mut self, _: Timeout, ctx: &mut Context<Self>) -> Result<()> {
-        // TODO: Chat the model
+        let prompt = self.task_info.prompt.clone();
+        self.chat.request(prompt);
 
         if self.task_info.repeat {
             self.schedule()?;

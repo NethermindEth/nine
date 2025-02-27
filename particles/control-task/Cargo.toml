@@ -14,5 +14,6 @@ schemars.workspace = true
 serde.workspace = true
 crb.workspace = true
 n9-core.workspace = true
+n9-control-chat.workspace = true
 ui9-app.workspace = true
 ui9-dui.workspace = true

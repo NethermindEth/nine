@@ -4709,6 +4709,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-control-task"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "crb",
+ "n9-core",
+ "schemars",
+ "serde",
+ "ui9-app",
+ "ui9-dui",
+]
+
+[[package]]
 name = "n9-core"
 version = "0.0.1"
 dependencies = [
@@ -7856,6 +7870,7 @@ dependencies = [
  "n9-app-tui",
  "n9-chat-telegram",
  "n9-control-chat",
+ "n9-control-task",
  "n9-core",
  "n9-exchange",
  "n9-exchange-dydx",

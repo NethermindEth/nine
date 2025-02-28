@@ -1,0 +1,15 @@
+[package]
+name = "n9-web-frontend"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+crb.workspace = true
+log.workspace = true
+wasm-logger = "0.2.0"
+yew = "0.21.0"

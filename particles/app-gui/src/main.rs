@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use crb::agent::RunAgent;
-use ice9_maker_gui::AppGui;
+use n9_maker_gui::AppGui;
 use tokio::runtime::Runtime;
 use ui9_maker::App;
 use ui9_mesh::Mesh;

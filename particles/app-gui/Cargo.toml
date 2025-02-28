@@ -1,5 +1,5 @@
 [package]
-name = "ice9-maker-gui"
+name = "n9-maker-gui"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

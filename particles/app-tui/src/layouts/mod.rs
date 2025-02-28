@@ -1,4 +1,5 @@
 mod auto;
+mod modal;
 mod tab;
 
 pub use auto::AutoLayout;

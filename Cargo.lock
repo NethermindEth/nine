@@ -5261,6 +5261,7 @@ dependencies = [
 name = "n9-web-frontend"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "async-trait",
  "crb",
  "log",

@@ -8,8 +8,9 @@ rust-version.workspace = true
 keywords.workspace = true
 
 [dependencies]
+anyhow.workspace = true
 async-trait.workspace = true
 crb.workspace = true
 log.workspace = true
 wasm-logger = "0.2.0"
-yew = "0.21.0"
+yew = { version = "0.21.0", features = ["csr"] }

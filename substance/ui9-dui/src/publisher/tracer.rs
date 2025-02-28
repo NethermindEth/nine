@@ -4,7 +4,7 @@ use super::RecorderState;
 use crate::flow::Flow;
 use crate::subscriber::{drainer, Act};
 use anyhow::{anyhow, Result};
-use crb::agent::StopAddress;
+use crb::agent::{Address, StopAddress};
 use crb::core::mpsc;
 use crb::superagent::Drainer;
 use serde::{Deserialize, Serialize};
@@ -43,6 +43,23 @@ impl<F: Flow> Tracer<F> {
         self.receiver().map(drainer::from_mpsc)
     }
 
+    pub fn event(&self, event: F::Event) {
+        let update = Update { event };
+        self.recorder.event(update).ok();
+    }
+
+    pub fn bare_tracer(&self) -> BareTracer<F> {
+        BareTracer {
+            recorder: (*self.recorder).clone(),
+        }
+    }
+}
+
+pub struct BareTracer<F: Flow> {
+    recorder: Address<Recorder<F>>,
+}
+
+impl<F: Flow> BareTracer<F> {
     pub fn event(&self, event: F::Event) {
         let update = Update { event };
         self.recorder.event(update).ok();

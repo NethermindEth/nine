@@ -10,11 +10,14 @@ keywords.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-schemars.workspace = true
-serde.workspace = true
 crb.workspace = true
+derive_more.workspace = true
 n9-core.workspace = true
 n9-control-chat.workspace = true
+schemars.workspace = true
+serde.workspace = true
+typed-slab.workspace = true
+ui9.workspace = true
 ui9-app.workspace = true
 ui9-dui.workspace = true
-typed-slab.workspace = true
+chrono.workspace = true

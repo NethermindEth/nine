@@ -1,4 +1,5 @@
-use super::task::ChatTask;
+use crate::flow::Tasks;
+use crate::task::ChatTask;
 use crate::tools::{TaskAdd, TaskDel, TaskId, TaskInfo, TaskParameters, TasksList};
 use anyhow::Result;
 use async_trait::async_trait;
@@ -7,7 +8,7 @@ use crb::core::Slot;
 use crb::superagent::{Supervisor, SupervisorSession};
 use n9_core::{Particle, SubstanceBond, SubstanceLinks, Tool, ToolInfo};
 use typed_slab::TypedSlab;
-use ui9_dui::Operation;
+use ui9_dui::{Operation, Pub};
 
 pub struct TaskRecord {
     parameters: TaskParameters,
@@ -27,6 +28,7 @@ pub struct ControlTask {
     substance: SubstanceLinks,
     bond: Slot<SubstanceBond<Self>>,
     tasks: TypedSlab<TaskId, TaskRecord>,
+    state: Pub<Tasks>,
     // TODO: Add tasks flow (tracer) here
 }
 
@@ -36,6 +38,7 @@ impl Particle for ControlTask {
             substance,
             bond: Slot::empty(),
             tasks: TypedSlab::new(),
+            state: Pub::unified(),
         }
     }
 }
@@ -86,7 +89,7 @@ impl Tool<TaskAdd> for ControlTask {
         let chat_task = ChatTask::new(parameters.clone());
         let address = ctx.spawn_agent(chat_task, ()).equip();
         let record = TaskRecord {
-            parameters,
+            parameters: parameters.clone(),
             address,
         };
         let id = self.tasks.insert(record);

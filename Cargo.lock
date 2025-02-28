@@ -4714,12 +4714,15 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "async-trait",
+ "chrono",
  "crb",
+ "derive_more 2.0.1",
  "n9-control-chat",
  "n9-core",
  "schemars",
  "serde",
  "typed-slab",
+ "ui9",
  "ui9-app",
  "ui9-dui",
 ]

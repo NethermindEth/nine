@@ -4,7 +4,7 @@ mod tracer;
 
 pub use recorder::{EventFlow, Recorder, RecorderLink, UniRecorder};
 pub use server::{HubServer, HubServerLink};
-pub use tracer::{Tracer, TracerInfo};
+pub use tracer::{BareTracer, Tracer, TracerInfo};
 
 use crate::flow::{Flow, Unified};
 use crate::subscriber::Act;

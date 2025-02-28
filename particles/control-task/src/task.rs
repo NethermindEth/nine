@@ -1,3 +1,4 @@
+use crate::flow::TaskPub;
 use crate::tools::TaskParameters;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -8,15 +9,15 @@ use n9_control_chat::Chat;
 use ui9_dui::Sub;
 
 pub struct ChatTask {
-    parameters: TaskParameters,
+    state: TaskPub,
     timer: Timer,
     chat: Sub<Chat>,
 }
 
 impl ChatTask {
-    pub fn new(parameters: TaskParameters) -> Self {
+    pub fn new(state: TaskPub) -> Self {
         Self {
-            parameters,
+            state,
             timer: Timer::new(),
             chat: Sub::local_unified(),
         }
@@ -27,14 +28,25 @@ impl Agent for ChatTask {
     type Context = StreamSession<Self>;
 
     fn begin(&mut self) -> Next<Self> {
+        self.state.register();
         Next::do_async(Initialize)
+    }
+
+    fn interrupt(&mut self, ctx: &mut Context<Self>) {
+        self.timer.cancel().ok();
+        ctx.shutdown();
+    }
+
+    fn end(&mut self) {
+        self.state.unregister();
     }
 }
 
 impl ChatTask {
     fn schedule(&mut self) -> Result<()> {
-        let duration = Duration::from_secs(self.parameters.interval_sec);
+        let duration = self.state.duration()?;
         self.timer.schedule(duration)?;
+        self.state.update();
         Ok(())
     }
 }
@@ -53,13 +65,13 @@ impl DoAsync<Initialize> for ChatTask {
 #[async_trait]
 impl OnEvent<Timeout> for ChatTask {
     async fn handle(&mut self, _: Timeout, ctx: &mut Context<Self>) -> Result<()> {
-        let prompt = self.parameters.prompt.clone();
+        let prompt = self.state.prompt.clone();
         self.chat.request(prompt);
 
-        if self.parameters.repeat {
+        if self.state.repeat {
             self.schedule()?;
         } else {
-            ctx.shutdown();
+            self.interrupt(ctx);
         }
         Ok(())
     }

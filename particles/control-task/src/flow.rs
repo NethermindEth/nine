@@ -1,5 +1,6 @@
 use crate::tools::{TaskId, TaskInfo, TaskParameters};
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, OutOfRangeError, TimeDelta, Utc};
+use crb::core::time::Duration;
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -28,26 +29,36 @@ impl Publisher for Tasks {
 
 impl TasksPub {
     pub fn create(&self, id: TaskId, parameters: TaskParameters) -> TaskPub {
+        let delta = TimeDelta::seconds(parameters.interval_sec as i64);
         TaskPub {
             id,
-            duration: Duration::seconds(parameters.interval_sec as i64),
+            parameters,
+            delta,
+            unregistered: false,
             tracer: self.bare_tracer(),
         }
     }
 }
 
+#[derive(Deref)]
 pub struct TaskPub {
     id: TaskId,
-    duration: Duration,
+    #[deref]
+    parameters: TaskParameters,
+    delta: TimeDelta,
+    unregistered: bool,
     tracer: BareTracer<Tasks>,
 }
 
 impl TaskPub {
-    pub fn add(&mut self, parameters: TaskParameters) {
+    pub fn duration(&self) -> Result<Duration, OutOfRangeError> {
+        self.delta.to_std()
+    }
+
+    pub fn register(&mut self) {
         let event = TasksEvent::Add {
             id: self.id,
-            deadline: Utc::now() + self.duration,
-            parameters,
+            parameters: self.parameters.clone(),
         };
         self.tracer.event(event);
     }
@@ -55,12 +66,12 @@ impl TaskPub {
     pub fn update(&mut self) {
         let event = TasksEvent::Update {
             id: self.id,
-            deadline: Utc::now() + self.duration,
+            deadline: Utc::now() + self.delta,
         };
         self.tracer.event(event);
     }
 
-    pub fn del(&mut self) {
+    pub fn unregister(&mut self) {
         let event = TasksEvent::Del { id: self.id };
         self.tracer.event(event);
     }
@@ -75,7 +86,7 @@ pub struct Message {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct TaskRecord {
     pub parameters: TaskParameters,
-    pub deadline: Deadline,
+    pub deadline: Option<Deadline>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
@@ -95,11 +106,7 @@ impl Flow for Tasks {
 
     fn apply(&mut self, event: Self::Event) {
         match event {
-            TasksEvent::Add {
-                id,
-                parameters,
-                deadline,
-            } => {}
+            TasksEvent::Add { id, parameters } => {}
             TasksEvent::Update { id, deadline } => {}
             TasksEvent::Del { id } => {}
         }
@@ -116,7 +123,6 @@ pub enum Role {
 pub enum TasksEvent {
     Add {
         id: TaskId,
-        deadline: Deadline,
         parameters: TaskParameters,
     },
     Update {

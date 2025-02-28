@@ -10,7 +10,7 @@ keywords.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-crb.workspace = true
+crb = { git = "https://github.com/runtime-blocks/crb", features = ["wasm"] }
 log.workspace = true
 wasm-logger = "0.2.0"
 yew = { version = "0.21.0", features = ["csr"] }

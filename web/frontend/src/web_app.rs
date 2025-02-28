@@ -18,7 +18,9 @@ impl Component for WebApp {
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
-            <p>{ "N9 APP" }</p>
+            <div>
+                <img width="200" src="static/logo.png" />
+            </div>
         }
     }
 }

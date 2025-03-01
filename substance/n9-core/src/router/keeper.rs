@@ -1,5 +1,4 @@
 use super::{ReasoningRouter, RouterLink};
-use crate::Config;
 use anyhow::{anyhow, Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, Equip, MessageFor, OnEvent, ToAddress};
@@ -8,10 +7,19 @@ use crb::superagent::{
     Entry, Fetcher, InteractExt, ManageSubscription, OnRequest, Request, SubscribeExt, Subscription,
 };
 use derive_more::{Deref, DerefMut};
+use serde::{de::DeserializeOwned, Serialize};
 use std::any::type_name;
 use std::marker::PhantomData;
 use std::sync::Arc;
 use toml::Value;
+
+pub trait Config: DeserializeOwned + Serialize + Send + 'static {
+    // TODO: Add scope
+    // TODO: Add methods to get a full path for logging
+    const NAMESPACE: &str;
+
+    fn template() -> Self;
+}
 
 pub trait Keeper: OnRequest<GetConfig> + ManageSubscription<ConfigSegmentUpdates> {}
 

@@ -1,6 +1,5 @@
 use super::particle::Particle;
 use super::SubstanceLinks;
-use crate::keeper::Keeper;
 use crate::router::ReasoningRouter;
 use crate::space::Space;
 use anyhow::{Error, Result};
@@ -84,9 +83,6 @@ struct Configure;
 #[async_trait]
 impl DoAsync<Configure> for Substance {
     async fn handle(&mut self, _: Configure, ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let agent = Keeper::new();
-        let keeper = ctx.spawn_agent(agent, Group::Services).equip();
-
         let agent = ReasoningRouter::new();
         let router = ctx.spawn_agent(agent, Group::Services).equip();
 
@@ -95,7 +91,6 @@ impl DoAsync<Configure> for Substance {
 
         let links = SubstanceLinks {
             substance: ctx.address().clone().equip(),
-            keeper,
             router,
             space,
         };

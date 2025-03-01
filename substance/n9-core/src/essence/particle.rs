@@ -1,20 +1,16 @@
 use super::SubstanceLinks;
-use crate::keeper::subscription::ConfigSegmentUpdates;
-use crate::keeper::{subscription::UpdateConfig, Config};
 use crate::router::{
+    keeper::{ConfigSegmentUpdates, Keeper, UpdateConfig},
     model::Model,
     tool::{Prompt, Tool},
     types::ToolMeta,
 };
+use crate::Config;
 use anyhow::Result;
 use crb::agent::{Address, Agent, ToAddress};
 use crb::superagent::Entry;
 
 impl SubstanceLinks {
-    pub async fn config<C: Config>(&mut self) -> Result<C> {
-        self.keeper.get_config().await
-    }
-
     pub fn bond<A: Agent>(&mut self, recipient: impl ToAddress<A>) -> SubstanceBond<A> {
         SubstanceBond {
             address: recipient.to_address(),
@@ -42,9 +38,16 @@ impl<A: Agent> SubstanceBond<A> {
         A: UpdateConfig<C>,
         C: Config,
     {
+        let keeper = self.substance.router.get_keeper().await?;
+        keeper.live_config_updates(&self.address).await
+    }
+
+    pub fn add_keeper(&mut self) -> Result<()>
+    where
+        A: Keeper,
+    {
         let address = self.address.clone();
-        let pair = self.substance.keeper.live_config_updates(address).await?;
-        Ok(pair)
+        self.substance.router.add_keeper(address)
     }
 
     pub fn add_model(&mut self) -> Result<()>

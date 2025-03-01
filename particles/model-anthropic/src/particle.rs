@@ -84,7 +84,8 @@ impl OnRequest<ToolingChatRequest> for AnthropicParticle {
         let client = self.client.take()?;
 
         let messages: Vec<_> = request.messages.into_iter().map(convert::message).collect();
-        let config = self.substance.config::<AnthropicConfig>().await?;
+        let keeper = self.substance.router.get_keeper().await?;
+        let config = keeper.get_config::<AnthropicConfig>().await?;
 
         let anthropic_request = client
             .model(config.model.as_str())

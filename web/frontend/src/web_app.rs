@@ -18,8 +18,9 @@ impl Component for WebApp {
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
-            <div>
-                <img width="200" src="static/logo.png" />
+            <div class="loader-container">
+                <img src="static/logo.png" />
+                <div class="loader-overlay"></div>
             </div>
         }
     }

@@ -13,3 +13,8 @@ ui9-dui.workspace = true
 
 [dev-dependencies]
 anyhow.workspace = true
+
+[features]
+default = ["std"]
+std = ["ui9-dui/std"]
+web = ["ui9-dui/web"]

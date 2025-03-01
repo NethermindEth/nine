@@ -10,10 +10,12 @@ keywords = ["ai", "ai-agent", "framework"]
 [dependencies]
 anyhow = "1.0.96"
 async-trait = "0.1.86"
-crb = { version = "0.0.30", default-features = false, features = ["web"] }
+crb = { version = "0.0.31", default-features = false, features = ["web"] }
 log = "0.4.26"
 wasm-logger = "0.2.0"
 yew = { version = "0.21.0", features = ["csr"] }
-# ui9.workspace = true
-# ui9-codec.workspace = true
-# ui9-dui.workspace = true
+ui9 = { path = "../../substance/ui9" }
+ui9-codec = { path = "../../substance/ui9-codec" }
+ui9-dui = { path = "../../substance/ui9-dui", default-features = false, features = ["web"] }
+ui9-tracers = { path = "../../substance/ui9-tracers", default-features = false, features = ["web"] }
+n9-core = { path = "../../substance/n9-core", default-features = false, features = ["web"] }

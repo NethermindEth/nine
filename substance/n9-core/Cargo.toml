@@ -9,7 +9,7 @@ repository.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-crb = { workspace = true, features = ["std"] }
+crb.workspace = true
 derive_more.workspace = true
 dotenvy.workspace = true
 envy.workspace = true
@@ -24,3 +24,14 @@ typedmap = "0.6.0"
 ui9.workspace = true
 ui9-dui.workspace = true
 ui9-tracers.workspace = true
+
+[features]
+default = ["std"]
+std = [
+    "crb/std",
+    "ui9-dui/std",
+]
+web = [
+    "crb/web",
+    "ui9-dui/web",
+]

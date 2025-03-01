@@ -5169,6 +5169,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-config-toml"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "crb 0.0.29",
+ "derive_more 2.0.1",
+ "dirs",
+ "log",
+ "n9-core",
+ "notify",
+ "tokio",
+ "toml",
+ "ui9-dui",
+]
+
+[[package]]
 name = "n9-control-chat"
 version = "0.0.1"
 dependencies = [
@@ -5213,7 +5230,6 @@ dependencies = [
  "envy",
  "futures",
  "log",
- "n9-std",
  "schemars",
  "serde",
  "serde_json",
@@ -5325,22 +5341,6 @@ dependencies = [
  "crb 0.0.29",
  "n9-core",
  "rig-core",
-]
-
-[[package]]
-name = "n9-std"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "async-trait",
- "crb 0.0.29",
- "derive_more 2.0.1",
- "dirs",
- "log",
- "notify",
- "tokio",
- "toml",
- "ui9-dui",
 ]
 
 [[package]]

@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, DoAsync, ManagedContext, Next, OnEvent, ToAddress};
-use crb::core::Unique;
+use crb::core::{Unique, Slot};
 use crb::send::{Recipient, Sender};
 use crb::superagent::{ManageSubscription, StreamSession, Subscription, Timeout, Timer};
 use derive_more::{Deref, DerefMut, From};
@@ -15,6 +15,7 @@ use std::time::Duration;
 use tokio::fs;
 use toml::{Table, Value};
 use ui9_dui::Operation;
+use n9_core::{Particle, SubstanceLinks, SubstanceBond};
 
 const CONFIG_NAME: &str = "nine.toml";
 const TEMPLATE_NAME: &str = "nine.example.toml";

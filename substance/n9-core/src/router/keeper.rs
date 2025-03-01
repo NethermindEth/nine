@@ -2,15 +2,18 @@ use super::{ReasoningRouter, RouterLink};
 use crate::Config;
 use anyhow::{anyhow, Error, Result};
 use async_trait::async_trait;
-use crb::agent::{Address, Agent, Context, Equip, OnEvent};
-use crb::send::Recipient;
-use crb::superagent::{Fetcher, InteractExt, OnRequest, Request, Subscription};
+use crb::agent::{Address, Agent, Context, Equip, MessageFor, OnEvent, ToAddress};
+use crb::send::{Recipient, Sender};
+use crb::superagent::{
+    Entry, Fetcher, InteractExt, ManageSubscription, OnRequest, Request, SubscribeExt, Subscription,
+};
 use derive_more::{Deref, DerefMut};
 use std::any::type_name;
+use std::marker::PhantomData;
 use std::sync::Arc;
 use toml::Value;
 
-pub trait Keeper: OnRequest<GetConfig> {}
+pub trait Keeper: OnRequest<GetConfig> + ManageSubscription<ConfigSegmentUpdates> {}
 
 #[derive(Deref, DerefMut, Clone)]
 pub struct KeeperLink {
@@ -25,6 +28,17 @@ impl<M: Keeper> From<Address<M>> for KeeperLink {
     }
 }
 
+pub trait KeeperAddress
+where
+    Self: InteractExt<GetConfig> + SubscribeExt<ConfigSegmentUpdates> + Send + Sync,
+{
+}
+
+impl<T> KeeperAddress for T where
+    Self: InteractExt<GetConfig> + SubscribeExt<ConfigSegmentUpdates> + Send + Sync
+{
+}
+
 // Single request
 
 impl KeeperLink {
@@ -37,10 +51,6 @@ impl KeeperLink {
     }
 }
 
-pub trait KeeperAddress: InteractExt<GetConfig> + Send + Sync {}
-
-impl<T> KeeperAddress for T where Self: InteractExt<GetConfig> + Send + Sync {}
-
 pub struct GetConfig;
 
 impl Request for GetConfig {
@@ -48,6 +58,28 @@ impl Request for GetConfig {
 }
 
 // Live updates
+
+impl KeeperLink {
+    pub async fn live_config_updates<A, C>(
+        &self,
+        address: impl ToAddress<A>,
+    ) -> Result<(C, Entry<ConfigSegmentUpdates>)>
+    where
+        A: UpdateConfig<C>,
+        C: Config,
+    {
+        let recipient = TypedConfigListener {
+            recipient: address.to_address().sender(),
+        };
+        let updates = ConfigSegmentUpdates {
+            get_config: GetConfig,
+            recipient: Recipient::new(recipient),
+        };
+        let state_entry = self.subscribe(updates).await?;
+        let config = state_entry.state.try_into()?;
+        Ok((config, state_entry.entry))
+    }
+}
 
 #[async_trait]
 pub trait UpdateConfig<C: Config>: Agent {
@@ -69,6 +101,51 @@ pub struct ConfigSegmentUpdates {
 
 impl Subscription for ConfigSegmentUpdates {
     type State = Value;
+}
+
+pub struct TypedConfigListener<C: Config> {
+    recipient: Recipient<UpdateConfigEvent<C>>,
+}
+
+impl<C> Sender<NewConfigSegment> for TypedConfigListener<C>
+where
+    C: Config,
+{
+    fn send(&self, value: NewConfigSegment) -> Result<()> {
+        let event = UpdateConfigEvent {
+            _type: PhantomData::<C>,
+            value: value.0,
+        };
+        self.recipient.send(event)?;
+        Ok(())
+    }
+}
+
+pub struct UpdateConfigEvent<C> {
+    _type: PhantomData<C>,
+    value: Value,
+}
+
+#[async_trait]
+impl<A, C> MessageFor<A> for UpdateConfigEvent<C>
+where
+    A: UpdateConfig<C>,
+    C: Config,
+{
+    async fn handle(self: Box<Self>, agent: &mut A, ctx: &mut Context<A>) -> Result<()> {
+        let result = match self.value.try_into() {
+            Ok(config) => agent.update_config(config, ctx).await,
+            Err(err) => {
+                let ns = C::NAMESPACE;
+                log::error!("Can't parse the section 'particle.{ns}.config': {err}");
+                Err(err.into())
+            }
+        };
+        if let Err(err) = result {
+            agent.fallback(err, ctx);
+        }
+        Ok(())
+    }
 }
 
 // Config registry

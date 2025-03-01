@@ -17,5 +17,5 @@ n9-control-chat.workspace = true
 n9-core.workspace = true
 n9-model-openai.workspace = true
 n9-system-info.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread"] }
 ui9-mesh.workspace = true

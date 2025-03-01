@@ -9,7 +9,7 @@ repository.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 clap.workspace = true
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 eframe.workspace = true
 egui.workspace = true
 env_logger.workspace = true

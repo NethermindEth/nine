@@ -8,7 +8,7 @@ license.workspace = true
 anyhow.workspace = true
 async-openai = "0.27.2"
 async-trait.workspace = true
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 n9-core.workspace = true
 schemars.workspace = true
 serde.workspace = true

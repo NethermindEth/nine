@@ -7,7 +7,7 @@ license.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 derive_more.workspace = true
 dydx = { git = "https://github.com/dydxprotocol/v4-clients", subdir = "v4-client-rs" }
 n9-core.workspace = true

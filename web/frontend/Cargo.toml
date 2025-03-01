@@ -1,19 +1,19 @@
 [package]
 name = "n9-web-frontend"
-version.workspace = true
-edition.workspace = true
-license.workspace = true
-repository.workspace = true
-rust-version.workspace = true
-keywords.workspace = true
+version = "0.0.1"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/NethermindEth/nine"
+rust-version = "1.84.1"
+keywords = ["ai", "ai-agent", "framework"]
 
 [dependencies]
-anyhow.workspace = true
-async-trait.workspace = true
-crb = { workspace = true, features = ["web"] }
-log.workspace = true
+anyhow = "1.0.96"
+async-trait = "0.1.86"
+crb = { version = "0.0.30", default-features = false, features = ["web"] }
+log = "0.4.26"
 wasm-logger = "0.2.0"
 yew = { version = "0.21.0", features = ["csr"] }
-ui9.workspace = true
-ui9-codec.workspace = true
+# ui9.workspace = true
+# ui9-codec.workspace = true
 # ui9-dui.workspace = true

@@ -9,7 +9,7 @@ keywords.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 env_logger.workspace = true
 n9-app-tui.workspace = true
 n9-config-toml.workspace = true

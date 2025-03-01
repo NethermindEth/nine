@@ -10,7 +10,7 @@ rust-version.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 colored = "3.0.0"
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 derive_more.workspace = true
 futures.workspace = true
 n9-core.workspace = true

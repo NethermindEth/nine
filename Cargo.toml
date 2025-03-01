@@ -4,9 +4,9 @@ members = [
     "examples/*",
     "particles/*",
     "substance/*",
-    "web/*",
 ]
 exclude = [
+    "web/frontend",
     # "examples",
 ]
 

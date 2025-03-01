@@ -8,7 +8,7 @@ repository.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 crossterm = "0.28.1"
 n9-core.workspace = true
 n9-control-chat.workspace = true

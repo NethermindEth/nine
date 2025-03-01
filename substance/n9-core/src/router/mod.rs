@@ -1,3 +1,4 @@
+pub mod keeper;
 pub mod model;
 pub mod session;
 pub mod tool;
@@ -9,6 +10,7 @@ use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Equip, Next};
 use crb::superagent::{InteractExt, OnRequest, Request, Responder, Supervisor, SupervisorSession};
 use derive_more::{Deref, DerefMut, From, Into};
+use keeper::KeeperLink;
 use model::ModelLink;
 use session::{ReasoningSession, SessionLink};
 use std::collections::HashMap;
@@ -27,6 +29,7 @@ pub struct RouterLink {
 
 pub struct ReasoningRouter {
     models: Vec<ModelLink>,
+    keepers: Vec<KeeperLink>,
     tools: HashMap<ToolId, ToolRecord>,
     requests: TypedSlab<ReqId, Responder<ChatResponse>>,
     tools_pub: Pub<Tools>,
@@ -36,6 +39,7 @@ impl ReasoningRouter {
     pub fn new() -> Self {
         Self {
             models: Vec::default(),
+            keepers: Vec::default(),
             tools: HashMap::default(),
             requests: TypedSlab::default(),
             tools_pub: Pub::unified(),

@@ -1,12 +1,14 @@
 use super::{ReasoningRouter, RouterLink};
+use crate::Config;
 use anyhow::{anyhow, Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, Equip, OnEvent};
 use crb::superagent::{Fetcher, InteractExt, OnRequest, Request};
 use derive_more::{Deref, DerefMut};
 use std::sync::Arc;
+use toml::Value;
 
-pub trait Keeper: Agent {}
+pub trait Keeper: OnRequest<GetConfig> {}
 
 #[derive(Deref, DerefMut, Clone)]
 pub struct KeeperLink {
@@ -21,9 +23,33 @@ impl<M: Keeper> From<Address<M>> for KeeperLink {
     }
 }
 
-pub trait KeeperAddress: Sync + Send {}
+impl KeeperLink {
+    pub async fn get_config<C>(&self) -> Result<C>
+    where
+        C: Config,
+    {
+        let config = self.address.get_config().await?.try_into()?;
+        Ok(config)
+    }
+}
 
-impl<M: Keeper> KeeperAddress for Address<M> {}
+#[async_trait]
+pub trait KeeperAddress: Sync + Send {
+    fn get_config(&self) -> Fetcher<Value>;
+}
+
+#[async_trait]
+impl<M: Keeper> KeeperAddress for Address<M> {
+    fn get_config(&self) -> Fetcher<Value> {
+        self.interact(GetConfig)
+    }
+}
+
+pub struct GetConfig;
+
+impl Request for GetConfig {
+    type Response = Value;
+}
 
 impl RouterLink {
     pub fn add_keeper<K>(&mut self, addr: Address<K>) -> Result<()>

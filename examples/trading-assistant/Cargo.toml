@@ -12,6 +12,7 @@ env_logger.workspace = true
 n9-app-stdio.path = "../../particles/app-stdio"
 n9-app-tui.workspace = true
 n9-chat-telegram.path = "../../particles/chat-telegram"
+n9-config-toml.workspace = true
 n9-control-chat.workspace = true
 n9-control-task.workspace = true
 n9-core.workspace = true

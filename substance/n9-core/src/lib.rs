@@ -7,7 +7,9 @@ pub mod tracers;
 pub use essence::particle::{Particle, SubstanceBond};
 pub use essence::substance::{Substance, SubstanceLink};
 pub use essence::SubstanceLinks;
-pub use router::keeper::{Config, ConfigSegmentUpdates, UpdateConfig, Keeper, NewConfigSegment, GetConfig};
+pub use router::keeper::{
+    Config, ConfigSegmentUpdates, GetConfig, Keeper, NewConfigSegment, UpdateConfig,
+};
 pub use router::model::{Model, ModelLink};
 pub use router::tool::{Prompt, Tool, ToolLink};
 pub use router::types::{

@@ -7,6 +7,7 @@ async fn main() -> Result<()> {
     env_logger::try_init()?;
     Mesh::activate().await?;
     let mut substance = Substance::arise();
+    substance.add_particle::<n9_config_toml::TomlConfigParticle>()?;
     // TODO: Rename to *Model
     substance.add_particle::<n9_model_openai::OpenAIParticle>()?;
     // substance.add_particle::<n9_model_anthropic::AnthropicParticle>()?;

@@ -12,6 +12,7 @@ anyhow.workspace = true
 crb.workspace = true
 env_logger.workspace = true
 n9-app-tui.workspace = true
+n9-config-toml.workspace = true
 n9-control-chat.workspace = true
 n9-core.workspace = true
 n9-model-openai.workspace = true

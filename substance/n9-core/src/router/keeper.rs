@@ -54,12 +54,27 @@ impl KeeperLink {
     where
         C: Config,
     {
-        let config = self.address.interact(GetConfig).await?.try_into()?;
+        let req = GetConfig::new::<C>()?;
+        let config = self.address.interact(req).await?.try_into()?;
         Ok(config)
     }
 }
 
-pub struct GetConfig;
+pub struct GetConfig {
+    pub namespace: String,
+    pub template: Value,
+}
+
+impl GetConfig {
+    pub fn new<C: Config>() -> Result<Self> {
+        let namespace = C::NAMESPACE.to_string();
+        let template = Value::try_from(C::template())?;
+        Ok(Self {
+            namespace,
+            template,
+        })
+    }
+}
 
 impl Request for GetConfig {
     type Response = Value;
@@ -80,7 +95,7 @@ impl KeeperLink {
             recipient: address.to_address().sender(),
         };
         let updates = ConfigSegmentUpdates {
-            get_config: GetConfig,
+            get_config: GetConfig::new::<C>()?,
             recipient: Recipient::new(recipient),
         };
         let state_entry = self.subscribe(updates).await?;
@@ -102,9 +117,8 @@ pub trait UpdateConfig<C: Config>: Agent {
 pub struct NewConfigSegment(pub Value);
 
 pub struct ConfigSegmentUpdates {
-    get_config: GetConfig,
-    // TODO: Keep `Arc` with a default value here
-    recipient: Recipient<NewConfigSegment>,
+    pub get_config: GetConfig,
+    pub recipient: Recipient<NewConfigSegment>,
 }
 
 impl Subscription for ConfigSegmentUpdates {

@@ -1,13 +1,21 @@
-use crate::config_loader::{table, wrap_level, merge_configs, StoreTemplate, ConfigLoader, ConfigUpdates, NewConfig};
+use crate::config_loader::{
+    merge_configs, table, wrap_level, ConfigLoader, ConfigUpdates, NewConfig, StoreTemplate,
+};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use derive_more::From;
-use crb::agent::{OnEvent, Agent, DoAsync, Context, Next, AgentSession, Address};
-use crb::superagent::{Entry, ManageSubscription, SupervisorSession, Supervisor, OnRequest, SubscribeExt};
+use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Next, OnEvent};
 use crb::core::{Slot, Unique};
-use n9_core::{SubstanceLinks, Particle, SubstanceBond, Keeper, ConfigSegmentUpdates, GetConfig, NewConfigSegment};
-use toml::Value;
+use crb::send::Sender;
+use crb::superagent::{
+    Entry, ManageSubscription, OnRequest, SubscribeExt, Supervisor, SupervisorSession,
+};
+use derive_more::From;
+use n9_core::{
+    ConfigSegmentUpdates, GetConfig, Keeper, NewConfigSegment, Particle, SubstanceBond,
+    SubstanceLinks,
+};
 use std::collections::HashMap;
+use toml::Value;
 
 pub struct TomlConfigParticle {
     // TODO: Use bond only
@@ -47,8 +55,7 @@ impl Agent for TomlConfigParticle {
     }
 }
 
-impl Keeper for TomlConfigParticle {
-}
+impl Keeper for TomlConfigParticle {}
 
 struct Initialize;
 
@@ -56,7 +63,7 @@ struct Initialize;
 impl DoAsync<Initialize> for TomlConfigParticle {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let mut bond = self.substance.bond(&ctx);
-        bond.add_keeper();
+        bond.add_keeper()?;
         self.bond.fill(bond)?;
 
         let loader = ConfigLoader::new();
@@ -145,9 +152,7 @@ pub struct MergedConfig {
 
 impl MergedConfig {
     fn new() -> Self {
-        Self {
-            value: table(),
-        }
+        Self { value: table() }
     }
 }
 

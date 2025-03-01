@@ -9,7 +9,7 @@ repository.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 chrono.workspace = true
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 derive_more.workspace = true
 futures.workspace = true
 log.workspace = true
@@ -17,4 +17,4 @@ serde.workspace = true
 tokio-stream.workspace = true # TODO: Consider moving this out
 ui9.workspace = true
 ui9-codec.workspace = true
-ulid = { version = "1.2.0", features = ["serde"] }
+# ulid = { version = "1.2.0", default-features = false }

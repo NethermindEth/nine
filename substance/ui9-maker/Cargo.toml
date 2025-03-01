@@ -9,7 +9,7 @@ repository.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 log.workspace = true
 ui9-dui.workspace = true
 ui9-net.workspace = true

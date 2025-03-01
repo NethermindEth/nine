@@ -1,11 +1,11 @@
 use crate::flow::{Flow, Unified};
 use crate::publisher::{Publisher, Tracer};
 use crate::subscriber::{Listener, Subscriber};
+use crb::core::uuid::Uuid;
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use ui9::names::Fqn;
-use ulid::Ulid;
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct JobSub {
@@ -69,12 +69,12 @@ pub enum JobData {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct OperationId {
-    id: Ulid,
+    id: Uuid,
 }
 
 impl OperationId {
     pub fn new() -> Self {
-        Self { id: Ulid::new() }
+        Self { id: Uuid::new_v4() }
     }
 }
 

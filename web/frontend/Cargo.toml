@@ -10,7 +10,10 @@ keywords.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-crb = { version = "0.0.30" , default-features = false, features = ["web"] }
+crb = { workspace = true, features = ["web"] }
 log.workspace = true
 wasm-logger = "0.2.0"
 yew = { version = "0.21.0", features = ["csr"] }
+ui9.workspace = true
+ui9-codec.workspace = true
+# ui9-dui.workspace = true

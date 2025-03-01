@@ -11,7 +11,7 @@ keywords.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 bytes.workspace = true
-crb.workspace = true
+crb = { workspace = true, features = ["std"] }
 derive_more.workspace = true
 flexbuffers.workspace = true
 futures.workspace = true

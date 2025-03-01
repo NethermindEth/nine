@@ -3,8 +3,10 @@ use crate::Config;
 use anyhow::{anyhow, Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, Equip, OnEvent};
-use crb::superagent::{Fetcher, InteractExt, OnRequest, Request};
+use crb::send::Recipient;
+use crb::superagent::{Fetcher, InteractExt, OnRequest, Request, Subscription};
 use derive_more::{Deref, DerefMut};
+use std::any::type_name;
 use std::sync::Arc;
 use toml::Value;
 
@@ -23,33 +25,53 @@ impl<M: Keeper> From<Address<M>> for KeeperLink {
     }
 }
 
+// Single request
+
 impl KeeperLink {
     pub async fn get_config<C>(&self) -> Result<C>
     where
         C: Config,
     {
-        let config = self.address.get_config().await?.try_into()?;
+        let config = self.address.interact(GetConfig).await?.try_into()?;
         Ok(config)
     }
 }
 
-#[async_trait]
-pub trait KeeperAddress: Sync + Send {
-    fn get_config(&self) -> Fetcher<Value>;
-}
+pub trait KeeperAddress: InteractExt<GetConfig> + Send + Sync {}
 
-#[async_trait]
-impl<M: Keeper> KeeperAddress for Address<M> {
-    fn get_config(&self) -> Fetcher<Value> {
-        self.interact(GetConfig)
-    }
-}
+impl<T> KeeperAddress for T where Self: InteractExt<GetConfig> + Send + Sync {}
 
 pub struct GetConfig;
 
 impl Request for GetConfig {
     type Response = Value;
 }
+
+// Live updates
+
+#[async_trait]
+pub trait UpdateConfig<C: Config>: Agent {
+    async fn update_config(&mut self, config: C, ctx: &mut Context<Self>) -> Result<()>;
+
+    fn fallback(&mut self, err: Error, _ctx: &mut Context<Self>) {
+        let typ = type_name::<C>();
+        log::error!("Can't load the config {typ}: {err}");
+    }
+}
+
+pub struct NewConfigSegment(pub Value);
+
+pub struct ConfigSegmentUpdates {
+    get_config: GetConfig,
+    // TODO: Keep `Arc` with a default value here
+    recipient: Recipient<NewConfigSegment>,
+}
+
+impl Subscription for ConfigSegmentUpdates {
+    type State = Value;
+}
+
+// Config registry
 
 impl RouterLink {
     pub fn add_keeper<K>(&mut self, addr: Address<K>) -> Result<()>

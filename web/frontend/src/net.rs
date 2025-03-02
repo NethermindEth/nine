@@ -11,14 +11,24 @@ pub fn server_multiaddr() -> Result<Multiaddr> {
     let host = location.hostname().map_err(|_| anyhow!("No `hostname` in the location"))?;
     let port_str = location.port().map_err(|_| anyhow!("No `port` in the location"))?;
 
-    let port = if port_str.is_empty() {
-        if protocol == "https:" {
-            "443"
+    let mut service = "dns4";
+    let port = {
+        if host == "localhost" {
+            "8080"
+        } else if host == "127.0.0.1" {
+            service = "ip4";
+            "8080"
         } else {
-            "80"
+            if port_str.is_empty() {
+                if protocol == "https:" {
+                    "443"
+                } else {
+                    "80"
+                }
+            } else {
+                &port_str
+            }
         }
-    } else {
-        &port_str
     };
 
     let ws_scheme = if protocol == "https:" { "wss" } else { "ws" };

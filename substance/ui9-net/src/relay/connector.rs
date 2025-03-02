@@ -109,7 +109,10 @@ impl DoAsync<Initialize> for Connector {
                 noise::Config::new,
                 yamux::Config::default,
             )?
-            .with_quic();
+            .with_websocket(noise::Config::new, yamux::Config::default)
+            .await?;
+        // .with_dns()
+        // .with_quic();
 
         #[cfg(feature = "web")]
         let swarm = swarm.with_wasm_bindgen().with_other_transport(|key| {
@@ -170,6 +173,7 @@ impl DoAsync<Initialize> for Connector {
         {
             swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
             swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+            swarm.listen_on("/ip4/127.0.0.1/tcp/8080/ws".parse()?)?;
         }
 
         self.swarm.fill(swarm)?;

@@ -20,4 +20,4 @@ n9-exchange-dydx.path = "../../particles/exchange-dydx"
 n9-model-anthropic.path = "../../particles/model-anthropic"
 n9-model-openai.workspace = true
 tokio.workspace = true
-ui9-mesh.workspace = true
+ui9-mesh = { workspace = true, features = ["std"] }

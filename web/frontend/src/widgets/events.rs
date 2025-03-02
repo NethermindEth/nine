@@ -1,26 +1,25 @@
 use derive_more::From;
-use ui9_dui::{Sub, SubEvent, State};
-use ui9_dui::tracers::event::Event;
+use ui9_dui::{Sub, SubEvent, State, Subscriber, Unified};
 use yew::{html, Component, Context, Html};
 
-pub struct EventsWidget {
-    sub: Sub<Event>,
-    state: Option<State<Event>>,
+pub struct SubWidget<E: Subscriber> {
+    sub: Sub<E>,
+    state: Option<State<E>>,
     lost: bool,
 }
 
-#[derive(Debug, From)]
-pub enum Msg {
-    Event(SubEvent<Event>),
+#[derive(From)]
+pub enum Msg<E: Subscriber> {
+    Event(SubEvent<E>),
 }
 
-impl Component for EventsWidget {
-    type Message = Msg;
+impl<E: Subscriber + Unified> Component for SubWidget<E> {
+    type Message = Msg<E>;
     type Properties = ();
 
     fn create(ctx: &Context<Self>) -> Self {
         // TODO: Use props here to get FQN
-        let mut sub = Sub::<Event>::local_unified();
+        let mut sub = Sub::<E>::local_unified();
         if let Ok(stream) = sub.events() {
             log::info!("Subscribed to events");
             ctx.link().send_stream(stream);
@@ -32,8 +31,7 @@ impl Component for EventsWidget {
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Msg) -> bool {
-        log::info!("Message: {msg:?}");
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Event(event) => {
                 // Events processing
@@ -61,11 +59,11 @@ impl Component for EventsWidget {
     }
 }
 
-impl EventsWidget {
+impl<E: Subscriber> SubWidget<E> {
     fn render(&self) -> Option<Html> {
         let state = self.state.as_ref()?.borrow();
         Some(html! {
-            <div>{ format!("events: {state:?}") }</div>
+            <div>{ format!("events") }</div>
         })
     }
 }

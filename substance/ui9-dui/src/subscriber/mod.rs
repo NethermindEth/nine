@@ -11,10 +11,11 @@ use crate::flow::{Flow, Unified};
 use crb::agent::{Agent, OnEvent};
 use crb::core::{mpsc, watch};
 use derive_more::{Deref, DerefMut};
+use std::ops::DerefMut;
 use ui9::names::Fqn;
 
 pub trait Subscriber: Flow + Default {
-    type Driver: From<Listener<Self>> + Send;
+    type Driver: From<Listener<Self>> + DerefMut<Target = Listener<Self>> + Send;
 }
 
 #[derive(Deref, DerefMut)]

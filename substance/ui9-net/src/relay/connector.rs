@@ -11,7 +11,7 @@ use futures::stream::StreamExt;
 use libp2p::{
     gossipsub, noise,
     swarm::{NetworkBehaviour, SwarmEvent},
-    yamux, StreamProtocol, Swarm,
+    yamux, Multiaddr, StreamProtocol, Swarm,
 };
 use libp2p_request_response::{self as request_response, ProtocolSupport};
 use libp2p_stream as stream;
@@ -38,6 +38,10 @@ impl ConnectorLink {
     pub fn get_control(&self) -> Fetcher<stream::Control> {
         let msg = GetControl;
         self.connector.interact(msg)
+    }
+
+    pub fn bootstrap(&self, address: Multiaddr) -> Result<()> {
+        self.connector.event(Bootstrap { address })
     }
 }
 
@@ -108,11 +112,13 @@ impl DoAsync<Initialize> for Connector {
             .with_quic();
 
         #[cfg(feature = "web")]
-        let swarm = swarm.with_wasm_bindgen().with_other_transport(|_| {
+        let swarm = swarm.with_wasm_bindgen().with_other_transport(|key| {
             use libp2p::Transport;
             libp2p::websocket_websys::Transport::default()
                 .upgrade(libp2p::core::upgrade::Version::V1)
-        });
+                .authenticate(noise::Config::new(&key).unwrap())
+                .multiplex(yamux::Config::default())
+        })?;
 
         let swarm = swarm.with_behaviour(|key| {
             let unique_message = |message: &gossipsub::Message| {
@@ -160,8 +166,11 @@ impl DoAsync<Initialize> for Connector {
         let topic = gossipsub::IdentTopic::new("ice-nine-ui9");
         swarm.behaviour_mut().gossipsub.subscribe(&topic)?;
 
-        swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
-        swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+        #[cfg(feature = "tcp")]
+        {
+            swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
+            swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+        }
 
         self.swarm.fill(swarm)?;
         Ok(Next::events())
@@ -296,5 +305,19 @@ impl OnRequest<GetControl> for Connector {
         let swarm = self.swarm.get_mut()?;
         let control = swarm.behaviour_mut().stream.new_control();
         Ok(control)
+    }
+}
+
+pub struct Bootstrap {
+    address: Multiaddr,
+}
+
+#[async_trait]
+impl OnEvent<Bootstrap> for Connector {
+    async fn handle(&mut self, event: Bootstrap, _ctx: &mut Context<Self>) -> Result<()> {
+        let addr = event.address;
+        log::info!("Dialing {addr}");
+        self.swarm.get_mut()?.dial(addr)?;
+        Ok(())
     }
 }

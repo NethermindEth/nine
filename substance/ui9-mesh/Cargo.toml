@@ -10,3 +10,14 @@ rust-version.workspace = true
 anyhow.workspace = true
 ui9-dui.workspace = true
 ui9-net.workspace = true
+
+[features]
+default = ["std"]
+std = [
+    "ui9-dui/std",
+    "ui9-net/std",
+]
+web = [
+    "ui9-dui/web",
+    "ui9-net/web",
+]

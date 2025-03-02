@@ -1,5 +1,5 @@
-mod widget;
 mod component;
+mod widget;
 
-pub use widget::SubWidget;
 pub use component::SubComponent;
+pub use widget::SubWidget;

@@ -1,19 +1,17 @@
-use crate::render::{SubWidget, SubComponent};
-use ui9_dui::State;
+use crate::render::{SubComponent, SubWidget};
 use ui9_dui::tracers::event::Event;
-use yew::{Html, html};
+use ui9_dui::State;
+use yew::{html, Html};
 
 pub type EventsList = SubWidget<Events>;
 
-pub struct Events {
-}
+pub struct Events {}
 
 impl SubComponent for Events {
     type Flow = Event;
 
     fn create() -> Self {
-        Self {
-        }
+        Self {}
     }
 
     fn render(&self, state: &State<Self::Flow>) -> Option<Html> {

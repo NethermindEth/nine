@@ -1,7 +1,7 @@
 use super::component::SubComponent;
 use derive_more::From;
 use ui9::names::Fqn;
-use ui9_dui::{Sub, SubEvent, State, Subscriber};
+use ui9_dui::{State, Sub, SubEvent, Subscriber};
 use yew::{html, Component, Context, Html, Properties};
 
 pub struct SubWidget<C: SubComponent> {
@@ -50,8 +50,7 @@ impl<C: SubComponent> Component for SubWidget<C> {
                         self.state = Some(state);
                         self.lost = false;
                     }
-                    SubEvent::Event(event) => {
-                    }
+                    SubEvent::Event(event) => {}
                     SubEvent::Lost => {
                         self.lost = true;
                     }
@@ -65,10 +64,12 @@ impl<C: SubComponent> Component for SubWidget<C> {
         self.state
             .as_ref()
             .and_then(|state| self.component.render(state))
-            .unwrap_or_else(|| html! {
-                <div>
-                    <img src="static/loader.gif" />
-                </div>
+            .unwrap_or_else(|| {
+                html! {
+                    <div>
+                        <img src="static/loader.gif" />
+                    </div>
+                }
             })
     }
 }

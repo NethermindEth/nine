@@ -1,7 +1,7 @@
 use crate::widgets::{EventsList, PeersList};
-use yew::{html, Component, Context, Html};
 use ui9_dui::tracers::event::Event;
 use ui9_dui::Unified;
+use yew::{html, Component, Context, Html};
 
 pub struct WebApp {}
 

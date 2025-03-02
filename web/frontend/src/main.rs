@@ -1,6 +1,6 @@
 use crb::agent::Standalone;
-use n9_web_frontend::Frontend;
 use n9_core::Substance;
+use n9_web_frontend::Frontend;
 
 fn main() {
     // TODO: Is that possible to use `tracing` package here?

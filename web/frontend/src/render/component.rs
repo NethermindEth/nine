@@ -1,4 +1,4 @@
-use ui9_dui::{Subscriber, State};
+use ui9_dui::{State, Subscriber};
 use yew::Html;
 
 pub trait SubComponent: 'static {

@@ -1,17 +1,18 @@
+use super::component::SubComponent;
 use derive_more::From;
 use ui9::names::Fqn;
-use ui9_dui::{Sub, SubEvent, State, Subscriber, Unified};
+use ui9_dui::{Sub, SubEvent, State, Subscriber};
 use yew::{html, Component, Context, Html, Properties};
 
-pub struct SubWidget<E: Subscriber> {
-    sub: Sub<E>,
-    state: Option<State<E>>,
+pub struct SubWidget<C: SubComponent> {
+    sub: Sub<C::Flow>,
+    state: Option<State<C::Flow>>,
     lost: bool,
 }
 
 #[derive(From)]
-pub enum Msg<E: Subscriber> {
-    Event(SubEvent<E>),
+pub enum Msg<C: SubComponent> {
+    Event(SubEvent<C::Flow>),
 }
 
 #[derive(Properties, PartialEq, Eq)]
@@ -19,14 +20,14 @@ pub struct Props {
     pub fqn: Fqn,
 }
 
-impl<E: Subscriber + Unified> Component for SubWidget<E> {
-    type Message = Msg<E>;
+impl<C: SubComponent> Component for SubWidget<C> {
+    type Message = Msg<C>;
     type Properties = Props;
 
     fn create(ctx: &Context<Self>) -> Self {
         // TODO: Use props here to get FQN
         let fqn = ctx.props().fqn.clone();
-        let mut sub = Sub::<E>::local(fqn);
+        let mut sub = Sub::<C::Flow>::local(fqn);
         if let Ok(stream) = sub.events() {
             log::info!("Subscribed to events");
             ctx.link().send_stream(stream);
@@ -66,10 +67,10 @@ impl<E: Subscriber + Unified> Component for SubWidget<E> {
     }
 }
 
-impl<E: Subscriber> SubWidget<E> {
+impl<C: SubComponent> SubWidget<C> {
     fn render(&self) -> Option<Html> {
         let state = self.state.as_ref()?.borrow();
-        let typ = std::any::type_name::<E>();
+        let typ = std::any::type_name::<C::Flow>();
         Some(html! {
             <div>{ format!("Loaded: {typ}") }</div>
         })

@@ -1,4 +1,4 @@
-use crate::widgets::EventsList;
+use crate::widgets::{EventsList, PeersList};
 use yew::{html, Component, Context, Html};
 use ui9_dui::tracers::event::Event;
 use ui9_dui::Unified;
@@ -23,7 +23,8 @@ impl Component for WebApp {
         let fqn = Event::fqn();
         html! {
             <div>
-                <EventsList {fqn} />
+                <EventsList fqn={fqn.clone()} />
+                <PeersList {fqn} />
                 <div class="loader">
                     <div class="loader-container">
                         <img src="static/logo.png" />

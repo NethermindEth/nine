@@ -107,6 +107,13 @@ impl DoAsync<Initialize> for Connector {
             )?
             .with_quic();
 
+        #[cfg(feature = "web")]
+        let swarm = swarm.with_wasm_bindgen().with_other_transport(|_| {
+            use libp2p::Transport;
+            libp2p::websocket_websys::Transport::default()
+                .upgrade(libp2p::core::upgrade::Version::V1)
+        });
+
         let swarm = swarm.with_behaviour(|key| {
             let unique_message = |message: &gossipsub::Message| {
                 let mut s = DefaultHasher::new();

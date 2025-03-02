@@ -11,7 +11,7 @@ keywords.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 bytes.workspace = true
-crb = { workspace = true, features = ["std"] }
+crb.workspace = true
 derive_more.workspace = true
 flexbuffers.workspace = true
 futures.workspace = true
@@ -24,3 +24,26 @@ tokio = { workspace = true, features = ["macros"] }
 tokio-util = { version = "0.7.13", features = ["codec", "compat"] }
 ui9.workspace = true
 ui9-dui.workspace = true
+
+[features]
+default = ["std"]
+std = [
+    "mdns",
+    "tcp",
+    "crb/std",
+    "ui9-dui/std",
+]
+web = [
+    "crb/web",
+    "ui9-dui/web",
+    "libp2p/wasm-bindgen",
+    "libp2p/websocket-websys",
+]
+mdns = [
+    "libp2p/mdns",
+]
+tcp = [
+    "libp2p/tcp",
+    "libp2p/tokio",
+    "libp2p/quic",
+]

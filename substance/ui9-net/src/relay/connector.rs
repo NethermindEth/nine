@@ -9,9 +9,9 @@ use crb::superagent::{Fetcher, InteractExt, OnRequest, Request};
 use derive_more::{Deref, DerefMut, From};
 use futures::stream::StreamExt;
 use libp2p::{
-    gossipsub, mdns, noise,
+    gossipsub, noise,
     swarm::{NetworkBehaviour, SwarmEvent},
-    tcp, yamux, StreamProtocol, Swarm,
+    yamux, StreamProtocol, Swarm,
 };
 use libp2p_request_response::{self as request_response, ProtocolSupport};
 use libp2p_stream as stream;
@@ -22,6 +22,12 @@ use std::{
 };
 use tokio::select;
 use ui9_dui::Pub;
+
+#[cfg(feature = "mdns")]
+use libp2p::mdns;
+
+#[cfg(feature = "tcp")]
+use libp2p::tcp;
 
 #[derive(Deref, DerefMut, From, Clone)]
 pub struct ConnectorLink {
@@ -52,6 +58,7 @@ impl Connector {
 #[derive(NetworkBehaviour)]
 struct Ui9Behaviour {
     gossipsub: gossipsub::Behaviour,
+    #[cfg(feature = "mdns")]
     mdns: mdns::tokio::Behaviour,
     request_response: request_response::cbor::Behaviour<(), ()>,
     stream: stream::Behaviour,
@@ -88,55 +95,60 @@ pub struct Initialize;
 #[async_trait]
 impl DoAsync<Initialize> for Connector {
     async fn handle(&mut self, _: Initialize, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let mut swarm = libp2p::SwarmBuilder::with_new_identity()
+        let swarm = libp2p::SwarmBuilder::with_new_identity();
+
+        #[cfg(feature = "tcp")]
+        let swarm = swarm
             .with_tokio()
             .with_tcp(
                 tcp::Config::default(),
                 noise::Config::new,
                 yamux::Config::default,
             )?
-            .with_quic()
-            .with_behaviour(|key| {
-                let unique_message = |message: &gossipsub::Message| {
-                    let mut s = DefaultHasher::new();
-                    message.data.hash(&mut s);
-                    gossipsub::MessageId::from(s.finish().to_string())
-                };
+            .with_quic();
 
-                let gossipsub_config = gossipsub::ConfigBuilder::default()
-                    .heartbeat_interval(Duration::from_secs(10))
-                    .validation_mode(gossipsub::ValidationMode::Strict)
-                    .message_id_fn(unique_message)
-                    .build()?;
+        let swarm = swarm.with_behaviour(|key| {
+            let unique_message = |message: &gossipsub::Message| {
+                let mut s = DefaultHasher::new();
+                message.data.hash(&mut s);
+                gossipsub::MessageId::from(s.finish().to_string())
+            };
 
-                let gossipsub = gossipsub::Behaviour::new(
-                    gossipsub::MessageAuthenticity::Signed(key.clone()),
-                    gossipsub_config,
-                )?;
+            let gossipsub_config = gossipsub::ConfigBuilder::default()
+                .heartbeat_interval(Duration::from_secs(10))
+                .validation_mode(gossipsub::ValidationMode::Strict)
+                .message_id_fn(unique_message)
+                .build()?;
 
-                let mdns = mdns::tokio::Behaviour::new(
-                    mdns::Config::default(),
-                    key.public().to_peer_id(),
-                )?;
+            let gossipsub = gossipsub::Behaviour::new(
+                gossipsub::MessageAuthenticity::Signed(key.clone()),
+                gossipsub_config,
+            )?;
 
-                let request_response = request_response::cbor::Behaviour::new(
-                    [(
-                        StreamProtocol::new("/ui9-trace/0.0.1"),
-                        ProtocolSupport::Full,
-                    )],
-                    request_response::Config::default(),
-                );
+            #[cfg(feature = "mdns")]
+            let mdns =
+                mdns::tokio::Behaviour::new(mdns::Config::default(), key.public().to_peer_id())?;
 
-                let stream = stream::Behaviour::new();
+            let request_response = request_response::cbor::Behaviour::new(
+                [(
+                    StreamProtocol::new("/ui9-trace/0.0.1"),
+                    ProtocolSupport::Full,
+                )],
+                request_response::Config::default(),
+            );
 
-                Ok(Ui9Behaviour {
-                    gossipsub,
-                    mdns,
-                    request_response,
-                    stream,
-                })
-            })?
-            .build();
+            let stream = stream::Behaviour::new();
+
+            Ok(Ui9Behaviour {
+                gossipsub,
+                #[cfg(feature = "mdns")]
+                mdns,
+                request_response,
+                stream,
+            })
+        })?;
+
+        let mut swarm = swarm.build();
 
         let topic = gossipsub::IdentTopic::new("ice-nine-ui9");
         swarm.behaviour_mut().gossipsub.subscribe(&topic)?;
@@ -157,6 +169,7 @@ impl Connector {
     ) -> Result<()> {
         match event {
             SwarmEvent::Behaviour(event) => match event {
+                #[cfg(feature = "mdns")]
                 Ui9BehaviourEvent::Mdns(event) => {
                     OnEvent::handle(self, event, ctx).await?;
                 }
@@ -187,6 +200,7 @@ impl Connector {
     }
 }
 
+#[cfg(feature = "mdns")]
 #[async_trait]
 impl OnEvent<mdns::Event> for Connector {
     async fn handle(&mut self, event: mdns::Event, _ctx: &mut Context<Self>) -> Result<()> {

@@ -1,8 +1,11 @@
-use ui9_dui::Subscriber;
+use ui9_dui::{Subscriber, State};
 use yew::Html;
 
 pub trait SubComponent: 'static {
     type Flow: Subscriber;
 
-    fn render(&self) -> Option<Html>;
+    // TODO: Provide links (maybe mapped)
+    fn create() -> Self;
+
+    fn render(&self, state: &State<Self::Flow>) -> Option<Html>;
 }

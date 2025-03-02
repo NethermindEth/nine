@@ -5,6 +5,7 @@ use ui9_dui::{Sub, SubEvent, State, Subscriber};
 use yew::{html, Component, Context, Html, Properties};
 
 pub struct SubWidget<C: SubComponent> {
+    component: C,
     sub: Sub<C::Flow>,
     state: Option<State<C::Flow>>,
     lost: bool,
@@ -25,7 +26,7 @@ impl<C: SubComponent> Component for SubWidget<C> {
     type Properties = Props;
 
     fn create(ctx: &Context<Self>) -> Self {
-        // TODO: Use props here to get FQN
+        let component = C::create();
         let fqn = ctx.props().fqn.clone();
         let mut sub = Sub::<C::Flow>::local(fqn);
         if let Ok(stream) = sub.events() {
@@ -33,6 +34,7 @@ impl<C: SubComponent> Component for SubWidget<C> {
             ctx.link().send_stream(stream);
         }
         Self {
+            component,
             sub,
             state: None,
             lost: false,
@@ -60,19 +62,13 @@ impl<C: SubComponent> Component for SubWidget<C> {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-        self.render()
+        self.state
+            .as_ref()
+            .and_then(|state| self.component.render(state))
             .unwrap_or_else(|| html! {
-                <div>{ "Loading..." }</div>
+                <div>
+                    <img src="static/loader.gif" />
+                </div>
             })
-    }
-}
-
-impl<C: SubComponent> SubWidget<C> {
-    fn render(&self) -> Option<Html> {
-        let state = self.state.as_ref()?.borrow();
-        let typ = std::any::type_name::<C::Flow>();
-        Some(html! {
-            <div>{ format!("Loaded: {typ}") }</div>
-        })
     }
 }

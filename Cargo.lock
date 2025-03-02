@@ -7992,7 +7992,6 @@ dependencies = [
  "thiserror 2.0.11",
  "ui9",
  "ui9-dui",
- "ui9-net",
 ]
 
 [[package]]

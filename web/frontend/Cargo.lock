@@ -1008,6 +1008,7 @@ dependencies = [
  "log",
  "n9-core",
  "ui9",
+ "ui9-app",
  "ui9-codec",
  "ui9-dui",
  "ui9-tracers",
@@ -1586,6 +1587,20 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.11",
+]
+
+[[package]]
+name = "ui9-app"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "crb",
+ "derive_more 2.0.1",
+ "log",
+ "thiserror 2.0.11",
+ "ui9",
+ "ui9-dui",
 ]
 
 [[package]]

@@ -1,10 +1,15 @@
 body {
   background: black;
 }
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .loader-container {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
 }
 .loader-container img {
   max-width: 100%;
@@ -19,12 +24,9 @@ body {
   background: black;
   opacity: 0.5;
   height: 0;
-  // animation: grow 5s forwards;
+  animation: grow 5s forwards;
 }
-
-/*
 @keyframes grow {
   from { height: 100%; }
   to { height: 0; }
 }
-*/

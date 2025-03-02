@@ -1,6 +1,7 @@
 use crate::widgets::events::SubWidget;
 use yew::{html, Component, Context, Html};
 use ui9_dui::tracers::event::Event;
+use ui9_dui::Unified;
 
 pub struct WebApp {}
 
@@ -19,9 +20,10 @@ impl Component for WebApp {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
+        let fqn = Event::fqn();
         html! {
             <div>
-                <SubWidget<Event> />
+                <SubWidget<Event> {fqn} />
                 <div class="loader">
                     <div class="loader-container">
                         <img src="static/logo.png" />

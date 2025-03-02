@@ -1,6 +1,7 @@
 use derive_more::From;
+use ui9::names::Fqn;
 use ui9_dui::{Sub, SubEvent, State, Subscriber, Unified};
-use yew::{html, Component, Context, Html};
+use yew::{html, Component, Context, Html, Properties};
 
 pub struct SubWidget<E: Subscriber> {
     sub: Sub<E>,
@@ -13,13 +14,19 @@ pub enum Msg<E: Subscriber> {
     Event(SubEvent<E>),
 }
 
+#[derive(Properties, PartialEq, Eq)]
+pub struct Props {
+    pub fqn: Fqn,
+}
+
 impl<E: Subscriber + Unified> Component for SubWidget<E> {
     type Message = Msg<E>;
-    type Properties = ();
+    type Properties = Props;
 
     fn create(ctx: &Context<Self>) -> Self {
         // TODO: Use props here to get FQN
-        let mut sub = Sub::<E>::local_unified();
+        let fqn = ctx.props().fqn.clone();
+        let mut sub = Sub::<E>::local(fqn);
         if let Ok(stream) = sub.events() {
             log::info!("Subscribed to events");
             ctx.link().send_stream(stream);
@@ -62,8 +69,9 @@ impl<E: Subscriber + Unified> Component for SubWidget<E> {
 impl<E: Subscriber> SubWidget<E> {
     fn render(&self) -> Option<Html> {
         let state = self.state.as_ref()?.borrow();
+        let typ = std::any::type_name::<E>();
         Some(html! {
-            <div>{ format!("events") }</div>
+            <div>{ format!("Loaded: {typ}") }</div>
         })
     }
 }

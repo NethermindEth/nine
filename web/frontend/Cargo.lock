@@ -1005,6 +1005,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "crb",
+ "derive_more 2.0.1",
  "log",
  "n9-core",
  "ui9",

@@ -20,3 +20,4 @@ ui9-codec = { path = "../../substance/ui9-codec" }
 ui9-dui = { path = "../../substance/ui9-dui", default-features = false, features = ["web"] }
 ui9-tracers = { path = "../../substance/ui9-tracers", default-features = false, features = ["web"] }
 n9-core = { path = "../../substance/n9-core", default-features = false, features = ["web"] }
+derive_more = "2.0.1"

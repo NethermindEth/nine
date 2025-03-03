@@ -21,12 +21,14 @@ use futures::stream::StreamExt;
 use libp2p::{
     gossipsub,
     swarm::{NetworkBehaviour, SwarmEvent},
-    Multiaddr, Swarm,
+    Multiaddr, StreamProtocol, Swarm,
 };
 use libp2p_request_response::{self as request_response};
 use libp2p_stream as stream;
 use tokio::select;
 use ui9_dui::Pub;
+
+static PROTOCOL: StreamProtocol = StreamProtocol::new("/ui9-trace/0.0.1");
 
 #[cfg(feature = "mdns")]
 use libp2p::mdns;

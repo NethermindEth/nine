@@ -1,4 +1,4 @@
-use crate::relay::connector::Ui9Behaviour;
+use super::{Ui9Behaviour, PROTOCOL};
 use anyhow::{Error, Result};
 use futures::future::Either;
 use libp2p::{
@@ -19,12 +19,13 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
 
     // Create Noise for encryption
     let noise = noise::Config::new(&key)?;
+    let mplex = yamux::Config::default();
 
     // Create TCP transport with tokio
     let tcp_transport = tcp::tokio::Transport::new(tcp::Config::default())
         .upgrade(upgrade::Version::V1)
         .authenticate(noise.clone())
-        .multiplex(yamux::Config::default())
+        .multiplex(mplex)
         .timeout(Duration::from_secs(20))
         .boxed();
 
@@ -32,7 +33,7 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
     let ws_transport = websocket::WsConfig::new(tcp::tokio::Transport::new(tcp::Config::default()))
         .upgrade(upgrade::Version::V1)
         .authenticate(noise.clone())
-        .multiplex(yamux::Config::default())
+        .multiplex(mplex)
         .timeout(Duration::from_secs(20))
         .boxed();
 
@@ -75,10 +76,7 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
     let mdns = mdns::tokio::Behaviour::new(mdns::Config::default(), key.public().to_peer_id())?;
 
     let request_response = request_response::cbor::Behaviour::new(
-        [(
-            StreamProtocol::new("/ui9-trace/0.0.1"),
-            ProtocolSupport::Full,
-        )],
+        [(PROTOCOL.clone(), ProtocolSupport::Full)],
         request_response::Config::default(),
     );
 

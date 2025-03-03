@@ -1,9 +1,20 @@
 use anyhow::Result;
+use clap::Parser;
 use n9_core::Substance;
 use ui9_mesh::Mesh;
 
+#[derive(Parser, Debug)]
+#[command(author, version, about)]
+struct Args {
+    /// Enable TUI mode
+    #[arg(long)]
+    tui: bool,
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
+    let args = Args::parse();
+
     env_logger::try_init()?;
     Mesh::activate().await?;
     let mut substance = Substance::arise();
@@ -22,7 +33,9 @@ async fn main() -> Result<()> {
 
     // substance.add_particle::<n9_app_stdio::StdioApp>()?;
 
-    substance.add_particle::<n9_app_tui::TuiApp>()?;
+    if args.tui {
+        substance.add_particle::<n9_app_tui::TuiApp>()?;
+    }
 
     // TODO: Rename to *Chat
     substance.add_particle::<n9_chat_telegram::TelegramParticle>()?;

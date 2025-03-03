@@ -7957,6 +7957,7 @@ name = "trading-assistant"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "clap",
  "crb",
  "env_logger",
  "n9-app-stdio",

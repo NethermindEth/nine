@@ -8,7 +8,7 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
     // Generate a new identity keypair
     let local_key = Keypair::generate_ed25519();
     let local_peer_id = PeerId::from(local_key.public());
-    println!("Local peer id: {local_peer_id}");
+    log::info!("Local peer id: {local_peer_id}");
     let key = local_key.clone();
 
     // Create Noise for encryption

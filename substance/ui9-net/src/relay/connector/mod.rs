@@ -98,7 +98,7 @@ impl DoAsync<Initialize> for Connector {
 
         #[cfg(feature = "tcp")]
         {
-            swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
+            // swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
             swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
             swarm.listen_on("/ip4/127.0.0.1/tcp/2020/ws".parse()?)?;
         }

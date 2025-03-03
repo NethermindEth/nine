@@ -6,6 +6,7 @@ edition.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+clap.workspace = true
 crb = { workspace = true, features = ["std"] }
 env_logger.workspace = true
 n9-app-stdio.path = "../../particles/app-stdio"

@@ -60,6 +60,7 @@ toml = "0.8.20"
 tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
 typed-slab = "0.2.1"
+walkdir = "2.5.0"
 ui9 = { version = "0.0.1", path = "substance/ui9" }
 ui9-app = { version = "0.0.1", path = "substance/ui9-app" }
 ui9-dui = { version = "0.0.1", path = "substance/ui9-dui", default-features = false }

@@ -1,13 +1,10 @@
-use super::behaviour::{Ui9Behaviour, PROTOCOL};
-use anyhow::{Error, Result};
+use super::behaviour::Ui9Behaviour;
+use anyhow::Result;
 use futures::future::Either;
 use libp2p::{
-    core::muxing::StreamMuxerBox, core::upgrade, gossipsub, identity::Keypair, mdns, noise, tcp,
-    websocket, yamux, PeerId, Swarm, Transport,
+    core::muxing::StreamMuxerBox, core::upgrade, identity::Keypair, noise, tcp, websocket, yamux,
+    PeerId, Swarm, Transport,
 };
-use libp2p_request_response::{self as request_response, ProtocolSupport};
-use libp2p_stream as stream;
-use std::hash::{DefaultHasher, Hash, Hasher};
 use std::time::Duration;
 
 pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
@@ -55,40 +52,7 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
         })
         .boxed();
 
-    let unique_message = |message: &gossipsub::Message| {
-        let mut s = DefaultHasher::new();
-        message.data.hash(&mut s);
-        gossipsub::MessageId::from(s.finish().to_string())
-    };
-
-    let gossipsub_config = gossipsub::ConfigBuilder::default()
-        .heartbeat_interval(Duration::from_secs(10))
-        .validation_mode(gossipsub::ValidationMode::Strict)
-        .message_id_fn(unique_message)
-        .build()?;
-
-    let gossipsub = gossipsub::Behaviour::new(
-        gossipsub::MessageAuthenticity::Signed(key.clone()),
-        gossipsub_config,
-    )
-    .map_err(Error::msg)?;
-
-    let mdns = mdns::tokio::Behaviour::new(mdns::Config::default(), key.public().to_peer_id())?;
-
-    let request_response = request_response::cbor::Behaviour::new(
-        [(PROTOCOL.clone(), ProtocolSupport::Full)],
-        request_response::Config::default(),
-    );
-
-    let stream = stream::Behaviour::new();
-
-    let behaviour = Ui9Behaviour {
-        gossipsub,
-        #[cfg(feature = "mdns")]
-        mdns,
-        request_response,
-        stream,
-    };
+    let behaviour = Ui9Behaviour::new(&key)?;
 
     // Create a Swarm directly without using a builder
     let swarm = Swarm::new(

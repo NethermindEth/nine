@@ -1,8 +1,8 @@
-use super::{Ui9Behaviour, PROTOCOL};
+use super::behaviour::{Ui9Behaviour, PROTOCOL};
 use anyhow::{Error, Result};
 use libp2p::{
-    core::upgrade, gossipsub, identity::Keypair, noise, websocket_websys, yamux, PeerId,
-    StreamProtocol, Swarm, Transport,
+    core::upgrade, gossipsub, identity::Keypair, noise, websocket_websys, yamux, PeerId, Swarm,
+    Transport,
 };
 use libp2p_request_response::{self as request_response, ProtocolSupport};
 use libp2p_stream as stream;
@@ -18,11 +18,12 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
 
     // Create Noise for encryption
     let noise = noise::Config::new(&key)?;
+    let mplex = yamux::Config::default();
 
     let ws_transport = websocket_websys::Transport::default()
         .upgrade(upgrade::Version::V1)
         .authenticate(noise.clone())
-        .multiplex(yamux::Config::default())
+        .multiplex(mplex.clone())
         .boxed();
 
     // Combine transports: WebSocket

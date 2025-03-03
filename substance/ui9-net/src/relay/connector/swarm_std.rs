@@ -1,9 +1,9 @@
-use super::{Ui9Behaviour, PROTOCOL};
+use super::behaviour::{Ui9Behaviour, PROTOCOL};
 use anyhow::{Error, Result};
 use futures::future::Either;
 use libp2p::{
     core::muxing::StreamMuxerBox, core::upgrade, gossipsub, identity::Keypair, mdns, noise, tcp,
-    websocket, yamux, PeerId, StreamProtocol, Swarm, Transport,
+    websocket, yamux, PeerId, Swarm, Transport,
 };
 use libp2p_request_response::{self as request_response, ProtocolSupport};
 use libp2p_stream as stream;
@@ -25,7 +25,7 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
     let tcp_transport = tcp::tokio::Transport::new(tcp::Config::default())
         .upgrade(upgrade::Version::V1)
         .authenticate(noise.clone())
-        .multiplex(mplex)
+        .multiplex(mplex.clone())
         .timeout(Duration::from_secs(20))
         .boxed();
 
@@ -33,7 +33,7 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
     let ws_transport = websocket::WsConfig::new(tcp::tokio::Transport::new(tcp::Config::default()))
         .upgrade(upgrade::Version::V1)
         .authenticate(noise.clone())
-        .multiplex(mplex)
+        .multiplex(mplex.clone())
         .timeout(Duration::from_secs(20))
         .boxed();
 

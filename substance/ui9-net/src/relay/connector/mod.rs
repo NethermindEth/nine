@@ -8,9 +8,12 @@ pub mod swarm_web;
 #[cfg(feature = "web")]
 use swarm_web as swarm_impl;
 
+pub mod behaviour;
+
 use crate::tracers::peer::Peer;
 use anyhow::Result;
 use async_trait::async_trait;
+use behaviour::{Ui9Behaviour, Ui9BehaviourEvent};
 use crb::agent::{
     Address, Agent, AgentContext, AgentSession, Context, DoAsync, ManagedContext, Next, OnEvent,
 };
@@ -18,17 +21,11 @@ use crb::core::Slot;
 use crb::superagent::{Fetcher, InteractExt, OnRequest, Request};
 use derive_more::{Deref, DerefMut, From};
 use futures::stream::StreamExt;
-use libp2p::{
-    gossipsub,
-    swarm::{NetworkBehaviour, SwarmEvent},
-    Multiaddr, StreamProtocol, Swarm,
-};
+use libp2p::{gossipsub, swarm::SwarmEvent, Multiaddr, Swarm};
 use libp2p_request_response::{self as request_response};
 use libp2p_stream as stream;
 use tokio::select;
 use ui9_dui::Pub;
-
-static PROTOCOL: StreamProtocol = StreamProtocol::new("/ui9-trace/0.0.1");
 
 #[cfg(feature = "mdns")]
 use libp2p::mdns;
@@ -61,15 +58,6 @@ impl Connector {
             peer_tracer: Pub::unified(),
         }
     }
-}
-
-#[derive(NetworkBehaviour)]
-struct Ui9Behaviour {
-    gossipsub: gossipsub::Behaviour,
-    #[cfg(feature = "mdns")]
-    mdns: mdns::tokio::Behaviour,
-    request_response: request_response::cbor::Behaviour<(), ()>,
-    stream: stream::Behaviour,
 }
 
 #[async_trait]

@@ -1,14 +1,14 @@
 use crate::render::{SubComponent, SubWidget};
-use ui9_dui::tracers::event::Event;
 use ui9_dui::State;
 use yew::{html, Html};
+use ui9_net::tracers::peer::Peer;
 
 pub type PeersList = SubWidget<Peers>;
 
 pub struct Peers {}
 
 impl SubComponent for Peers {
-    type Flow = Event;
+    type Flow = Peer;
 
     fn create() -> Self {
         Self {}

@@ -1,7 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+$background: #0d1c27;
+$foreground: #ededed;
+
 body {
-  background: black;
-  color: white;
+  background: $background;
+  color: $foreground;
+  // font-family: "League Spartan", sans-serif;
+  font-family: "Niramit", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  // font-size: 24px;
 }
+
+.spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  div:last-child {
+    font-style: italic;
+    opacity: 0.5;
+  }
+}
+
 .loader {
   display: flex;
   align-items: center;
@@ -22,7 +46,7 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  background: black;
+  background: $background;
   opacity: 0.5;
   height: 0;
   animation: grow 5s forwards;

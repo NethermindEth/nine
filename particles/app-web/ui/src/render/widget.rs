@@ -3,6 +3,7 @@ use derive_more::From;
 use ui9::names::Fqn;
 use ui9_dui::{State, Sub, SubEvent, Subscriber};
 use yew::{html, Component, Context, Html, Properties};
+use std::any::type_name;
 
 pub struct SubWidget<C: SubComponent> {
     component: C,
@@ -61,13 +62,16 @@ impl<C: SubComponent> Component for SubWidget<C> {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
+        let name = type_name::<C::Flow>();
         self.state
             .as_ref()
             .and_then(|state| self.component.render(state))
             .unwrap_or_else(|| {
                 html! {
-                    <div>
-                        <img src="static/loader.gif" />
+                    <div class="spinner">
+                        <img width="32px" src="static/loader.gif" />
+                        <div>{ "Loading..." }</div>
+                        <div>{ name }</div>
                     </div>
                 }
             })

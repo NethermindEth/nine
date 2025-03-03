@@ -1,3 +1,13 @@
+#[cfg(feature = "std")]
+pub mod swarm_std;
+#[cfg(feature = "std")]
+use swarm_std as swarm_impl;
+
+#[cfg(feature = "web")]
+pub mod swarm_web;
+#[cfg(feature = "web")]
+use swarm_web as swarm_impl;
+
 use crate::tracers::peer::Peer;
 use anyhow::Result;
 use async_trait::async_trait;

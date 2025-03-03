@@ -1,15 +1,21 @@
-use std::str::FromStr;
 use anyhow::{anyhow, Result};
 use libp2p::Multiaddr;
+use std::str::FromStr;
 use web_sys::window;
 
 pub fn server_multiaddr() -> Result<Multiaddr> {
     let window = window().ok_or_else(|| anyhow!("No `window` object available"))?;
     let location = window.location();
 
-    let protocol = location.protocol().map_err(|_| anyhow!("No `protocol` part in the location"))?;
-    let host = location.hostname().map_err(|_| anyhow!("No `hostname` in the location"))?;
-    let port_str = location.port().map_err(|_| anyhow!("No `port` in the location"))?;
+    let protocol = location
+        .protocol()
+        .map_err(|_| anyhow!("No `protocol` part in the location"))?;
+    let host = location
+        .hostname()
+        .map_err(|_| anyhow!("No `hostname` in the location"))?;
+    let port_str = location
+        .port()
+        .map_err(|_| anyhow!("No `port` in the location"))?;
 
     let mut service = "dns4";
     let port = {

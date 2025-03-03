@@ -2,8 +2,8 @@ use crate::web_app::WebApp;
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, DoAsync, Next, Standalone};
-use ui9_net::MeshNode;
 use ui9_mesh::Mesh;
+use ui9_net::MeshNode;
 
 pub struct Frontend;
 

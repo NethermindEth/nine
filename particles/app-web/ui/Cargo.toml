@@ -1,0 +1,27 @@
+[package]
+name = "n9-web-frontend"
+version = "0.0.1"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/NethermindEth/nine"
+rust-version = "1.84.1"
+keywords = ["ai", "ai-agent", "framework"]
+
+[dependencies]
+anyhow = "1.0.96"
+async-trait = "0.1.86"
+crb = { version = "0.0.31", default-features = false, features = ["web"] }
+log = "0.4.26"
+wasm-logger = "0.2.0"
+yew = { version = "0.21.0", features = ["csr"] }
+ui9 = { path = "../../../substance/ui9" }
+ui9-app = { path = "../../../substance/ui9-app", default-features = false, features = ["web"] }
+ui9-codec = { path = "../../../substance/ui9-codec" }
+ui9-dui = { path = "../../../substance/ui9-dui", default-features = false, features = ["web"] }
+ui9-net = { path = "../../../substance/ui9-net", default-features = false, features = ["web"] }
+ui9-mesh = { path = "../../../substance/ui9-mesh", default-features = false, features = ["web"] }
+ui9-tracers = { path = "../../../substance/ui9-tracers", default-features = false, features = ["web"] }
+n9-core = { path = "../../../substance/n9-core", default-features = false, features = ["web"] }
+derive_more = "2.0.1"
+web-sys = "0.3.77"
+libp2p = "0.55.0"

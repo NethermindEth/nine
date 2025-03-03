@@ -6,7 +6,7 @@ members = [
     "substance/*",
 ]
 exclude = [
-    "web/frontend",
+    "particles/app-web/ui",
     # "examples",
 ]
 

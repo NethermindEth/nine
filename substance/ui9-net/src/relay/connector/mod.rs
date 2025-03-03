@@ -19,25 +19,17 @@ use crb::superagent::{Fetcher, InteractExt, OnRequest, Request};
 use derive_more::{Deref, DerefMut, From};
 use futures::stream::StreamExt;
 use libp2p::{
-    gossipsub, noise,
+    gossipsub,
     swarm::{NetworkBehaviour, SwarmEvent},
-    yamux, Multiaddr, StreamProtocol, Swarm,
+    Multiaddr, Swarm,
 };
-use libp2p_request_response::{self as request_response, ProtocolSupport};
+use libp2p_request_response::{self as request_response};
 use libp2p_stream as stream;
-use std::{
-    collections::hash_map::DefaultHasher,
-    hash::{Hash, Hasher},
-    time::Duration,
-};
 use tokio::select;
 use ui9_dui::Pub;
 
 #[cfg(feature = "mdns")]
 use libp2p::mdns;
-
-#[cfg(feature = "tcp")]
-use libp2p::tcp;
 
 #[derive(Deref, DerefMut, From, Clone)]
 pub struct ConnectorLink {
@@ -109,74 +101,9 @@ pub struct Initialize;
 #[async_trait]
 impl DoAsync<Initialize> for Connector {
     async fn handle(&mut self, _: Initialize, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let swarm = libp2p::SwarmBuilder::with_new_identity();
+        let mut swarm = swarm_impl::swarm().await?;
 
-        #[cfg(feature = "tcp")]
-        let swarm = swarm
-            .with_tokio()
-            .with_tcp(
-                tcp::Config::default(),
-                noise::Config::new,
-                yamux::Config::default,
-            )?
-            .with_websocket(noise::Config::new, yamux::Config::default)
-            .await?;
-        // .with_dns()
-        // .with_quic();
-
-        #[cfg(feature = "web")]
-        let swarm = swarm.with_wasm_bindgen().with_other_transport(|key| {
-            use libp2p::Transport;
-            libp2p::websocket_websys::Transport::default()
-                .upgrade(libp2p::core::upgrade::Version::V1)
-                .authenticate(noise::Config::new(&key).unwrap())
-                .multiplex(yamux::Config::default())
-        })?;
-
-        let swarm = swarm.with_behaviour(|key| {
-            let unique_message = |message: &gossipsub::Message| {
-                let mut s = DefaultHasher::new();
-                message.data.hash(&mut s);
-                gossipsub::MessageId::from(s.finish().to_string())
-            };
-
-            let gossipsub_config = gossipsub::ConfigBuilder::default()
-                .heartbeat_interval(Duration::from_secs(10))
-                .validation_mode(gossipsub::ValidationMode::Strict)
-                .message_id_fn(unique_message)
-                .build()?;
-
-            let gossipsub = gossipsub::Behaviour::new(
-                gossipsub::MessageAuthenticity::Signed(key.clone()),
-                gossipsub_config,
-            )?;
-
-            #[cfg(feature = "mdns")]
-            let mdns =
-                mdns::tokio::Behaviour::new(mdns::Config::default(), key.public().to_peer_id())?;
-
-            let request_response = request_response::cbor::Behaviour::new(
-                [(
-                    StreamProtocol::new("/ui9-trace/0.0.1"),
-                    ProtocolSupport::Full,
-                )],
-                request_response::Config::default(),
-            );
-
-            let stream = stream::Behaviour::new();
-
-            Ok(Ui9Behaviour {
-                gossipsub,
-                #[cfg(feature = "mdns")]
-                mdns,
-                request_response,
-                stream,
-            })
-        })?;
-
-        let mut swarm = swarm.build();
-
-        let topic = gossipsub::IdentTopic::new("ice-nine-ui9");
+        let topic = gossipsub::IdentTopic::new("n9");
         swarm.behaviour_mut().gossipsub.subscribe(&topic)?;
 
         #[cfg(feature = "tcp")]

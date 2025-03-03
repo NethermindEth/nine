@@ -1,16 +1,12 @@
 use crate::relay::connector::Ui9Behaviour;
 use anyhow::Result;
-use libp2p::{
-    gossipsub, mdns, noise,
-    swarm::{NetworkBehaviour, SwarmEvent},
-    tcp, yamux, Multiaddr, StreamProtocol, Swarm, SwarmBuilder,
-};
+use libp2p::{gossipsub, mdns, noise, tcp, yamux, StreamProtocol, Swarm, SwarmBuilder};
 use libp2p_request_response::{self as request_response, ProtocolSupport};
 use libp2p_stream as stream;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::time::Duration;
 
-pub async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
+pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
     let swarm = SwarmBuilder::with_new_identity();
 
     let swarm = swarm

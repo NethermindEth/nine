@@ -20,10 +20,10 @@ pub fn server_multiaddr() -> Result<Multiaddr> {
     let mut service = "dns4";
     let port = {
         if host == "localhost" {
-            "8080"
+            "2020"
         } else if host == "127.0.0.1" {
             service = "ip4";
-            "8080"
+            "2020"
         } else {
             if port_str.is_empty() {
                 if protocol == "https:" {

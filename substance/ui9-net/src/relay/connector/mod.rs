@@ -100,7 +100,7 @@ impl DoAsync<Initialize> for Connector {
         {
             swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
             swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
-            swarm.listen_on("/ip4/127.0.0.1/tcp/8080/ws".parse()?)?;
+            swarm.listen_on("/ip4/127.0.0.1/tcp/2020/ws".parse()?)?;
         }
 
         self.swarm.fill(swarm)?;

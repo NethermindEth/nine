@@ -1,5 +1,4 @@
 use crate::render::{SubComponent, SubWidget};
-use ui9_dui::State;
 use ui9_net::tracers::peer::{Peer, PeerId};
 use yew::{html, Html};
 

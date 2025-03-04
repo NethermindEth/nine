@@ -2,7 +2,7 @@ use super::component::SubComponent;
 use derive_more::From;
 use std::any::type_name;
 use ui9::names::Fqn;
-use ui9_dui::{State, Sub, SubEvent, Subscriber};
+use ui9_dui::{State, Sub, SubEvent};
 use yew::{html, Component, Context, Html, Properties};
 
 pub struct SubWidget<C: SubComponent> {
@@ -44,14 +44,15 @@ impl<C: SubComponent> Component for SubWidget<C> {
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::Event(event) => {
+            Msg::Event(sub_event) => {
+                self.component.on_sub(&sub_event);
                 // Events processing
-                match event {
+                match sub_event {
                     SubEvent::State(state) => {
                         self.state = Some(state);
                         self.lost = false;
                     }
-                    SubEvent::Event(event) => {}
+                    SubEvent::Event(_event) => {}
                     SubEvent::Lost => {
                         self.lost = true;
                     }

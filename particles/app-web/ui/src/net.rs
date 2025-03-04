@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Result};
 use libp2p::Multiaddr;
-use std::str::FromStr;
 use web_sys::window;
 
 pub fn server_multiaddr() -> Result<Multiaddr> {
@@ -39,6 +38,6 @@ pub fn server_multiaddr() -> Result<Multiaddr> {
 
     let ws_scheme = if protocol == "https:" { "wss" } else { "ws" };
 
-    let addr = format!("/dns4/{host}/tcp/{port}/{ws_scheme}").parse()?;
+    let addr = format!("/{service}/{host}/tcp/{port}/{ws_scheme}").parse()?;
     Ok(addr)
 }

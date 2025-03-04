@@ -1,5 +1,4 @@
-use crate::widgets::{EventsList, PeersList};
-use ui9_dui::tracers::event::Event;
+use crate::widgets::PeersList;
 use ui9_dui::Unified;
 use ui9_net::tracers::peer::Peer;
 use yew::{html, Component, Context, Html};

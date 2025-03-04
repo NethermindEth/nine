@@ -1,6 +1,7 @@
 use crate::widgets::{EventsList, PeersList};
 use ui9_dui::tracers::event::Event;
 use ui9_dui::Unified;
+use ui9_net::tracers::peer::Peer;
 use yew::{html, Component, Context, Html};
 
 pub struct WebApp {}
@@ -20,16 +21,21 @@ impl Component for WebApp {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-        let fqn = Event::fqn();
         html! {
-            <div>
-                <EventsList fqn={fqn.clone()} />
-                <PeersList {fqn} />
-                <div class="loader">
-                    <div class="loader-container">
-                        <img src="static/logo.png" />
-                        <div class="loader-overlay"></div>
+            <div class="app">
+                <div class="app-header">
+                    <div class="loader">
+                        <div class="loader-container">
+                            <img src="static/logo.png" />
+                            <div class="loader-overlay"></div>
+                        </div>
                     </div>
+                    <div class="app-header-title">{ "N9 Dashboard" }</div>
+                </div>
+
+                <div class="app-content">
+                    // <EventsList fqn={Event::fqn()} />
+                    <PeersList fqn={Peer::fqn()} />
                 </div>
             </div>
         }

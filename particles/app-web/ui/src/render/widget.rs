@@ -1,9 +1,9 @@
 use super::component::SubComponent;
 use derive_more::From;
+use std::any::type_name;
 use ui9::names::Fqn;
 use ui9_dui::{State, Sub, SubEvent, Subscriber};
 use yew::{html, Component, Context, Html, Properties};
-use std::any::type_name;
 
 pub struct SubWidget<C: SubComponent> {
     component: C,
@@ -65,7 +65,10 @@ impl<C: SubComponent> Component for SubWidget<C> {
         let name = type_name::<C::Flow>();
         self.state
             .as_ref()
-            .and_then(|state| self.component.render(state))
+            .and_then(|state| {
+                let state = state.borrow();
+                self.component.render(&state)
+            })
             .unwrap_or_else(|| {
                 html! {
                     <div class="spinner">

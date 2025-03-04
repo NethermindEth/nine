@@ -14,7 +14,7 @@ impl SubComponent for Events {
         Self {}
     }
 
-    fn render(&self, state: &State<Self::Flow>) -> Option<Html> {
+    fn render(&self, state: &Self::Flow) -> Option<Html> {
         let typ = std::any::type_name::<Self::Flow>();
         Some(html! {
             <div>{ format!("Loaded: {typ}") }</div>

@@ -3,10 +3,13 @@
 
 $background: #0d1c27;
 $foreground: #ededed;
+$logo-size: 48px;
 
 body {
   background: $background;
   color: $foreground;
+  margin: 0;
+  padding: 0;
   // font-family: "League Spartan", sans-serif;
   font-family: "Niramit", sans-serif;
   font-optical-sizing: auto;
@@ -26,6 +29,42 @@ body {
   }
 }
 
+.app-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0.5rem 1rem;
+  background: #09151d;
+  border-bottom: 1px solid #2e280b;
+  box-shadow: 0px 1px 32px #1d1c19;
+
+  .app-header-title {
+    margin-top: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+}
+
+.app-content {
+  padding: 1rem;
+}
+
+.component-peers {
+  display: flex;
+  flex-direction: column;
+
+  .component-peers-header {
+    padding: 1rem;
+    font-size: 2rem;
+  }
+
+  .component-peers-peer {
+    padding: 1rem;
+  }
+}
+
 .loader {
   display: flex;
   align-items: center;
@@ -33,8 +72,8 @@ body {
 }
 .loader-container {
   position: relative;
-  width: 400px;
-  height: 400px;
+  width: $logo-size;
+  height: $logo-size;
 }
 .loader-container img {
   max-width: 100%;
@@ -49,7 +88,7 @@ body {
   background: $background;
   opacity: 0.5;
   height: 0;
-  animation: grow 5s forwards;
+  // animation: grow 5s forwards;
 }
 @keyframes grow {
   from { height: 100%; }

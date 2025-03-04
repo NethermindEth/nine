@@ -7,5 +7,5 @@ pub trait SubComponent: 'static {
     // TODO: Provide links (maybe mapped)
     fn create() -> Self;
 
-    fn render(&self, state: &State<Self::Flow>) -> Option<Html>;
+    fn render(&self, state: &Self::Flow) -> Option<Html>;
 }

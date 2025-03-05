@@ -8,6 +8,18 @@ use ui9_dui::{State, Sub, SubEvent, Subscriber};
 use ui9_net::RemoteExt;
 use yew::Properties;
 
+#[derive(Clone, PartialEq, Eq)]
+pub struct FqnLink {
+    pub fqn: Fqn,
+    pub peer: Option<PeerId>,
+}
+
+impl From<Fqn> for FqnLink {
+    fn from(fqn: Fqn) -> Self {
+        Self { fqn, peer: None }
+    }
+}
+
 #[derive(Deref)]
 pub struct StateTracker<F: Subscriber> {
     #[deref]
@@ -24,12 +36,12 @@ pub struct StateView<'a, F> {
 }
 
 impl<F: Subscriber> StateTracker<F> {
-    pub fn new(fqn: Fqn, peer: Option<PeerId>) -> Self {
+    pub fn new(link: FqnLink) -> Self {
         let sub = {
-            if let Some(peer) = peer {
-                Sub::remote(peer, fqn)
+            if let Some(peer) = link.peer {
+                Sub::remote(peer, link.fqn)
             } else {
-                Sub::local(fqn)
+                Sub::local(link.fqn)
             }
         };
         Self {

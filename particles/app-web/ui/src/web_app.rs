@@ -1,3 +1,4 @@
+use crate::render::FqnLink;
 use crate::widgets::dashboard::{Dashboard, DashboardWidget};
 use ui9_dui::Unified;
 use yew::{html, Component, Context, Html};
@@ -13,8 +14,9 @@ impl Component for WebApp {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
+        let link: FqnLink = Dashboard::fqn().into();
         html! {
-            <DashboardWidget fqn={Dashboard::fqn()} />
+            <DashboardWidget {link} />
         }
     }
 }

@@ -1,4 +1,4 @@
-use super::projection::{Projection, ProjectionStream, StateTracker, StateView};
+use super::projection::{FqnLink, Projection, ProjectionStream, StateTracker, StateView};
 use derive_more::Deref;
 use futures::StreamExt;
 use ui9::names::Fqn;
@@ -12,7 +12,7 @@ pub struct Flow<F: Subscriber> {
 
 #[derive(Properties, PartialEq, Eq)]
 pub struct Props {
-    pub fqn: Fqn,
+    pub link: FqnLink,
 }
 
 pub type State<'a, F> = StateView<'a, F>;
@@ -23,9 +23,9 @@ impl<F: Subscriber> Projection for Flow<F> {
     type State<'a> = StateView<'a, F>;
 
     fn create(props: &Self::Properties) -> Self {
-        let fqn = props.fqn.clone();
+        let link = props.link.clone();
         Self {
-            tracker: StateTracker::new(fqn, None),
+            tracker: StateTracker::new(link),
         }
     }
 

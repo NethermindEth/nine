@@ -1,5 +1,5 @@
 use super::flow::Dashboard;
-use crate::render::{single, SubComponent, SubContext, SubWidget};
+use crate::render::{single, FqnLink, SubComponent, SubContext, SubWidget};
 use crate::widgets::PeersList;
 use ui9_dui::Unified;
 use ui9_net::tracers::peer::Peer;
@@ -29,6 +29,8 @@ impl SubComponent for DashboardComponent {
                 }
             }
         };
+        let first: FqnLink = Peer::fqn().into();
+        let second: FqnLink = Dashboard::fqn().into();
         html! {
             <div class="app">
                 <div class="app-header">
@@ -44,7 +46,7 @@ impl SubComponent for DashboardComponent {
                 <div class="app-content">
                     { peer }
                     // <EventsList fqn={Event::fqn()} />
-                    <PeersList first={Peer::fqn()} second={Dashboard::fqn()} />
+                    <PeersList {first} {second} />
                 </div>
             </div>
         }

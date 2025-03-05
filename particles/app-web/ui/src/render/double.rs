@@ -61,6 +61,8 @@ impl<F: Subscriber, S: Subscriber> Projection for Flow<F, S> {
     }
 
     fn state(&self) -> Option<Self::State<'_>> {
-        None
+        let first = self.first.state_view()?;
+        let second = self.second.state_view()?;
+        Some(State { first, second })
     }
 }

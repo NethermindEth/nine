@@ -4,45 +4,45 @@ use ui9::names::Fqn;
 use ui9_dui::{Flow, Listener, Publisher, Subscriber, Tracer, Unified};
 
 #[derive(Deref, DerefMut, From, Into)]
-pub struct WebAppSub {
-    listener: Listener<WebApp>,
+pub struct DashboardSub {
+    listener: Listener<Dashboard>,
 }
 
-impl Subscriber for WebApp {
-    type Driver = WebAppSub;
+impl Subscriber for Dashboard {
+    type Driver = DashboardSub;
 }
 
-impl WebAppSub {}
+impl DashboardSub {}
 
 #[derive(Deref, DerefMut, From, Into)]
-pub struct WebAppPub {
-    tracer: Tracer<WebApp>,
+pub struct DashboardPub {
+    tracer: Tracer<Dashboard>,
 }
 
-impl Publisher for WebApp {
-    type Driver = WebAppPub;
+impl Publisher for Dashboard {
+    type Driver = DashboardPub;
 }
 
-impl WebAppPub {}
+impl DashboardPub {}
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
-pub struct WebApp {}
+pub struct Dashboard {}
 
-impl Unified for WebApp {
+impl Unified for Dashboard {
     fn fqn() -> Fqn {
         Fqn::root("@web-app")
     }
 }
 
-impl Flow for WebApp {
-    type Event = WebAppEvent;
-    type Action = WebAppAction;
+impl Flow for Dashboard {
+    type Event = DashboardEvent;
+    type Action = DashboardAction;
 
     fn apply(&mut self, event: Self::Event) {}
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub enum WebAppEvent {}
+pub enum DashboardEvent {}
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub enum WebAppAction {}
+pub enum DashboardAction {}

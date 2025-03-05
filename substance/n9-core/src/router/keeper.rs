@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, Equip, MessageFor, OnEvent, ToAddress};
 use crb::send::{Recipient, Sender};
 use crb::superagent::{
-    Entry, Fetcher, InteractExt, ManageSubscription, OnRequest, Request, SubscribeExt, Subscription,
+    Entry, InteractExt, ManageSubscription, OnRequest, Request, SubscribeExt, Subscription,
 };
 use derive_more::{Deref, DerefMut};
 use serde::{de::DeserializeOwned, Serialize};

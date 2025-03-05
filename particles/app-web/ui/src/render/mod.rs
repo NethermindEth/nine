@@ -1,7 +1,7 @@
 pub mod double;
-mod projection;
 pub mod single;
+
+mod projection;
 mod widget;
 
-pub use projection::Projection;
 pub use widget::{SubComponent, SubWidget};

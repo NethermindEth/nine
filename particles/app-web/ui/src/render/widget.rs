@@ -1,12 +1,6 @@
 use super::projection::Projection;
-use crb::core::watch::Ref;
-use derive_more::{Deref, From};
-use futures::{Stream, StreamExt};
 use std::any::type_name;
-use std::pin::Pin;
-use ui9::names::Fqn;
-use ui9_dui::{State, Sub, SubEvent, Subscriber};
-use yew::{html, Component, Context, Html, Properties};
+use yew::{html, Component, Context, Html};
 
 pub trait SubComponent: 'static {
     type Projection: Projection;

@@ -1,7 +1,7 @@
 use super::projection::{Projection, ProjectionStream, StateTracker, StateView};
 use futures::StreamExt;
 use ui9::names::Fqn;
-use ui9_dui::{Sub, SubEvent, Subscriber};
+use ui9_dui::{SubEvent, Subscriber};
 use yew::Properties;
 
 pub struct DoubleFlow<F: Subscriber, S: Subscriber> {

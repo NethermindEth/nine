@@ -74,7 +74,7 @@ impl Projection for () {
     type Properties = ();
     type State<'a> = ();
 
-    fn create(props: &Self::Properties) -> Self {
+    fn create(_props: &Self::Properties) -> Self {
         ()
     }
 
@@ -82,7 +82,7 @@ impl Projection for () {
         Vec::new()
     }
 
-    fn update(&mut self, msg: Self::Message) -> bool {
+    fn update(&mut self, _msg: Self::Message) -> bool {
         true
     }
 

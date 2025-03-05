@@ -1,5 +1,4 @@
-use crate::render::single::{SingleFlow, SingleState};
-use crate::render::{SubComponent, SubWidget};
+use crate::render::{single, SubComponent, SubWidget};
 use ui9_net::tracers::peer::{Peer, PeerId};
 use yew::{html, Html};
 
@@ -8,13 +7,13 @@ pub type PeersList = SubWidget<Peers>;
 pub struct Peers {}
 
 impl SubComponent for Peers {
-    type Projection = SingleFlow<Peer>;
+    type Projection = single::Flow<Peer>;
 
     fn create() -> Self {
         Self {}
     }
 
-    fn render(&self, state: SingleState<Peer>) -> Option<Html> {
+    fn render(&self, state: single::State<Peer>) -> Option<Html> {
         let typ = std::any::type_name::<Peer>();
         let list = {
             if state.peers.is_empty() {

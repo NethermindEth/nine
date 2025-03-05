@@ -1,5 +1,5 @@
 use super::flow::Dashboard;
-use crate::render::{SubComponent, SubWidget};
+use crate::render::widget_2::{SingleFlow, SingleState, SubComponent, SubWidget};
 use crate::widgets::PeersList;
 use ui9_dui::Unified;
 use ui9_net::tracers::peer::Peer;
@@ -10,13 +10,13 @@ pub type DashboardWidget = SubWidget<DashboardComponent>;
 pub struct DashboardComponent {}
 
 impl SubComponent for DashboardComponent {
-    type Flow = Dashboard;
+    type Projection = SingleFlow<Dashboard>;
 
     fn create() -> Self {
         Self {}
     }
 
-    fn render(&self, state: &Self::Flow) -> Option<Html> {
+    fn render(&self, state: SingleState<Dashboard>) -> Option<Html> {
         let peer = {
             if let Some(active_peer) = state.active_peer {
                 html! {

@@ -2286,6 +2286,7 @@ dependencies = [
  "async-trait",
  "crb",
  "derive_more 2.0.1",
+ "futures",
  "libp2p",
  "log",
  "n9-core",

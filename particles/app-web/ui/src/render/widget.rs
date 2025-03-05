@@ -1,9 +1,19 @@
-use super::component::SubComponent;
 use derive_more::From;
 use std::any::type_name;
 use ui9::names::Fqn;
-use ui9_dui::{State, Sub, SubEvent};
+use ui9_dui::{State, Sub, SubEvent, Subscriber};
 use yew::{html, Component, Context, Html, Properties};
+
+pub trait SubComponent: 'static {
+    type Flow: Subscriber;
+
+    // TODO: Provide links (maybe mapped)
+    fn create() -> Self;
+
+    fn on_sub(&mut self, _event: &SubEvent<Self::Flow>) {}
+
+    fn render(&self, state: &Self::Flow) -> Option<Html>;
+}
 
 pub struct SubWidget<C: SubComponent> {
     component: C,

@@ -1,5 +1,4 @@
-mod component;
 mod widget;
+pub mod widget_2;
 
-pub use component::SubComponent;
-pub use widget::SubWidget;
+pub use widget::{SubComponent, SubWidget};

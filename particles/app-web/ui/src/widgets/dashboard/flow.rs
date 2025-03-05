@@ -2,6 +2,7 @@ use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use ui9::names::Fqn;
 use ui9_dui::{Flow, Listener, Publisher, Subscriber, Tracer, Unified};
+use ui9_net::tracers::peer::PeerId;
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct DashboardSub {
@@ -26,7 +27,9 @@ impl Publisher for Dashboard {
 impl DashboardPub {}
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
-pub struct Dashboard {}
+pub struct Dashboard {
+    pub active_peer: Option<PeerId>,
+}
 
 impl Unified for Dashboard {
     fn fqn() -> Fqn {
@@ -35,14 +38,19 @@ impl Unified for Dashboard {
 }
 
 impl Flow for Dashboard {
-    type Event = DashboardEvent;
-    type Action = DashboardAction;
+    type Event = DashboardMessage;
+    type Action = DashboardMessage;
 
-    fn apply(&mut self, event: Self::Event) {}
+    fn apply(&mut self, event: Self::Event) {
+        match event {
+            DashboardMessage::SetActivePeer { peer } => {
+                self.active_peer = peer;
+            }
+        }
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub enum DashboardEvent {}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub enum DashboardAction {}
+pub enum DashboardMessage {
+    SetActivePeer { peer: Option<PeerId> },
+}

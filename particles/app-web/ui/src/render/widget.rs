@@ -1,9 +1,24 @@
 use super::projection::Projection;
+use derive_more::Deref;
 use futures::StreamExt;
 use std::any::type_name;
-use yew::{html, Component, Context, Html};
+use yew::{html, Callback, Component, Context, Html};
 
-pub trait SubComponent: 'static {
+#[derive(Deref)]
+pub struct SubContext<'a, C: SubComponent> {
+    context: &'a Context<SubWidget<C>>,
+}
+
+impl<'a, C: SubComponent> SubContext<'a, C> {
+    pub fn event<IN>(&self, event: C::Message) -> Callback<IN>
+    where
+        C::Message: Clone,
+    {
+        self.link().callback(move |_| Msg::Component(event.clone()))
+    }
+}
+
+pub trait SubComponent: Sized + 'static {
     type Projection: Projection;
     type Message;
 
@@ -19,7 +34,11 @@ pub trait SubComponent: 'static {
 
     */
 
-    fn render(&self, state: <Self::Projection as Projection>::State<'_>) -> Option<Html>;
+    fn render(
+        &self,
+        state: <Self::Projection as Projection>::State<'_>,
+        ctx: &SubContext<Self>,
+    ) -> Option<Html>;
 }
 
 pub enum Msg<C: SubComponent> {
@@ -55,10 +74,11 @@ impl<C: SubComponent> Component for SubWidget<C> {
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ctx = SubContext { context: ctx };
         self.projection
             .state()
-            .and_then(|state| self.component.render(state))
+            .and_then(|state| self.component.render(state, &ctx))
             .unwrap_or_else(|| {
                 let name = type_name::<C>();
                 html! {

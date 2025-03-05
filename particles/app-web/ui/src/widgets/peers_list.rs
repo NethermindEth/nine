@@ -1,4 +1,4 @@
-use crate::render::{double, SubComponent, SubWidget};
+use crate::render::{double, SubComponent, SubContext, SubWidget};
 use crate::widgets::dashboard::Dashboard;
 use ui9_net::tracers::peer::{Peer, PeerId};
 use yew::{html, Html};
@@ -20,7 +20,11 @@ impl SubComponent for Peers {
         true
     }
 
-    fn render(&self, state: double::State<Peer, Dashboard>) -> Option<Html> {
+    fn render(
+        &self,
+        state: double::State<Peer, Dashboard>,
+        ctx: &SubContext<Self>,
+    ) -> Option<Html> {
         let typ = std::any::type_name::<Peer>();
         let list = {
             if state.peers.is_empty() {
@@ -30,7 +34,7 @@ impl SubComponent for Peers {
             } else {
                 html! {
                     <div>
-                        { for state.peers.keys().map(|peer| self.render_peer(peer)) }
+                        { for state.peers.keys().map(|peer| self.render_peer(peer, ctx)) }
                     </div>
                 }
             }
@@ -45,9 +49,10 @@ impl SubComponent for Peers {
 }
 
 impl Peers {
-    fn render_peer(&self, peer: &PeerId) -> Html {
+    fn render_peer(&self, peer: &PeerId, ctx: &SubContext<Self>) -> Html {
+        let onclick = ctx.event(Some(peer.clone()));
         html! {
-            <div class="component-peers-peer">{ peer.to_string() }</div>
+            <div {onclick} class="component-peers-peer">{ peer.to_string() }</div>
         }
     }
 }

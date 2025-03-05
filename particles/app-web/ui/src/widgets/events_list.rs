@@ -1,4 +1,4 @@
-use crate::render::{single, SubComponent, SubWidget};
+use crate::render::{single, SubComponent, SubContext, SubWidget};
 use ui9_dui::tracers::event::Event;
 use yew::{html, Html};
 
@@ -14,7 +14,7 @@ impl SubComponent for Events {
         Self {}
     }
 
-    fn render(&self, state: single::State<Event>) -> Option<Html> {
+    fn render(&self, state: single::State<Event>, _ctx: &SubContext<Self>) -> Option<Html> {
         let typ = std::any::type_name::<Event>();
         Some(html! {
             <div>{ format!("Loaded: {typ}") }</div>

@@ -1,5 +1,5 @@
 use super::flow::Dashboard;
-use crate::render::widget_2::{SingleFlow, SingleState, SubComponent, SubWidget};
+use crate::render::{SingleFlow, SingleState, SubComponent, SubWidget};
 use crate::widgets::PeersList;
 use ui9_dui::Unified;
 use ui9_net::tracers::peer::Peer;

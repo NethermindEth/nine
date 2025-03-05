@@ -1,4 +1,3 @@
-mod widget;
-pub mod widget_2;
+mod widget_2;
 
-pub use widget::{SubComponent, SubWidget};
+pub use widget_2::{SingleFlow, SingleState, SubComponent, SubWidget};

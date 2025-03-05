@@ -6,7 +6,7 @@ A flexible framework for building a distributed network of AI agents that work e
 
 One of the key concepts of the framework is a meta-layer that enables building software systems in a No-code style, where the entire integration is handled by the LLM.
 
-[Documentation](https://nethermindeth.github.io/nine/) | [Discord](https://discord.gg/sXCEBQMkyZ)
+[Documentation](https://nethermindeth.github.io/nine/) | [Telegram](http://t.me/n9_nethermind) | [X](https://x.com/n9_nethermind) | [Discord](https://discord.gg/sXCEBQMkyZ)
 
 ## Overview
 

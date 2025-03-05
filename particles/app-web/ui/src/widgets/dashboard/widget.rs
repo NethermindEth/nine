@@ -17,6 +17,17 @@ impl SubComponent for DashboardComponent {
     }
 
     fn render(&self, state: &Self::Flow) -> Option<Html> {
+        let peer = {
+            if let Some(active_peer) = state.active_peer {
+                html! {
+                    <p>{ active_peer.to_string() }</p>
+                }
+            } else {
+                html! {
+                    <p>{ "No selected peer" }</p>
+                }
+            }
+        };
         html! {
             <div class="app">
                 <div class="app-header">
@@ -30,6 +41,7 @@ impl SubComponent for DashboardComponent {
                 </div>
 
                 <div class="app-content">
+                    { peer }
                     // <EventsList fqn={Event::fqn()} />
                     <PeersList fqn={Peer::fqn()} />
                 </div>

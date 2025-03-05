@@ -6,7 +6,9 @@ use ui9::names::Fqn;
 use ui9_dui::{State, Sub, SubEvent, Subscriber};
 use yew::Properties;
 
+#[derive(Deref)]
 pub struct StateTracker<F: Subscriber> {
+    #[deref]
     pub sub: Sub<F>,
     pub state: Option<State<F>>,
     pub lost: bool,

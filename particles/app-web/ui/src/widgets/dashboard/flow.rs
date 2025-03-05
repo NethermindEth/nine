@@ -13,7 +13,12 @@ impl Subscriber for Dashboard {
     type Driver = DashboardSub;
 }
 
-impl DashboardSub {}
+impl DashboardSub {
+    pub fn set_peer(&self, peer: Option<PeerId>) {
+        let msg = DashboardMessage::SetActivePeer { peer };
+        self.action(msg);
+    }
+}
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct DashboardPub {

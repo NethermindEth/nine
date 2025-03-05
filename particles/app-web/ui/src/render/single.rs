@@ -1,11 +1,13 @@
 use super::projection::{Projection, ProjectionStream, StateTracker, StateView};
+use derive_more::Deref;
 use futures::StreamExt;
 use ui9::names::Fqn;
 use ui9_dui::{SubEvent, Subscriber};
 use yew::Properties;
 
+#[derive(Deref)]
 pub struct Flow<F: Subscriber> {
-    tracker: StateTracker<F>,
+    pub tracker: StateTracker<F>,
 }
 
 #[derive(Properties, PartialEq, Eq)]

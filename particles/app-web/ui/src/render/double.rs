@@ -6,8 +6,8 @@ use ui9_dui::{SubEvent, Subscriber};
 use yew::Properties;
 
 pub struct Flow<F: Subscriber, S: Subscriber> {
-    first: StateTracker<F>,
-    second: StateTracker<S>,
+    pub first: StateTracker<F>,
+    pub second: StateTracker<S>,
 }
 
 pub enum Msg<F: Subscriber, S: Subscriber> {

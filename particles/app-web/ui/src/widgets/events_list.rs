@@ -8,6 +8,7 @@ pub struct Events {}
 
 impl SubComponent for Events {
     type Projection = single::Flow<Event>;
+    type Message = ();
 
     fn create() -> Self {
         Self {}

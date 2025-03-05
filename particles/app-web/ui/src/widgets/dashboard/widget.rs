@@ -11,6 +11,7 @@ pub struct DashboardComponent {}
 
 impl SubComponent for DashboardComponent {
     type Projection = single::Flow<Dashboard>;
+    type Message = ();
 
     fn create() -> Self {
         Self {}

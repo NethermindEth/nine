@@ -9,9 +9,15 @@ pub struct Peers {}
 
 impl SubComponent for Peers {
     type Projection = double::Flow<Peer, Dashboard>;
+    type Message = Option<PeerId>;
 
     fn create() -> Self {
         Self {}
+    }
+
+    fn update(&mut self, msg: Self::Message, pro: &Self::Projection) -> bool {
+        pro.second.set_peer(msg);
+        true
     }
 
     fn render(&self, state: double::State<Peer, Dashboard>) -> Option<Html> {

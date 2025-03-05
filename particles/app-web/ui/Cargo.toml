@@ -25,3 +25,4 @@ n9-core = { path = "../../../substance/n9-core", default-features = false, featu
 derive_more = "2.0.1"
 web-sys = "0.3.77"
 libp2p = "0.55.0"
+serde = "1.0.218"

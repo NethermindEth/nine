@@ -1,14 +1,10 @@
 use crate::widgets::PeersList;
 use ui9_dui::Unified;
-use ui9_net::tracers::peer::Peer;
+use ui9_net::tracers::peer::{Peer, PeerId};
 use yew::{html, Component, Context, Html};
 
-pub struct WebApp {}
-
-impl WebApp {
-    pub fn new() -> Self {
-        Self {}
-    }
+pub struct WebApp {
+    active_peer: Option<PeerId>,
 }
 
 impl Component for WebApp {
@@ -16,7 +12,7 @@ impl Component for WebApp {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        Self {}
+        Self { active_peer: None }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

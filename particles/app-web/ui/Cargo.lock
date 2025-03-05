@@ -2289,6 +2289,7 @@ dependencies = [
  "libp2p",
  "log",
  "n9-core",
+ "serde",
  "ui9",
  "ui9-app",
  "ui9-codec",

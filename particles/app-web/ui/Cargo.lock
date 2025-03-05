@@ -2256,6 +2256,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-control-chat"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "crb",
+ "derive_more 2.0.1",
+ "n9-core",
+ "serde",
+ "ui9",
+ "ui9-dui",
+]
+
+[[package]]
 name = "n9-core"
 version = "0.0.1"
 dependencies = [
@@ -2289,6 +2303,7 @@ dependencies = [
  "futures",
  "libp2p",
  "log",
+ "n9-control-chat",
  "n9-core",
  "serde",
  "ui9",

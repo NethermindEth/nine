@@ -1,3 +1,4 @@
+mod chat;
 pub mod dashboard;
 mod events_list;
 mod peers_list;

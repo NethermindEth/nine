@@ -22,6 +22,7 @@ ui9-net = { path = "../../../substance/ui9-net", default-features = false, featu
 ui9-mesh = { path = "../../../substance/ui9-mesh", default-features = false, features = ["web"] }
 ui9-tracers = { path = "../../../substance/ui9-tracers", default-features = false, features = ["web"] }
 n9-core = { path = "../../../substance/n9-core", default-features = false, features = ["web"] }
+n9-control-chat = { path = "../../../particles/control-chat", default-features = false, features = ["web"] }
 derive_more = "2.0.1"
 web-sys = "0.3.77"
 libp2p = "0.55.0"

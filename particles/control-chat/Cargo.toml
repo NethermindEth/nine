@@ -9,9 +9,22 @@ rust-version.workspace = true
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
-crb = { workspace = true, features = ["std"] }
+crb.workspace = true
 derive_more.workspace = true
 n9-core.workspace = true
 serde.workspace = true
 ui9.workspace = true
 ui9-dui.workspace = true
+
+[features]
+default = ["std"]
+std = [
+    "crb/std",
+    "n9-core/std",
+    "ui9-dui/std",
+]
+web = [
+    "crb/web",
+    "n9-core/web",
+    "ui9-dui/web",
+]

@@ -1,9 +1,11 @@
 use crb::core::watch::Ref;
 use derive_more::Deref;
 use futures::Stream;
+use libp2p::PeerId;
 use std::pin::Pin;
 use ui9::names::Fqn;
 use ui9_dui::{State, Sub, SubEvent, Subscriber};
+use ui9_net::RemoteExt;
 use yew::Properties;
 
 #[derive(Deref)]
@@ -22,8 +24,14 @@ pub struct StateView<'a, F> {
 }
 
 impl<F: Subscriber> StateTracker<F> {
-    pub fn new(fqn: Fqn) -> Self {
-        let sub = Sub::local(fqn);
+    pub fn new(fqn: Fqn, peer: Option<PeerId>) -> Self {
+        let sub = {
+            if let Some(peer) = peer {
+                Sub::remote(peer, fqn)
+            } else {
+                Sub::local(fqn)
+            }
+        };
         Self {
             sub,
             state: None,

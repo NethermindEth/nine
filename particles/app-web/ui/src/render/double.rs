@@ -37,8 +37,8 @@ impl<F: Subscriber, S: Subscriber> Projection for Flow<F, S> {
         let first = props.first.clone();
         let second = props.second.clone();
         Self {
-            first: StateTracker::new(first),
-            second: StateTracker::new(second),
+            first: StateTracker::new(first, None),
+            second: StateTracker::new(second, None),
         }
     }
 

@@ -25,7 +25,7 @@ impl<F: Subscriber> Projection for Flow<F> {
     fn create(props: &Self::Properties) -> Self {
         let fqn = props.fqn.clone();
         Self {
-            tracker: StateTracker::new(fqn),
+            tracker: StateTracker::new(fqn, None),
         }
     }
 

@@ -1,3 +1,4 @@
+pub mod double;
 mod projection;
 pub mod single;
 mod widget;

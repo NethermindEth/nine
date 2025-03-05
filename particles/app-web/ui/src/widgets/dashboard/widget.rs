@@ -43,7 +43,7 @@ impl SubComponent for DashboardComponent {
                 <div class="app-content">
                     { peer }
                     // <EventsList fqn={Event::fqn()} />
-                    <PeersList fqn={Peer::fqn()} />
+                    <PeersList first={Peer::fqn()} second={Dashboard::fqn()} />
                 </div>
             </div>
         }

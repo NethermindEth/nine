@@ -1,10 +1,11 @@
 use super::projection::{Projection, ProjectionStream, StateTracker, StateView};
+use derive_more::Deref;
 use futures::StreamExt;
 use ui9::names::Fqn;
 use ui9_dui::{SubEvent, Subscriber};
 use yew::Properties;
 
-pub struct DoubleFlow<F: Subscriber, S: Subscriber> {
+pub struct Flow<F: Subscriber, S: Subscriber> {
     first: StateTracker<F>,
     second: StateTracker<S>,
 }
@@ -20,15 +21,17 @@ pub struct Props {
     pub second: Fqn,
 }
 
-pub struct DoubleState<'a, F, S> {
+#[derive(Deref)]
+pub struct State<'a, F, S> {
+    #[deref]
     pub first: StateView<'a, F>,
     pub second: StateView<'a, S>,
 }
 
-impl<F: Subscriber, S: Subscriber> Projection for DoubleFlow<F, S> {
+impl<F: Subscriber, S: Subscriber> Projection for Flow<F, S> {
     type Message = Msg<F, S>;
     type Properties = Props;
-    type State<'a> = DoubleState<'a, F, S>;
+    type State<'a> = State<'a, F, S>;
 
     fn create(props: &Self::Properties) -> Self {
         let first = props.first.clone();

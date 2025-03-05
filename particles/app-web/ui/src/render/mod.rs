@@ -1,3 +1,6 @@
+mod projection;
+pub mod single;
 mod widget;
 
-pub use widget::{SingleFlow, SingleState, SubComponent, SubWidget};
+pub use projection::Projection;
+pub use widget::{SubComponent, SubWidget};

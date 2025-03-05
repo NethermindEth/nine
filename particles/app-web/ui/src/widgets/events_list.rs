@@ -1,4 +1,5 @@
-use crate::render::{SingleFlow, SingleState, SubComponent, SubWidget};
+use crate::render::single::{SingleFlow, SingleState};
+use crate::render::{SubComponent, SubWidget};
 use ui9_dui::tracers::event::Event;
 use yew::{html, Html};
 

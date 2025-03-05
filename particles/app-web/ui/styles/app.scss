@@ -57,11 +57,32 @@ body {
 
   .component-peers-header {
     padding: 1rem;
-    font-size: 2rem;
+    font-size: 1.2rem;
   }
 
   .component-peers-peer {
     padding: 1rem;
+    cursor: pointer;
+  }
+}
+
+.widget-chat {
+  display: flex;
+  flex-direction: column;
+  // gap: 2rem;
+
+  .widget-chat-message {
+    padding: 1rem;
+  }
+
+  .widget-chat-request {
+    margin-left: 20%;
+    padding: 2rem;
+    background: #1a2934;
+    border-radius: 1rem;
+  }
+
+  .widget-chat-response {
   }
 }
 

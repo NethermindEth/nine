@@ -1,6 +1,7 @@
 use super::flow::Dashboard;
 use crate::render::{single, FqnLink, SubComponent, SubContext, SubWidget};
-use crate::widgets::PeersList;
+use crate::widgets::{self, PeersList};
+use n9_control_chat::Chat;
 use ui9_dui::Unified;
 use ui9_net::tracers::peer::Peer;
 use yew::{html, Html};
@@ -18,19 +19,23 @@ impl SubComponent for DashboardComponent {
     }
 
     fn render(&self, state: single::State<Dashboard>, _ctx: &SubContext<Self>) -> Option<Html> {
-        let peer = {
-            if let Some(active_peer) = state.active_peer {
-                html! {
-                    <p>{ active_peer.to_string() }</p>
-                }
-            } else {
-                html! {
-                    <p>{ "No selected peer" }</p>
-                }
-            }
-        };
-        let first: FqnLink = Peer::fqn().into();
-        let second: FqnLink = Dashboard::fqn().into();
+        let chat_or_peers;
+        if let Some(active_peer) = state.active_peer {
+            let peer = active_peer.to_string();
+            let link = FqnLink::remote(Chat::fqn(), active_peer);
+            chat_or_peers = html! {
+                <div>
+                    <div>{ "Chat of the peer: " }{ peer }</div>
+                    <widgets::Chat {link} />
+                </div>
+            };
+        } else {
+            let first: FqnLink = Peer::fqn().into();
+            let second: FqnLink = Dashboard::fqn().into();
+            chat_or_peers = html! {
+                <PeersList {first} {second} />
+            };
+        }
         html! {
             <div class="app">
                 <div class="app-header">
@@ -44,9 +49,7 @@ impl SubComponent for DashboardComponent {
                 </div>
 
                 <div class="app-content">
-                    { peer }
-                    // <EventsList fqn={Event::fqn()} />
-                    <PeersList {first} {second} />
+                    { chat_or_peers }
                 </div>
             </div>
         }

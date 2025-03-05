@@ -41,7 +41,7 @@ impl SubComponent for Peers {
         };
         Some(html! {
             <div class="component-peers">
-                <div class="component-peers-header">{ "Peers" }</div>
+                <div class="component-peers-header">{ "Select a peer:" }</div>
                 { list }
             </div>
         })

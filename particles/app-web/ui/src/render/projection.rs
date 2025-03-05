@@ -20,6 +20,15 @@ impl From<Fqn> for FqnLink {
     }
 }
 
+impl FqnLink {
+    pub fn remote(fqn: Fqn, peer: PeerId) -> Self {
+        Self {
+            fqn,
+            peer: Some(peer),
+        }
+    }
+}
+
 #[derive(Deref)]
 pub struct StateTracker<F: Subscriber> {
     #[deref]
@@ -28,7 +37,7 @@ pub struct StateTracker<F: Subscriber> {
     pub lost: bool,
 }
 
-#[derive(Deref)]
+#[derive(Deref, Debug)]
 pub struct StateView<'a, F> {
     #[deref]
     pub state: Ref<'a, F>,

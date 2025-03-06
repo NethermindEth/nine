@@ -3,11 +3,11 @@ use crate::widgets::dashboard::Dashboard;
 use ui9_net::tracers::peer::{Peer, PeerId};
 use yew::{html, Html};
 
-pub type PeersList = SubWidget<Peers>;
+pub type PeersWidget = SubWidget<PeersComponent>;
 
-pub struct Peers {}
+pub struct PeersComponent {}
 
-impl SubComponent for Peers {
+impl SubComponent for PeersComponent {
     type Projection = double::Flow<Peer, Dashboard>;
     type Message = Option<PeerId>;
 
@@ -48,7 +48,7 @@ impl SubComponent for Peers {
     }
 }
 
-impl Peers {
+impl PeersComponent {
     fn render_peer(&self, peer: &PeerId, ctx: &SubContext<Self>) -> Html {
         let onclick = ctx.event(Some(peer.clone()));
         html! {

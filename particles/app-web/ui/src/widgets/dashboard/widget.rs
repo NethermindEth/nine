@@ -1,7 +1,8 @@
 use super::flow::Dashboard;
 use crate::render::{single, FqnLink, SubComponent, SubContext, SubWidget};
-use crate::widgets::{self, PeersList};
+use crate::widgets;
 use n9_control_chat::Chat;
+use ui9_dui::tracers::job::Job;
 use ui9_dui::Unified;
 use ui9_net::tracers::peer::Peer;
 use yew::{html, Html};
@@ -22,18 +23,20 @@ impl SubComponent for DashboardComponent {
         let chat_or_peers;
         if let Some(active_peer) = state.active_peer {
             let peer = active_peer.to_string();
-            let link = FqnLink::remote(Chat::fqn(), active_peer);
+            let chat_link = FqnLink::remote(Chat::fqn(), active_peer);
+            let jobs_link = FqnLink::remote(Job::fqn(), active_peer);
             chat_or_peers = html! {
                 <div>
                     <div>{ "Chat of the peer: " }{ peer }</div>
-                    <widgets::Chat {link} />
+                    <widgets::Chat link={chat_link} />
+                    <widgets::Jobs link={jobs_link} />
                 </div>
             };
         } else {
             let first: FqnLink = Peer::fqn().into();
             let second: FqnLink = Dashboard::fqn().into();
             chat_or_peers = html! {
-                <PeersList {first} {second} />
+                <widgets::Peers {first} {second} />
             };
         }
         html! {

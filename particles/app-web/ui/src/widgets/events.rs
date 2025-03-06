@@ -2,11 +2,11 @@ use crate::render::{single, SubComponent, SubContext, SubWidget};
 use ui9_dui::tracers::event::Event;
 use yew::{html, Html};
 
-pub type EventsList = SubWidget<Events>;
+pub type EventsWidget = SubWidget<EventsComponent>;
 
-pub struct Events {}
+pub struct EventsComponent {}
 
-impl SubComponent for Events {
+impl SubComponent for EventsComponent {
     type Projection = single::Flow<Event>;
     type Message = ();
 

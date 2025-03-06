@@ -1,8 +1,10 @@
 mod chat;
 pub mod dashboard;
-mod events_list;
-mod peers_list;
+mod events;
+mod jobs;
+mod peers;
 
 pub use chat::ChatWidget as Chat;
-pub use events_list::EventsList;
-pub use peers_list::PeersList;
+pub use events::EventsWidget as Events;
+pub use jobs::JobsWidget as Jobs;
+pub use peers::PeersWidget as Peers;

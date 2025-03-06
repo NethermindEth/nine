@@ -78,11 +78,11 @@ impl MarkdownRender {
         }
     }
 
-    pub fn render_inline(&self, src: &str) -> Html {
+    pub fn inline(&self, src: &str) -> Html {
         InlineProcessor::new(self, src).render()
     }
 
-    pub fn render_block(&self, src: &str) -> Html {
+    pub fn block(&self, src: &str) -> Html {
         BlockProcessor::new(self, src).render()
     }
 }

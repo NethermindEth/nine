@@ -21,6 +21,7 @@ ui9-dui = { path = "../../../substance/ui9-dui", default-features = false, featu
 ui9-net = { path = "../../../substance/ui9-net", default-features = false, features = ["web"] }
 ui9-mesh = { path = "../../../substance/ui9-mesh", default-features = false, features = ["web"] }
 ui9-tracers = { path = "../../../substance/ui9-tracers", default-features = false, features = ["web"] }
+ui9-markdown = { path = "../../../substance/ui9-markdown" }
 n9-core = { path = "../../../substance/n9-core", default-features = false, features = ["web"] }
 n9-control-chat = { path = "../../../particles/control-chat", default-features = false, features = ["web"] }
 derive_more = "2.0.1"

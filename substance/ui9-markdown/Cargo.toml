@@ -9,7 +9,7 @@ keywords.workspace = true
 
 [dependencies]
 log.workspace = true
-pulldown-cmark = "0.9.6"
+pulldown-cmark = "0.10.0"
 regex.workspace = true
 slugify-rs = "0.0.3"
 thiserror.workspace = true

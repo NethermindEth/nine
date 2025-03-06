@@ -1,6 +1,6 @@
 /// Original author of this code is [Nathan Ringo](https://github.com/remexre)
 /// Source: https://github.com/acmumn/mentoring/blob/master/web-client/src/view/markdown.rs
-use pulldown_cmark::{Alignment, CodeBlockKind, Event, Options, Parser, Tag};
+use pulldown_cmark::{Alignment, CodeBlockKind, Event, Options, Parser, Tag, TagEnd};
 use regex::{Match, Regex};
 use slugify_rs::slugify;
 use std::collections::VecDeque;
@@ -17,6 +17,10 @@ const PATT: &str = r#"^\s*(?P<attr>\w+)\s*=\s*"(?P<value>\w+)"\s*$"#;
 pub enum Error {
     #[error("No parent element")]
     NoParent,
+    #[error("Lost kind of a codeblock")]
+    LostKind,
+    #[error("Lost aligns of a table")]
+    LostAligns,
 }
 
 pub fn slug_title(title: &str) -> String {
@@ -73,6 +77,14 @@ impl MarkdownRender {
             regex: Regex::new(PATT).unwrap(),
         }
     }
+
+    pub fn render_inline(&self, src: &str) -> Html {
+        InlineProcessor::new(self, src).render()
+    }
+
+    pub fn render_block(&self, src: &str) -> Html {
+        BlockProcessor::new(self, src).render()
+    }
 }
 
 /// Adds a class to the VTag.
@@ -96,13 +108,28 @@ pub fn set_href(el: &mut VTag, href: &str) {
     el.add_attribute("href", href.to_string());
 }
 
-impl MarkdownRender {
-    pub fn render_inline(&self, src: &str) -> Html {
+struct InlineProcessor<'a> {
+    render: &'a MarkdownRender,
+    source: &'a str,
+}
+
+impl<'a> InlineProcessor<'a> {
+    pub fn new(render: &'a MarkdownRender, source: &'a str) -> Self {
+        Self {
+            render,
+            source,
+        }
+    }
+}
+
+impl<'a> InlineProcessor<'a> {
+    pub fn render(&mut self) -> Html {
         // TODO: Render the real `Error`
-        self.render_inline_opt(src).ok().unwrap_or_default()
+        self.render_opt().ok().unwrap_or_default()
     }
 
-    pub fn render_inline_opt(&self, src: &str) -> Result<Html, Error> {
+    pub fn render_opt(&mut self) -> Result<Html, Error> {
+        let src = self.source;
         let mut elems = Vec::new();
         let mut spine = VecDeque::new();
 
@@ -141,23 +168,23 @@ impl MarkdownRender {
         })
     }
 
-    fn make_inline_tag(&self, t: Tag) -> VTag {
+    fn make_inline_tag(&mut self, t: Tag) -> VTag {
         match t {
             Tag::Paragraph => VTag::new("span"),
             Tag::Emphasis => VTag::new("i"),
             Tag::Strong => VTag::new("b"),
             Tag::Strikethrough => VTag::new("s"),
-            Tag::Link(_link_type, ref href, ref title) => {
+            Tag::Link { title, dest_url, .. } => {
                 let mut el = VTag::new("a");
                 if !title.is_empty() {
                     el.add_attribute("title", title.to_string());
                 }
-                self.filler.fill_link(&mut el, href);
+                self.render.filler.fill_link(&mut el, &dest_url);
                 el
             }
-            Tag::Image(_link_type, ref src, ref title) => {
+            Tag::Image { title, dest_url, .. } => {
                 let mut el = VTag::new("img");
-                el.add_attribute("src", src.to_string());
+                el.add_attribute("src", dest_url.to_string());
                 if !title.is_empty() {
                     el.add_attribute("title", title.to_string());
                 }
@@ -166,15 +193,36 @@ impl MarkdownRender {
             _ => VTag::new("span"),
         }
     }
+}
 
-    pub fn render(&self, src: &str) -> Html {
+struct BlockProcessor<'a> {
+    render: &'a MarkdownRender,
+    source: &'a str,
+    kinds: VecDeque<CodeBlockKind<'a>>,
+    aligns: VecDeque<Vec<Alignment>>,
+}
+
+impl<'a> BlockProcessor<'a> {
+    pub fn new(render: &'a MarkdownRender, source: &'a str) -> Self {
+        Self {
+            render,
+            source,
+            kinds: VecDeque::new(),
+            aligns: VecDeque::new(),
+        }
+    }
+}
+
+impl<'a> BlockProcessor<'a> {
+    pub fn render(&mut self) -> Html {
         // TODO: Render the real `Error`
-        self.render_opt(src).ok().unwrap_or_default()
+        self.render_opt().ok().unwrap_or_default()
     }
 
     /// Renders a string of Markdown to HTML with the default options (footnotes
     /// disabled, tables enabled).
-    pub fn render_opt(&self, src: &str) -> Result<Html, Error> {
+    pub fn render_opt(&mut self) -> Result<Html, Error> {
+        let src = self.source;
         let mut parse_attributes = false;
         let mut elems = Vec::new();
         let mut spine = VecDeque::new();
@@ -191,14 +239,16 @@ impl MarkdownRender {
                     // TODO Verify stack end.
                     let l = spine.len();
                     let mut top = spine.pop_back().ok_or(Error::NoParent)?;
-                    if let Tag::Heading(_, _, _) = tag {
+                    if let TagEnd::Heading { .. } = tag {
                         if let Some(item) = top.children().iter().next() {
                             if let VNode::VText(text_node) = item {
                                 let id = slug_title(&*text_node.text);
                                 top.add_attribute("id", id);
                             }
                         }
-                    } else if let Tag::CodeBlock(kind) = tag {
+                    } else if let TagEnd::CodeBlock = tag {
+                        let kind = self.kinds.pop_back()
+                            .ok_or_else(|| Error::LostKind)?;
                         let label = make_badge_label(&kind);
                         // let mut pre = VTag::new("pre");
                         // // pre.add_attribute("lang", );
@@ -220,7 +270,11 @@ impl MarkdownRender {
                         codeblock.add_child(top.into());
 
                         top = codeblock;
-                    } else if let Tag::Table(aligns) = tag {
+                        self.kinds.push_back(kind);
+
+                    } else if let TagEnd::Table = tag {
+                        let aligns = self.aligns.pop_back()
+                            .ok_or_else(|| Error::LostAligns)?;
                         if let Some(children) = top.children_mut() {
                             for r in children.to_vlist_mut().iter_mut() {
                                 if let VNode::VTag(ref mut vtag) = r {
@@ -246,7 +300,7 @@ impl MarkdownRender {
                                 }
                             }
                         }
-                    } else if let Tag::TableHead = tag {
+                    } else if let TagEnd::TableHead = tag {
                         if let Some(children) = top.children_mut() {
                             for c in children.to_vlist_mut().iter_mut() {
                                 if let VNode::VTag(ref mut vtag) = c {
@@ -273,7 +327,7 @@ impl MarkdownRender {
                             parse_attributes = false;
                         }
                         attr_value if parse_attributes => {
-                            if let Some(caps) = self.regex.captures(&attr_value) {
+                            if let Some(caps) = self.render.regex.captures(&attr_value) {
                                 let attr = caps.name("attr").as_ref().map(Match::as_str);
                                 let value = caps.name("value").as_ref().map(Match::as_str);
                                 if let (Some("class"), Some(value)) = (attr, value) {
@@ -325,30 +379,30 @@ impl MarkdownRender {
         })
     }
 
-    fn make_tag(&self, t: Tag) -> VTag {
+    fn make_tag(&mut self, t: Tag) -> VTag {
         match t {
             Tag::Paragraph => VTag::new("p"),
             Tag::Emphasis => VTag::new("i"),
             Tag::Strong => VTag::new("b"),
             Tag::Strikethrough => VTag::new("s"),
-            Tag::Link(_link_type, ref href, ref title) => {
+            Tag::Link { title, dest_url, .. } => {
                 let mut el = VTag::new("a");
                 if !title.is_empty() {
                     el.add_attribute("title", title.to_string());
                 }
-                self.filler.fill_link(&mut el, href);
+                self.render.filler.fill_link(&mut el, &dest_url);
                 el
             }
-            Tag::Image(_link_type, ref src, ref title) => {
+            Tag::Image { title, dest_url, .. } => {
                 let mut el = VTag::new("img");
-                el.add_attribute("src", src.to_string());
+                el.add_attribute("src", dest_url.to_string());
                 if !title.is_empty() {
                     el.add_attribute("title", title.to_string());
                 }
                 el
             }
 
-            Tag::Heading(n, _, _) => VTag::new(n.to_string()),
+            Tag::Heading { level, .. } => VTag::new(level.to_string()),
             Tag::BlockQuote => {
                 let mut el = VTag::new("blockquote");
                 el.add_attribute("class", "blockquote");
@@ -384,7 +438,8 @@ impl MarkdownRender {
                 el
             }
             Tag::Item => VTag::new("li"),
-            Tag::Table(_) => {
+            Tag::Table(aligns) => {
+                self.aligns.push_back(aligns);
                 let mut el = VTag::new("table");
                 el.add_attribute("class", "table");
                 el
@@ -398,6 +453,12 @@ impl MarkdownRender {
             Tag::TableCell => {
                 // TODO: Consider using table head (th) here
                 VTag::new("td")
+            }
+            Tag::HtmlBlock => {
+                VTag::new("div")
+            }
+            Tag::MetadataBlock(_) => {
+                VTag::new("div")
             }
             Tag::FootnoteDefinition(ref _footnote_id) => VTag::new("span"), // Footnotes are not rendered as anything special
         }

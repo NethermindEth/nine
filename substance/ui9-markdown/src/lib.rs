@@ -470,6 +470,12 @@ impl<'a> BlockProcessor<'a> {
             Tag::DefinitionListDefinition => {
                 VTag::new("div")
             },
+            Tag::Superscript => {
+                VTag::new("sup")
+            },
+            Tag::Subscript => {
+                VTag::new("sub")
+            },
         }
     }
 }

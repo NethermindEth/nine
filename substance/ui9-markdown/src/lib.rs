@@ -370,7 +370,7 @@ impl<'a> BlockProcessor<'a> {
                         .ok_or(Error::NoParent)?
                         .add_child(VTag::new("br").into());
                 }
-                _ => println!("Unknown event: {:#?}", ev),
+                _ => log::warn!("Unknown event: {:#?}", ev),
             }
         }
 
@@ -461,6 +461,15 @@ impl<'a> BlockProcessor<'a> {
                 VTag::new("div")
             }
             Tag::FootnoteDefinition(ref _footnote_id) => VTag::new("span"), // Footnotes are not rendered as anything special
+            Tag::DefinitionList => {
+                VTag::new("div")
+            },
+            Tag::DefinitionListTitle => {
+                VTag::new("div")
+            },
+            Tag::DefinitionListDefinition => {
+                VTag::new("div")
+            },
         }
     }
 }

@@ -403,7 +403,7 @@ impl<'a> BlockProcessor<'a> {
             }
 
             Tag::Heading { level, .. } => VTag::new(level.to_string()),
-            Tag::BlockQuote => {
+            Tag::BlockQuote(_) => {
                 let mut el = VTag::new("blockquote");
                 el.add_attribute("class", "blockquote");
                 el

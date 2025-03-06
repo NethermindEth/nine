@@ -115,10 +115,7 @@ struct InlineProcessor<'a> {
 
 impl<'a> InlineProcessor<'a> {
     pub fn new(render: &'a MarkdownRender, source: &'a str) -> Self {
-        Self {
-            render,
-            source,
-        }
+        Self { render, source }
     }
 }
 
@@ -174,7 +171,9 @@ impl<'a> InlineProcessor<'a> {
             Tag::Emphasis => VTag::new("i"),
             Tag::Strong => VTag::new("b"),
             Tag::Strikethrough => VTag::new("s"),
-            Tag::Link { title, dest_url, .. } => {
+            Tag::Link {
+                title, dest_url, ..
+            } => {
                 let mut el = VTag::new("a");
                 if !title.is_empty() {
                     el.add_attribute("title", title.to_string());
@@ -182,7 +181,9 @@ impl<'a> InlineProcessor<'a> {
                 self.render.filler.fill_link(&mut el, &dest_url);
                 el
             }
-            Tag::Image { title, dest_url, .. } => {
+            Tag::Image {
+                title, dest_url, ..
+            } => {
                 let mut el = VTag::new("img");
                 el.add_attribute("src", dest_url.to_string());
                 if !title.is_empty() {
@@ -247,8 +248,7 @@ impl<'a> BlockProcessor<'a> {
                             }
                         }
                     } else if let TagEnd::CodeBlock = tag {
-                        let kind = self.kinds.pop_back()
-                            .ok_or_else(|| Error::LostKind)?;
+                        let kind = self.kinds.pop_back().ok_or_else(|| Error::LostKind)?;
                         let label = make_badge_label(&kind);
                         // let mut pre = VTag::new("pre");
                         // // pre.add_attribute("lang", );
@@ -271,10 +271,8 @@ impl<'a> BlockProcessor<'a> {
 
                         top = codeblock;
                         self.kinds.push_back(kind);
-
                     } else if let TagEnd::Table = tag {
-                        let aligns = self.aligns.pop_back()
-                            .ok_or_else(|| Error::LostAligns)?;
+                        let aligns = self.aligns.pop_back().ok_or_else(|| Error::LostAligns)?;
                         if let Some(children) = top.children_mut() {
                             for r in children.to_vlist_mut().iter_mut() {
                                 if let VNode::VTag(ref mut vtag) = r {
@@ -385,7 +383,9 @@ impl<'a> BlockProcessor<'a> {
             Tag::Emphasis => VTag::new("i"),
             Tag::Strong => VTag::new("b"),
             Tag::Strikethrough => VTag::new("s"),
-            Tag::Link { title, dest_url, .. } => {
+            Tag::Link {
+                title, dest_url, ..
+            } => {
                 let mut el = VTag::new("a");
                 if !title.is_empty() {
                     el.add_attribute("title", title.to_string());
@@ -393,7 +393,9 @@ impl<'a> BlockProcessor<'a> {
                 self.render.filler.fill_link(&mut el, &dest_url);
                 el
             }
-            Tag::Image { title, dest_url, .. } => {
+            Tag::Image {
+                title, dest_url, ..
+            } => {
                 let mut el = VTag::new("img");
                 el.add_attribute("src", dest_url.to_string());
                 if !title.is_empty() {
@@ -454,28 +456,14 @@ impl<'a> BlockProcessor<'a> {
                 // TODO: Consider using table head (th) here
                 VTag::new("td")
             }
-            Tag::HtmlBlock => {
-                VTag::new("div")
-            }
-            Tag::MetadataBlock(_) => {
-                VTag::new("div")
-            }
+            Tag::HtmlBlock => VTag::new("div"),
+            Tag::MetadataBlock(_) => VTag::new("div"),
             Tag::FootnoteDefinition(ref _footnote_id) => VTag::new("span"), // Footnotes are not rendered as anything special
-            Tag::DefinitionList => {
-                VTag::new("div")
-            },
-            Tag::DefinitionListTitle => {
-                VTag::new("div")
-            },
-            Tag::DefinitionListDefinition => {
-                VTag::new("div")
-            },
-            Tag::Superscript => {
-                VTag::new("sup")
-            },
-            Tag::Subscript => {
-                VTag::new("sub")
-            },
+            Tag::DefinitionList => VTag::new("div"),
+            Tag::DefinitionListTitle => VTag::new("div"),
+            Tag::DefinitionListDefinition => VTag::new("div"),
+            Tag::Superscript => VTag::new("sup"),
+            Tag::Subscript => VTag::new("sub"),
         }
     }
 }

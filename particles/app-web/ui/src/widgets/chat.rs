@@ -35,7 +35,7 @@ impl ChatComponent {
             Role::Request => "widget-chat-request",
             Role::Response => "widget-chat-response",
         };
-        let content = self.render.inline(&msg.content);
+        let content = self.render.block(&msg.content);
         html! {
             <div class="widget-chat-message">
                 <div {class}>{ content }</div>

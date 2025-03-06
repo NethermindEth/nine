@@ -2,7 +2,7 @@ use crate::flow::{Flow, Unified};
 use crate::publisher::{Publisher, Tracer};
 use crate::subscriber::{Listener, Subscriber};
 use crb::core::uuid::Uuid;
-use derive_more::{Deref, DerefMut, From, Into, Display};
+use derive_more::{Deref, DerefMut, Display, From, Into};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use ui9::names::Fqn;
@@ -67,7 +67,9 @@ pub enum JobData {
     End { id: OperationId },
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash, Display)]
+#[derive(
+    Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash, Display,
+)]
 pub struct OperationId {
     id: Uuid,
 }

@@ -49,6 +49,19 @@ body {
 
 .app-content {
   padding: 1rem;
+  display: flex;
+  flex-direction: row;
+
+  .app-content-left {
+    width: 300px;
+  }
+
+  .app-content-center {
+    flex-grow: 1;
+  }
+
+  .app-content-right {
+  }
 }
 
 .component-peers {

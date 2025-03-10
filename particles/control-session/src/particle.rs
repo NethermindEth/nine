@@ -11,6 +11,13 @@ struct SessionRecord {
     // session: Pub<Session>,
 }
 
+impl SessionRecord {
+    pub fn new() -> Self {
+        Self {
+        }
+    }
+}
+
 pub struct SessionParticle {
     substance: SubstanceLinks,
     session_control: Pub<SessionControl>,
@@ -58,6 +65,10 @@ impl OnEvent<Act<SessionControl>> for SessionParticle {
     async fn handle(&mut self, msg: Act<SessionControl>, ctx: &mut Context<Self>) -> Result<()> {
         match msg.action {
             SessionControlAction::Create { key } => {
+                if !self.sessions.contains_key(&key) {
+                    let session = SessionRecord::new();
+                    self.sessions.insert(key, session);
+                }
             }
         }
         Ok(())

@@ -30,6 +30,7 @@ async fn main() -> Result<()> {
     // TODO: Rename to *Control
     substance.add_particle::<n9_control_chat::ChatParticle>()?;
     substance.add_particle::<n9_control_task::ControlTask>()?;
+    substance.add_particle::<n9_control_session::SessionParticle>()?;
 
     // substance.add_particle::<n9_app_stdio::StdioApp>()?;
 

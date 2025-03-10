@@ -24,6 +24,7 @@ ui9-tracers = { path = "../../../substance/ui9-tracers", default-features = fals
 ui9-markdown = { path = "../../../substance/ui9-markdown" }
 n9-core = { path = "../../../substance/n9-core", default-features = false, features = ["web"] }
 n9-control-chat = { path = "../../../particles/control-chat", default-features = false, features = ["web"] }
+n9-control-session = { path = "../../../particles/control-session", default-features = false, features = ["web"] }
 derive_more = "2.0.1"
 web-sys = "0.3.77"
 libp2p = "0.55.0"

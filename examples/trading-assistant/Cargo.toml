@@ -14,6 +14,7 @@ n9-app-tui.workspace = true
 n9-chat-telegram.path = "../../particles/chat-telegram"
 n9-config-toml.workspace = true
 n9-control-chat.workspace = true
+n9-control-session.workspace = true
 n9-control-task.workspace = true
 n9-core.workspace = true
 n9-exchange.path = "../../particles/exchange"

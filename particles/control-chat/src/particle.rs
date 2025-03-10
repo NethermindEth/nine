@@ -20,11 +20,6 @@ impl Particle for ChatParticle {
     }
 }
 
-impl Supervisor for ChatParticle {
-    type BasedOn = AgentSession<Self>;
-    type GroupBy = ();
-}
-
 impl Agent for ChatParticle {
     type Context = StreamSession<Self>;
 

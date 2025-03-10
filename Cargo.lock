@@ -5165,6 +5165,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-control-session"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "crb",
+ "derive_more 2.0.1",
+ "n9-core",
+ "serde",
+ "ui9",
+ "ui9-dui",
+]
+
+[[package]]
 name = "n9-control-task"
 version = "0.0.1"
 dependencies = [

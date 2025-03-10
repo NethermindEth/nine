@@ -1,17 +1,28 @@
+use crate::flow::{SessionControl, SessionKey, SessionControlAction};
 use anyhow::{Error, Result};
 use async_trait::async_trait;
-use crb::agent::{Next, DoAsync, Context, Agent, AgentSession};
+use crb::agent::{Next, DoAsync, Context, Agent, AgentSession, OnEvent};
 use crb::superagent::{Supervisor, StreamSession};
 use n9_core::{SubstanceLinks, Particle};
+use ui9_dui::{Act, Operation, Pub};
+use std::collections::HashMap;
+
+struct SessionRecord {
+    // session: Pub<Session>,
+}
 
 pub struct SessionParticle {
     substance: SubstanceLinks,
+    session_control: Pub<SessionControl>,
+    sessions: HashMap<SessionKey, SessionRecord>,
 }
 
 impl Particle for SessionParticle {
     fn construct(substance: SubstanceLinks) -> Self {
         Self {
             substance,
+            session_control: Pub::unified(),
+            sessions: HashMap::new(),
         }
     }
 }
@@ -34,8 +45,21 @@ struct Initialize;
 #[async_trait]
 impl DoAsync<Initialize> for SessionParticle {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        // ctx.consume(self.chat.actions()?);
+        // TODO: Try to restore sessions from a persistent layer
+
+        let actions = self.session_control.actions()?;
+        ctx.consume(actions);
         Ok(Next::events())
     }
 }
 
+#[async_trait]
+impl OnEvent<Act<SessionControl>> for SessionParticle {
+    async fn handle(&mut self, msg: Act<SessionControl>, ctx: &mut Context<Self>) -> Result<()> {
+        match msg.action {
+            SessionControlAction::Create { key } => {
+            }
+        }
+        Ok(())
+    }
+}

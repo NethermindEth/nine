@@ -1,8 +1,8 @@
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 use ui9::names::Fqn;
 use ui9_dui::{Flow, Listener, Publisher, Subscriber, Tracer, Unified};
-use std::collections::BTreeMap;
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct SessionControlSub {
@@ -75,9 +75,7 @@ pub enum SessionControlEvent {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum SessionControlAction {
-    Create {
-        key: SessionKey,
-    },
+    Create { key: SessionKey },
 }
 
 pub type SessionKey = String;

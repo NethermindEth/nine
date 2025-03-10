@@ -41,17 +41,41 @@ impl ChatControlPub {
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
-pub struct ChatControl {}
+pub struct ChatControl {
+    pub messages: Vec<Message>,
+}
 
 impl Flow for ChatControl {
     type Event = ChatControlEvent;
     type Action = ChatControlAction;
 
-    fn apply(&mut self, event: Self::Event) {}
+    fn apply(&mut self, event: Self::Event) {
+        match event {
+            ChatControlEvent::Add { message } => {
+                self.messages.push(message);
+            }
+        }
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub enum ChatControlEvent {}
+pub enum ChatControlEvent {
+    Add { message: Message },
+}
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub enum ChatControlAction {}
+pub enum ChatControlAction {
+    Prompt { prompt: String },
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct Message {
+    pub role: Role,
+    pub content: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub enum Role {
+    Request,
+    Response,
+}

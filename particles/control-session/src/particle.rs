@@ -12,15 +12,13 @@ struct SessionRecord {
     chat_control: Pub<ChatControl>,
 }
 
-/*
 impl SessionRecord {
-    pub fn new() -> Self {
+    pub fn new(key: SessionKey) -> Self {
         Self {
-            chat_control: Pub::new(),
+            chat_control: Pub::new(key),
         }
     }
 }
-*/
 
 pub struct SessionParticle {
     substance: SubstanceLinks,
@@ -69,10 +67,8 @@ impl OnEvent<Act<SessionControl>> for SessionParticle {
         match msg.action {
             SessionControlAction::Create { key } => {
                 if !self.sessions.contains_key(&key) {
-                    /*
-                    let session = SessionRecord::new();
+                    let session = SessionRecord::new(key.clone());
                     self.sessions.insert(key, session);
-                    */
                 }
             }
         }

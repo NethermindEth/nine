@@ -34,6 +34,7 @@ impl DashboardPub {}
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
 pub struct Dashboard {
     pub active_peer: Option<PeerId>,
+    pub active_chat: Option<Fqn>,
 }
 
 impl Unified for Dashboard {

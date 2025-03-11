@@ -27,15 +27,19 @@ impl SubComponent for DashboardComponent {
                 let session_control_link = FqnLink::remote(SessionControl::fqn(), active_peer);
                 let chat_link = FqnLink::remote(Chat::fqn(), active_peer);
                 let jobs_link = FqnLink::remote(Job::fqn(), active_peer);
+                let chat_interaction: FqnLink = Dashboard::fqn().into();
                 html! {
                     <div class="app-content">
                         <div class="app-content-left">
                             <widgets::SessionControl link={session_control_link} />
                         </div>
                         <div class="app-content-center">
+                            <widgets::ChatInteraction link={chat_interaction} />
+                            /*
                             <div>{ "Chat of the peer: " }{ peer }</div>
                             <widgets::Chat link={chat_link} />
                             <widgets::Jobs link={jobs_link} />
+                            */
                         </div>
                         <div class="app-content-right">
                         </div>

@@ -57,7 +57,7 @@ impl Flow for SessionControl {
     fn apply(&mut self, event: Self::Event) {
         match event {
             SessionControlEvent::Add { key } => {
-                let info = SessionInfo { };
+                let info = SessionInfo {};
                 self.active_sessions.insert(key, info);
             }
         }
@@ -77,5 +77,4 @@ pub enum SessionControlAction {
 pub type SessionKey = Fqn;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct SessionInfo {
-}
+pub struct SessionInfo {}

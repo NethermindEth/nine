@@ -1,4 +1,5 @@
 mod chat;
+mod chat_interaction;
 mod chats_list;
 pub mod dashboard;
 mod events;
@@ -7,6 +8,7 @@ mod peers;
 mod session_control;
 
 pub use chat::ChatWidget as Chat;
+pub use chat_interaction::ChatInteraction;
 pub use chats_list::ChatsListWidget as ChatsList;
 pub use events::EventsWidget as Events;
 pub use jobs::JobsWidget as Jobs;

@@ -30,7 +30,7 @@ impl SubComponent for ChatInteractionComponent {
         } else {
             html! {
                 <div class="widget-chat">
-                    { "Not connected" }
+                    { "No chat selected" }
                 </div>
             }
             .into()

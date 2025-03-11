@@ -36,26 +36,36 @@ impl SubComponent for PeersComponent {
         state: double::State<Peer, Dashboard>,
         ctx: &SubContext<Self>,
     ) -> Option<Html> {
-        let typ = std::any::type_name::<Peer>();
-        let list = {
-            if state.peers.is_empty() {
-                html! {
-                    <div class="component-peers-peer">{ format!("No peers yet :)") }</div>
-                }
-            } else {
-                html! {
-                    <div>
-                        { for state.peers.keys().map(|peer| self.render_peer(peer, ctx)) }
-                    </div>
-                }
+        if self.auto_connect {
+            html! {
+                <div class="component-peers">
+                    <div class="component-peers-peer">{ "Connecting..." }</div>
+                </div>
             }
-        };
-        Some(html! {
-            <div class="component-peers">
-                <div class="component-peers-header">{ "Select a peer:" }</div>
-                { list }
-            </div>
-        })
+            .into()
+        } else {
+            let typ = std::any::type_name::<Peer>();
+            let list = {
+                if state.peers.is_empty() {
+                    html! {
+                        <div class="component-peers-peer">{ format!("No peers yet :)") }</div>
+                    }
+                } else {
+                    html! {
+                        <div>
+                            { for state.peers.keys().map(|peer| self.render_peer(peer, ctx)) }
+                        </div>
+                    }
+                }
+            };
+            html! {
+                <div class="component-peers">
+                    <div class="component-peers-header">{ "Select a peer:" }</div>
+                    { list }
+                </div>
+            }
+            .into()
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::tools::{TaskId, TaskInfo, TaskParameters};
+use crate::tools::{TaskId, TaskParameters};
 use chrono::{DateTime, OutOfRangeError, TimeDelta, Utc};
 use crb::core::time::Duration;
 use derive_more::{Deref, DerefMut, From, Into};

@@ -3,7 +3,7 @@ use async_openai::types::*;
 use n9_core::{
     ActionableMessage, Message as MessageN9, Reason, Role as RoleN9, ToolCall, ToolInfo,
 };
-use schemars::schema::{InstanceType, RootSchema, SingleOrVec};
+use schemars::schema::RootSchema;
 use serde_json::{json, Value};
 
 // REQUESTS

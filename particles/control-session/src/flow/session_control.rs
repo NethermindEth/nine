@@ -1,7 +1,7 @@
+use chrono::NaiveDateTime;
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use chrono::NaiveDateTime;
 use ui9::names::Fqn;
 use ui9_dui::{Flow, Listener, Publisher, Subscriber, Tracer, Unified};
 

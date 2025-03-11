@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next};
 use crb::core::Slot;
 use crb::superagent::{Supervisor, SupervisorSession};
-use n9_core::{Particle, SubstanceBond, SubstanceLinks, Tool, ToolInfo};
+use n9_core::{Particle, SubstanceBond, SubstanceLinks, Tool};
 use std::collections::HashMap;
 use ui9_dui::{Operation, Pub};
 

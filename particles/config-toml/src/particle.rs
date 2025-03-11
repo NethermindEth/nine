@@ -1,7 +1,7 @@
 use crate::config_loader::{
     merge_configs, table, wrap_level, ConfigLoader, ConfigUpdates, NewConfig, StoreTemplate,
 };
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Next, OnEvent};
 use crb::core::{Slot, Unique};

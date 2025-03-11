@@ -1,8 +1,7 @@
 use crate::tools;
 use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::Agent;
-use n9_core::{SubstanceBond, Tool};
+use n9_core::SubstanceBond;
 use n9_kit::{LiquidParticle, Toolkit};
 
 pub type ExchangeParticle = LiquidParticle<ExchangeToolkit>;

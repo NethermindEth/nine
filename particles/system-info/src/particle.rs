@@ -6,7 +6,6 @@ use crb::core::Slot;
 use n9_core::tracers::tools::Tools;
 use n9_core::{Particle, SubstanceBond, SubstanceLinks, Tool};
 use ui9_app::SubState;
-use ui9_dui::Sub;
 
 pub struct SystemInfo {
     substance: SubstanceLinks,

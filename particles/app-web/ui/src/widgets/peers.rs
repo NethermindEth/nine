@@ -44,7 +44,6 @@ impl SubComponent for PeersComponent {
             }
             .into()
         } else {
-            let typ = std::any::type_name::<Peer>();
             let list = {
                 if state.peers.is_empty() {
                     html! {

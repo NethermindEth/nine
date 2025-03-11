@@ -1,7 +1,6 @@
 use super::projection::{FqnLink, Projection, ProjectionStream, StateTracker, StateView};
 use derive_more::{Deref, DerefMut};
 use futures::StreamExt;
-use ui9::names::Fqn;
 use ui9_dui::{SubEvent, Subscriber};
 use yew::Properties;
 

@@ -20,7 +20,6 @@ impl SubComponent for ChatComponent {
     }
 
     fn render(&self, state: single::State<Chat>, _ctx: &SubContext<Self>) -> Option<Html> {
-        let typ = std::any::type_name::<Chat>();
         Some(html! {
             <div class="widget-chat">
                 { for state.messages.iter().map(|msg| self.render(msg)) }

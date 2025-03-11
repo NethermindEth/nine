@@ -1,13 +1,13 @@
 use crate::flow::chat_control::ChatControl;
-use crate::flow::session_control::{SessionControl, SessionControlAction, SessionKey, SessionInfo};
-use anyhow::{Error, Result};
+use crate::flow::session_control::{SessionControl, SessionControlAction, SessionInfo, SessionKey};
+use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
 use chrono::Utc;
+use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
 use crb::superagent::{StreamSession, Supervisor};
 use n9_core::{Particle, SubstanceLinks};
 use std::collections::HashMap;
-use ui9_dui::{Act, Operation, Pub};
+use ui9_dui::{Act, Pub};
 
 struct SessionRecord {
     chat_control: Pub<ChatControl>,

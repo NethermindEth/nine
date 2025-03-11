@@ -1,8 +1,11 @@
 use super::projection::Projection;
+use crb::core::time::{Duration, Instant};
 use derive_more::Deref;
 use futures::StreamExt;
 use std::any::type_name;
 use yew::{html, Callback, Component, Context, Html};
+
+static SHOW_LOADING_AFTER: Duration = Duration::from_secs(3);
 
 #[derive(Deref)]
 pub struct SubContext<'a, C: SubComponent> {
@@ -62,6 +65,7 @@ pub struct SubWidget<C: SubComponent> {
     component: C,
     // TODO: Wrap with an Option
     projection: Option<C::Projection>,
+    created: Instant,
 }
 
 impl<C: SubComponent> Component for SubWidget<C> {
@@ -74,6 +78,7 @@ impl<C: SubComponent> Component for SubWidget<C> {
         Self {
             component,
             projection: None,
+            created: Instant::now(),
         }
     }
 
@@ -117,12 +122,18 @@ impl<C: SubComponent> Component for SubWidget<C> {
     fn view(&self, ctx: &Context<Self>) -> Html {
         self.view_opt(ctx).unwrap_or_else(|| {
             let name = type_name::<C>();
-            html! {
-                <div class="spinner">
-                    <img width="32px" src="static/loader.gif" />
-                    <div>{ "Loading..." }</div>
-                    <div>{ name }</div>
-                </div>
+            if self.created.elapsed() >= SHOW_LOADING_AFTER {
+                html! {
+                    <div class="spinner">
+                        <img width="32px" src="static/loader.gif" />
+                        <div>{ "Loading..." }</div>
+                        <div>{ name }</div>
+                    </div>
+                }
+            } else {
+                html! {
+                    <div></div>
+                }
             }
         })
     }

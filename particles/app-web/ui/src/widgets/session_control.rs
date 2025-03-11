@@ -22,7 +22,16 @@ impl SubComponent for SessionControlComponent {
     ) -> Option<Html> {
         let typ = std::any::type_name::<Event>();
         Some(html! {
-            <div>{ format!("Chats:") }</div>
+            <div class="widget-session-control">
+                <div class="widget-session-control-header">
+                    <div class="widget-session-control-header-title">
+                        { "Chats" }
+                    </div>
+                    <div class="widget-session-control-header-new">
+                        { "New" }
+                    </div>
+                </div>
+            </div>
         })
     }
 }

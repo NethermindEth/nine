@@ -1,0 +1,17 @@
+.widget-session-control {
+  display: flex;
+  flex-direction: column;
+
+  .widget-session-control-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .widget-session-control-header-title {
+      font-weight: bold;
+    }
+    .widget-session-control-header-new {
+      color: #52A021;
+    }
+  }
+}

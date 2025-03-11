@@ -42,6 +42,7 @@ pub trait SubComponent: Sized + 'static {
 }
 
 pub enum Msg<C: SubComponent> {
+    Install,
     Projection(<C::Projection as Projection>::Message),
     Component(C::Message),
 }
@@ -57,33 +58,41 @@ impl<C: SubComponent> Component for SubWidget<C> {
     type Properties = <C::Projection as Projection>::Properties;
 
     fn create(ctx: &Context<Self>) -> Self {
+        ctx.link().send_message(Msg::Install);
         let component = C::create();
-        let mut this = Self {
+        Self {
             component,
             projection: None,
-        };
-        this.install(ctx);
-        this
+        }
     }
 
     fn changed(&mut self, ctx: &Context<Self>, old: &Self::Properties) -> bool {
         let update = ctx.props() != old;
         if update {
+            self.projection.take();
             // TODO: Cancel streams
-            // TODO: Subscribe to changed streams only
-            self.install(ctx);
+            ctx.link().send_message(Msg::Install);
         }
         update
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        if let Some(projection) = self.projection.as_mut() {
-            match msg {
-                Msg::Projection(event) => projection.update(event),
-                Msg::Component(event) => self.component.update(event, projection),
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::Install => {
+                self.install(ctx);
+                false
             }
-        } else {
-            false
+            _ => {
+                if let Some(projection) = self.projection.as_mut() {
+                    match msg {
+                        Msg::Projection(event) => projection.update(event),
+                        Msg::Component(event) => self.component.update(event, projection),
+                        _ => false,
+                    }
+                } else {
+                    false
+                }
+            }
         }
     }
 

@@ -16,6 +16,10 @@ impl<'a, C: SubComponent> SubContext<'a, C> {
     {
         self.link().callback(move |_| Msg::Component(event.clone()))
     }
+
+    pub fn send(&self, msg: C::Message) {
+        self.link().send_message(Msg::Component(msg))
+    }
 }
 
 pub trait SubComponent: Sized + 'static {
@@ -33,6 +37,13 @@ pub trait SubComponent: Sized + 'static {
     fn on_sub(&mut self, _event: &Self::Projection::Event) {}
 
     */
+
+    fn discover(
+        &mut self,
+        _state: <Self::Projection as Projection>::State<'_>,
+        _ctx: &SubContext<Self>,
+    ) {
+    }
 
     fn render(
         &self,
@@ -85,7 +96,14 @@ impl<C: SubComponent> Component for SubWidget<C> {
             _ => {
                 if let Some(projection) = self.projection.as_mut() {
                     match msg {
-                        Msg::Projection(event) => projection.update(event),
+                        Msg::Projection(event) => {
+                            let render = projection.update(event);
+                            if let Some(state) = projection.state() {
+                                let ctx = SubContext { context: ctx };
+                                self.component.discover(state, &ctx);
+                            }
+                            render
+                        }
                         Msg::Component(event) => self.component.update(event, projection),
                         _ => false,
                     }

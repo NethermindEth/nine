@@ -5,19 +5,30 @@ use yew::{html, Html};
 
 pub type PeersWidget = SubWidget<PeersComponent>;
 
-pub struct PeersComponent {}
+pub struct PeersComponent {
+    auto_connect: bool,
+}
 
 impl SubComponent for PeersComponent {
     type Projection = double::Flow<Peer, Dashboard>;
     type Message = Option<PeerId>;
 
     fn create() -> Self {
-        Self {}
+        Self { auto_connect: true }
     }
 
     fn update(&mut self, msg: Self::Message, pro: &mut Self::Projection) -> bool {
         pro.second.set_peer(msg);
         true
+    }
+
+    fn discover(&mut self, state: double::State<Peer, Dashboard>, ctx: &SubContext<Self>) {
+        if self.auto_connect {
+            if let Some(peer_id) = state.first.peers.keys().next().cloned() {
+                ctx.send(Some(peer_id));
+                self.auto_connect = false;
+            }
+        }
     }
 
     fn render(

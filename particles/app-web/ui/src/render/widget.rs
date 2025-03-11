@@ -49,7 +49,7 @@ pub enum Msg<C: SubComponent> {
 pub struct SubWidget<C: SubComponent> {
     component: C,
     // TODO: Wrap with an Option
-    projection: C::Projection,
+    projection: Option<C::Projection>,
 }
 
 impl<C: SubComponent> Component for SubWidget<C> {
@@ -58,26 +58,32 @@ impl<C: SubComponent> Component for SubWidget<C> {
 
     fn create(ctx: &Context<Self>) -> Self {
         let component = C::create();
-        let projection = Self::new_projection(ctx);
-        Self {
+        let mut this = Self {
             component,
-            projection,
-        }
+            projection: None,
+        };
+        this.install(ctx);
+        this
     }
 
     fn changed(&mut self, ctx: &Context<Self>, old: &Self::Properties) -> bool {
         let update = ctx.props() != old;
-        // TODO: Cancel streams
-        // TODO: Subscribe to changed streams only
-        let projection = Self::new_projection(ctx);
-        self.projection = projection;
+        if update {
+            // TODO: Cancel streams
+            // TODO: Subscribe to changed streams only
+            self.install(ctx);
+        }
         update
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            Msg::Projection(event) => self.projection.update(event),
-            Msg::Component(event) => self.component.update(event, &self.projection),
+        if let Some(projection) = self.projection.as_mut() {
+            match msg {
+                Msg::Projection(event) => projection.update(event),
+                Msg::Component(event) => self.component.update(event, projection),
+            }
+        } else {
+            false
         }
     }
 
@@ -96,20 +102,19 @@ impl<C: SubComponent> Component for SubWidget<C> {
 }
 
 impl<C: SubComponent> SubWidget<C> {
-    fn new_projection(ctx: &Context<Self>) -> C::Projection {
-        C::Projection::create(ctx.props())
-    }
-
-    fn subscribe(&mut self, ctx: &Context<Self>) {
-        for stream in self.projection.streams() {
-            // TODO: Cancel streams
+    fn install(&mut self, ctx: &Context<Self>) {
+        self.projection.take();
+        let mut projection = C::Projection::create(ctx.props());
+        for stream in projection.streams() {
             ctx.link().send_stream(stream.map(Msg::Projection));
         }
+        self.projection = Some(projection);
     }
 
     fn view_opt(&self, ctx: &Context<Self>) -> Option<Html> {
         let ctx = SubContext { context: ctx };
-        let state = self.projection.state()?;
+        let projection = self.projection.as_ref()?;
+        let state = projection.state()?;
         let rendered = self.component.render(state, &ctx)?;
         Some(rendered)
     }

@@ -16,6 +16,7 @@ n9-core.workspace = true
 serde.workspace = true
 ui9.workspace = true
 ui9-dui.workspace = true
+vectorize.workspace = true
 
 [features]
 default = ["std"]

@@ -30,17 +30,15 @@ impl Publisher for SessionControl {
 }
 
 impl SessionControlPub {
-    /*
-    pub fn add(&mut self, content: String, role: Role) {
-        let message = Message { content, role };
-        let event = SessionControlEvent::Add { message };
+    pub fn add(&mut self, key: SessionKey) {
+        let event = SessionControlEvent::Add { key };
         self.tracer.event(event);
     }
-    */
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
 pub struct SessionControl {
+    #[serde(with = "vectorize")]
     pub active_sessions: BTreeMap<SessionKey, SessionInfo>,
 }
 

@@ -1,6 +1,6 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use crb::core::uuid::Uuid;
-use n9_control_session::SessionControl;
+use n9_control_session::{SessionControl, SessionInfo, SessionKey};
 use ui9::names::Fqn;
 use ui9_dui::tracers::event::Event;
 use yew::{html, Html};
@@ -45,7 +45,20 @@ impl SubComponent for SessionControlComponent {
                         { "New" }
                     </div>
                 </div>
+                <div class="widget-session-control-list">
+                    { for state.active_sessions.iter().map(|(k, v)| self.render_item(k, v)) }
+                </div>
             </div>
         })
+    }
+}
+
+impl SessionControlComponent {
+    fn render_item(&self, key: &SessionKey, info: &SessionInfo) -> Html {
+        html! {
+            <div class="widget-session-control-list-item">
+                { key.to_string() }
+            </div>
+        }
     }
 }

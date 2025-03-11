@@ -1,6 +1,7 @@
 .widget-session-control {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 
   .widget-session-control-header {
     display: flex;
@@ -13,6 +14,15 @@
     .widget-session-control-header-new {
       color: #52A021;
       cursor: pointer;
+    }
+  }
+
+  .widget-session-control-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .widget-session-control-list-item {
     }
   }
 }

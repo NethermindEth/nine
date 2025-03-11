@@ -2296,6 +2296,7 @@ dependencies = [
  "serde",
  "ui9",
  "ui9-dui",
+ "vectorize",
 ]
 
 [[package]]
@@ -3903,6 +3904,15 @@ dependencies = [
  "serde",
  "sha1_smol",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "vectorize"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25e3bbfdfdcc4ea60ce183b1b45c936aacd69fe097ebf137984a32faf80e365b"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

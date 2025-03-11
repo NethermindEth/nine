@@ -68,7 +68,8 @@ impl OnEvent<Act<SessionControl>> for SessionParticle {
             SessionControlAction::Create { key } => {
                 if !self.sessions.contains_key(&key) {
                     let session = SessionRecord::new(key.clone());
-                    self.sessions.insert(key, session);
+                    self.sessions.insert(key.clone(), session);
+                    self.session_control.add(key);
                 }
             }
         }

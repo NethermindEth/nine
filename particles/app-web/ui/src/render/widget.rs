@@ -48,7 +48,21 @@ pub enum Msg<C: SubComponent> {
 
 pub struct SubWidget<C: SubComponent> {
     component: C,
+    // TODO: Wrap with an option
     projection: C::Projection,
+}
+
+impl<C: SubComponent> SubWidget<C> {
+    fn new_projection(ctx: &Context<Self>) -> C::Projection {
+        C::Projection::create(ctx.props())
+    }
+
+    fn subscribe(&mut self, ctx: &Context<Self>) {
+        for stream in self.projection.streams() {
+            // TODO: Cancel streams
+            ctx.link().send_stream(stream.map(Msg::Projection));
+        }
+    }
 }
 
 impl<C: SubComponent> Component for SubWidget<C> {
@@ -57,14 +71,20 @@ impl<C: SubComponent> Component for SubWidget<C> {
 
     fn create(ctx: &Context<Self>) -> Self {
         let component = C::create();
-        let mut projection = C::Projection::create(ctx.props());
-        for stream in projection.streams() {
-            ctx.link().send_stream(stream.map(Msg::Projection));
-        }
+        let projection = Self::new_projection(ctx);
         Self {
             component,
             projection,
         }
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>, old: &Self::Properties) -> bool {
+        let update = ctx.props() != old;
+        // TODO: Cancel streams
+        // TODO: Subscribe to changed streams only
+        let projection = Self::new_projection(ctx);
+        self.projection = projection;
+        update
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {

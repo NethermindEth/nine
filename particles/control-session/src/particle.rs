@@ -1,8 +1,9 @@
 use crate::flow::chat_control::ChatControl;
-use crate::flow::session_control::{SessionControl, SessionControlAction, SessionKey};
+use crate::flow::session_control::{SessionControl, SessionControlAction, SessionKey, SessionInfo};
 use anyhow::{Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
+use chrono::Utc;
 use crb::superagent::{StreamSession, Supervisor};
 use n9_core::{Particle, SubstanceLinks};
 use std::collections::HashMap;
@@ -69,7 +70,12 @@ impl OnEvent<Act<SessionControl>> for SessionParticle {
                 if !self.sessions.contains_key(&key) {
                     let session = SessionRecord::new(key.clone());
                     self.sessions.insert(key.clone(), session);
-                    self.session_control.add(key);
+                    let utc_now = Utc::now();
+                    let info = SessionInfo {
+                        created: utc_now.naive_utc(),
+                        title: None,
+                    };
+                    self.session_control.add(key, info);
                 }
             }
         }

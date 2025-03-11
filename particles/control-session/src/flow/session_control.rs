@@ -1,6 +1,7 @@
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use chrono::NaiveDateTime;
 use ui9::names::Fqn;
 use ui9_dui::{Flow, Listener, Publisher, Subscriber, Tracer, Unified};
 
@@ -30,8 +31,8 @@ impl Publisher for SessionControl {
 }
 
 impl SessionControlPub {
-    pub fn add(&mut self, key: SessionKey) {
-        let event = SessionControlEvent::Add { key };
+    pub fn add(&mut self, key: SessionKey, info: SessionInfo) {
+        let event = SessionControlEvent::Add { key, info };
         self.tracer.event(event);
     }
 }
@@ -54,8 +55,7 @@ impl Flow for SessionControl {
 
     fn apply(&mut self, event: Self::Event) {
         match event {
-            SessionControlEvent::Add { key } => {
-                let info = SessionInfo {};
+            SessionControlEvent::Add { key, info } => {
                 self.active_sessions.insert(key, info);
             }
         }
@@ -64,7 +64,7 @@ impl Flow for SessionControl {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum SessionControlEvent {
-    Add { key: SessionKey },
+    Add { key: SessionKey, info: SessionInfo },
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -75,4 +75,7 @@ pub enum SessionControlAction {
 pub type SessionKey = Fqn;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct SessionInfo {}
+pub struct SessionInfo {
+    pub created: NaiveDateTime,
+    pub title: Option<String>,
+}

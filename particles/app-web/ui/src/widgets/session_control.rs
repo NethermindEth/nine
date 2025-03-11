@@ -35,6 +35,8 @@ impl SubComponent for SessionControlComponent {
     fn render(&self, state: single::State<SessionControl>, ctx: &SubContext<Self>) -> Option<Html> {
         let typ = std::any::type_name::<Event>();
         let onclick = ctx.event(Msg::NewChat);
+        let mut items: Vec<_> = state.active_sessions.iter().collect();
+        items.sort_by_key(|(_, info)| info.created);
         Some(html! {
             <div class="widget-session-control">
                 <div class="widget-session-control-header">
@@ -46,7 +48,7 @@ impl SubComponent for SessionControlComponent {
                     </div>
                 </div>
                 <div class="widget-session-control-list">
-                    { for state.active_sessions.iter().map(|(k, v)| self.render_item(k, v)) }
+                    { for items.into_iter().rev().map(|(k, v)| self.render_item(k, v)) }
                 </div>
             </div>
         })
@@ -57,7 +59,7 @@ impl SessionControlComponent {
     fn render_item(&self, key: &SessionKey, info: &SessionInfo) -> Html {
         html! {
             <div class="widget-session-control-list-item">
-                { key.to_string() }
+                { info.created.to_string() }
             </div>
         }
     }

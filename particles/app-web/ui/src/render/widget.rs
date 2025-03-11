@@ -48,21 +48,8 @@ pub enum Msg<C: SubComponent> {
 
 pub struct SubWidget<C: SubComponent> {
     component: C,
-    // TODO: Wrap with an option
+    // TODO: Wrap with an Option
     projection: C::Projection,
-}
-
-impl<C: SubComponent> SubWidget<C> {
-    fn new_projection(ctx: &Context<Self>) -> C::Projection {
-        C::Projection::create(ctx.props())
-    }
-
-    fn subscribe(&mut self, ctx: &Context<Self>) {
-        for stream in self.projection.streams() {
-            // TODO: Cancel streams
-            ctx.link().send_stream(stream.map(Msg::Projection));
-        }
-    }
 }
 
 impl<C: SubComponent> Component for SubWidget<C> {
@@ -95,19 +82,35 @@ impl<C: SubComponent> Component for SubWidget<C> {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        self.view_opt(ctx).unwrap_or_else(|| {
+            let name = type_name::<C>();
+            html! {
+                <div class="spinner">
+                    <img width="32px" src="static/loader.gif" />
+                    <div>{ "Loading..." }</div>
+                    <div>{ name }</div>
+                </div>
+            }
+        })
+    }
+}
+
+impl<C: SubComponent> SubWidget<C> {
+    fn new_projection(ctx: &Context<Self>) -> C::Projection {
+        C::Projection::create(ctx.props())
+    }
+
+    fn subscribe(&mut self, ctx: &Context<Self>) {
+        for stream in self.projection.streams() {
+            // TODO: Cancel streams
+            ctx.link().send_stream(stream.map(Msg::Projection));
+        }
+    }
+
+    fn view_opt(&self, ctx: &Context<Self>) -> Option<Html> {
         let ctx = SubContext { context: ctx };
-        self.projection
-            .state()
-            .and_then(|state| self.component.render(state, &ctx))
-            .unwrap_or_else(|| {
-                let name = type_name::<C>();
-                html! {
-                    <div class="spinner">
-                        <img width="32px" src="static/loader.gif" />
-                        <div>{ "Loading..." }</div>
-                        <div>{ name }</div>
-                    </div>
-                }
-            })
+        let state = self.projection.state()?;
+        let rendered = self.component.render(state, &ctx)?;
+        Some(rendered)
     }
 }

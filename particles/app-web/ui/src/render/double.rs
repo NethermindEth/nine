@@ -1,5 +1,5 @@
 use super::projection::{FqnLink, Projection, ProjectionStream, StateTracker, StateView};
-use derive_more::Deref;
+use derive_more::{Deref, DerefMut};
 use futures::StreamExt;
 use ui9::names::Fqn;
 use ui9_dui::{SubEvent, Subscriber};
@@ -21,9 +21,10 @@ pub struct Props {
     pub second: FqnLink,
 }
 
-#[derive(Deref)]
+#[derive(Deref, DerefMut)]
 pub struct State<'a, F, S> {
     #[deref]
+    #[deref_mut]
     pub first: StateView<'a, F>,
     pub second: StateView<'a, S>,
 }

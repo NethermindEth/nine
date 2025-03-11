@@ -1,4 +1,5 @@
 use crate::names::Pqn;
+use derive_more::From;
 use nom::{
     bytes::complete::{tag, take_while1},
     multi::separated_list1,
@@ -28,7 +29,7 @@ pub enum Error {
     Remaining(String),
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, From, Ord, Hash, Clone, Deserialize, Serialize)]
 pub struct Fqn {
     components: Vec<String>,
 }

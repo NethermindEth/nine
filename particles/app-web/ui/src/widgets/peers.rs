@@ -15,7 +15,7 @@ impl SubComponent for PeersComponent {
         Self {}
     }
 
-    fn update(&mut self, msg: Self::Message, pro: &Self::Projection) -> bool {
+    fn update(&mut self, msg: Self::Message, pro: &mut Self::Projection) -> bool {
         pro.second.set_peer(msg);
         true
     }

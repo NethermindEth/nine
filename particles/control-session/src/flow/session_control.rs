@@ -14,7 +14,7 @@ impl Subscriber for SessionControl {
 }
 
 impl SessionControlSub {
-    pub fn create(&mut self, key: SessionKey) {
+    pub fn new_chat(&self, key: SessionKey) {
         let event = SessionControlAction::Create { key };
         self.listener.action(event);
     }

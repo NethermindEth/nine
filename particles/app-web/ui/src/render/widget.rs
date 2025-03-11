@@ -25,7 +25,7 @@ pub trait SubComponent: Sized + 'static {
     // TODO: Provide links (maybe mapped)
     fn create() -> Self;
 
-    fn update(&mut self, _msg: Self::Message, pro: &Self::Projection) -> bool {
+    fn update(&mut self, _msg: Self::Message, pro: &mut Self::Projection) -> bool {
         true
     }
 

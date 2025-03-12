@@ -20,6 +20,14 @@ impl<'a, C: SubComponent> SubContext<'a, C> {
         self.link().callback(move |_| Msg::Component(event.clone()))
     }
 
+    pub fn callback<IN, F>(&self, func: F) -> Callback<IN>
+    where
+        F: Fn(IN) -> C::Message + 'static,
+    {
+        self.link()
+            .callback(move |input| Msg::Component(func(input)))
+    }
+
     pub fn send(&self, msg: C::Message) {
         self.link().send_message(Msg::Component(msg))
     }

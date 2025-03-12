@@ -28,17 +28,21 @@ impl Publisher for ChatControl {
 }
 
 impl ChatControlPub {
-    /*
     pub fn add(&mut self, content: String, role: Role) {
         let message = Message { content, role };
         let event = ChatControlEvent::Add { message };
         self.tracer.event(event);
     }
-    */
+
+    pub fn thinking(&mut self, flag: bool) {
+        let event = ChatControlEvent::SetThinking { flag };
+        self.tracer.event(event);
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
 pub struct ChatControl {
+    pub thinking: bool,
     pub messages: Vec<Message>,
 }
 
@@ -57,6 +61,9 @@ impl Flow for ChatControl {
             ChatControlEvent::Add { message } => {
                 self.messages.push(message);
             }
+            ChatControlEvent::SetThinking { flag } => {
+                self.thinking = flag;
+            }
         }
     }
 }
@@ -64,6 +71,7 @@ impl Flow for ChatControl {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum ChatControlEvent {
     Add { message: Message },
+    SetThinking { flag: bool },
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]

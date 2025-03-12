@@ -10,13 +10,11 @@ use std::collections::HashMap;
 use ui9_dui::{Act, Pub};
 
 struct SessionRecord {
-    chat_control: Pub<ChatControl>,
 }
 
 impl SessionRecord {
     pub fn new(key: SessionKey) -> Self {
         Self {
-            chat_control: Pub::new(key),
         }
     }
 }

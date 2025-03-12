@@ -7,7 +7,7 @@ members = [
 ]
 exclude = [
     "particles/app-web/ui",
-    "particles/app-web",
+    # "particles/app-web",
     # "examples",
 ]
 

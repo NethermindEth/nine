@@ -1,5 +1,6 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use n9_control_session::{ChatControl, Message, Role};
+use std::mem::swap;
 use ui9_markdown::MarkdownRender;
 use yew::{html, Html, InputEvent, TargetCast};
 
@@ -38,7 +39,8 @@ impl SubComponent for ChatComponent {
                 self.text = text;
             }
             Msg::Send => {
-                let text = self.text.clone();
+                let mut text = String::new();
+                swap(&mut text, &mut self.text);
                 pro.prompt(text);
             }
         }

@@ -4,7 +4,7 @@ use crate::flow::session_control::{SessionControl, SessionControlAction, Session
 use anyhow::Result;
 use async_trait::async_trait;
 use chrono::Utc;
-use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent, Address, Equip};
+use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next, OnEvent};
 use crb::superagent::{StreamSession, Supervisor, SupervisorSession};
 use n9_core::{Particle, SubstanceLinks};
 use std::collections::HashMap;
@@ -57,7 +57,6 @@ impl OnEvent<Act<SessionControl>> for SessionParticle {
         match msg.action {
             SessionControlAction::Create { key } => {
                 if !self.sessions.contains_key(&key) {
-
                     let session = self.spawn_session(key.clone(), ctx);
                     self.sessions.insert(key.clone(), session);
 

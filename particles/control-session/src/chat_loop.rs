@@ -60,18 +60,20 @@ struct SendRequest {
 impl DoAsync<SendRequest> for ChatControlLoop {
     async fn handle(&mut self, msg: SendRequest, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let op = Operation::start("Sending a prompt");
-        self.chat.thinking(true);
+        self.chat.start_thinking("Sending a prompt");
+
         let request = ChatRequest::user(&msg.prompt);
         let session = self.router.new_session().await?;
         let req = session.chat(request);
         self.chat.add(msg.prompt, Role::Request);
+
         op.end();
         let state = WaitResponse { req };
         Ok(Next::do_async(state))
     }
 
     async fn fallback(&mut self, err: Error) -> Next<Self> {
-        self.chat.thinking(false);
+        self.chat.stop_thinking();
         // TODO: Operation failure reporting here
         Next::events()
     }
@@ -85,15 +87,18 @@ struct WaitResponse {
 impl DoAsync<WaitResponse> for ChatControlLoop {
     async fn handle(&mut self, msg: WaitResponse, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let op = Operation::start("Waiting for the response");
+        self.chat.start_thinking("Waiting for the response");
+
         let resp = msg.req.await?.squash();
         self.chat.add(resp, Role::Response);
-        self.chat.thinking(false);
+
         op.end();
+        self.chat.stop_thinking();
         Ok(Next::events())
     }
 
     async fn fallback(&mut self, err: Error) -> Next<Self> {
-        self.chat.thinking(false);
+        self.chat.stop_thinking();
         // TODO: Operation failure reporting here
         Next::events()
     }

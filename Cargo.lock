@@ -5114,6 +5114,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-app-web"
+version = "0.0.1"
+dependencies = [
+ "walkdir",
+]
+
+[[package]]
 name = "n9-chat-telegram"
 version = "0.0.1"
 dependencies = [

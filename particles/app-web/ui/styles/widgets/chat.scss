@@ -3,6 +3,8 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
 
   .widget-chat-input {
     width: 100%;
@@ -70,10 +72,15 @@
       }
 
       .widget-chat-request {
-        margin-left: 20%;
-        padding: 2rem;
+        margin-left: 30%;
+        padding: 1rem 2rem;
         background: #1a2934;
         border-radius: 1rem;
+      }
+
+      .widget-chat-thinking {
+        padding: 1rem;
+        font-size: 0.8rem;
       }
 
       .widget-chat-response {

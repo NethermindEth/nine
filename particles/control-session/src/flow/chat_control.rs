@@ -34,15 +34,22 @@ impl ChatControlPub {
         self.tracer.event(event);
     }
 
-    pub fn thinking(&mut self, flag: bool) {
-        let event = ChatControlEvent::SetThinking { flag };
+    pub fn start_thinking(&mut self, reason: impl ToString) {
+        let reason = Some(reason.to_string());
+        let event = ChatControlEvent::SetThinking { reason };
+        self.tracer.event(event);
+    }
+
+    pub fn stop_thinking(&mut self) {
+        let reason = None;
+        let event = ChatControlEvent::SetThinking { reason };
         self.tracer.event(event);
     }
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
 pub struct ChatControl {
-    pub thinking: bool,
+    pub thinking: Option<String>,
     pub messages: Vec<Message>,
 }
 
@@ -61,8 +68,8 @@ impl Flow for ChatControl {
             ChatControlEvent::Add { message } => {
                 self.messages.push(message);
             }
-            ChatControlEvent::SetThinking { flag } => {
-                self.thinking = flag;
+            ChatControlEvent::SetThinking { reason } => {
+                self.thinking = reason;
             }
         }
     }
@@ -71,7 +78,7 @@ impl Flow for ChatControl {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum ChatControlEvent {
     Add { message: Message },
-    SetThinking { flag: bool },
+    SetThinking { reason: Option<String> },
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]

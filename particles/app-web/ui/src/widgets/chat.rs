@@ -48,6 +48,17 @@ impl SubComponent for ChatComponent {
     }
 
     fn render(&self, state: single::State<ChatControl>, ctx: &SubContext<Self>) -> Option<Html> {
+        let thinking = {
+            if let Some(reason) = &state.thinking {
+                Some(html! {
+                    <div class="widget-chat-thinking">
+                        { reason }
+                    </div>
+                })
+            } else {
+                None
+            }
+        };
         let body = {
             if state.is_empty() {
                 html! {
@@ -62,7 +73,8 @@ impl SubComponent for ChatComponent {
                 html! {
                     <div class="widget-chat-filled">
                         <div class="widget-chat-dialog">
-                            { for state.messages.iter().map(|msg| self.render(msg)) }
+                            { for state.messages.iter().map(|msg| self.render_message(msg)) }
+                            { thinking }
                         </div>
                     </div>
                 }
@@ -101,7 +113,7 @@ impl ChatComponent {
         }
     }
 
-    fn render(&self, msg: &Message) -> Html {
+    fn render_message(&self, msg: &Message) -> Html {
         let class = match msg.role {
             Role::Request => "widget-chat-request",
             Role::Response => "widget-chat-response",

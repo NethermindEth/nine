@@ -1,4 +1,5 @@
-use crate::render::{single, SubComponent, SubContext, SubWidget};
+use crate::render::{double, SubComponent, SubContext, SubWidget};
+use crate::widgets::dashboard::Dashboard;
 use crb::core::uuid::Uuid;
 use n9_control_session::{SessionControl, SessionInfo, SessionKey};
 use ui9::names::Fqn;
@@ -12,10 +13,11 @@ pub struct SessionControlComponent {}
 #[derive(Clone)]
 pub enum Msg {
     NewChat,
+    Select(Fqn),
 }
 
 impl SubComponent for SessionControlComponent {
-    type Projection = single::Flow<SessionControl>;
+    type Projection = double::Flow<SessionControl, Dashboard>;
     type Message = Msg;
 
     fn create() -> Self {
@@ -26,13 +28,22 @@ impl SubComponent for SessionControlComponent {
         match msg {
             Msg::NewChat => {
                 let fqn: Fqn = vec!["user-chat".to_string(), Uuid::new_v4().to_string()].into();
-                pro.new_chat(fqn);
+                pro.first.new_chat(fqn.clone());
+                pro.second.set_chat(Some(fqn));
+                false
+            }
+            Msg::Select(fqn) => {
+                pro.second.set_chat(Some(fqn));
                 false
             }
         }
     }
 
-    fn render(&self, state: single::State<SessionControl>, ctx: &SubContext<Self>) -> Option<Html> {
+    fn render(
+        &self,
+        state: double::State<SessionControl, Dashboard>,
+        ctx: &SubContext<Self>,
+    ) -> Option<Html> {
         let typ = std::any::type_name::<Event>();
         let onclick = ctx.event(Msg::NewChat);
         let mut items: Vec<_> = state.active_sessions.iter().collect();
@@ -48,7 +59,7 @@ impl SubComponent for SessionControlComponent {
                     </div>
                 </div>
                 <div class="widget-session-control-list">
-                    { for items.into_iter().rev().map(|(k, v)| self.render_item(k, v)) }
+                    { for items.into_iter().rev().map(|(k, v)| self.render_item(k, v, ctx)) }
                 </div>
             </div>
         })
@@ -56,9 +67,10 @@ impl SubComponent for SessionControlComponent {
 }
 
 impl SessionControlComponent {
-    fn render_item(&self, key: &SessionKey, info: &SessionInfo) -> Html {
+    fn render_item(&self, key: &SessionKey, info: &SessionInfo, ctx: &SubContext<Self>) -> Html {
+        let onclick = ctx.event(Msg::Select(key.clone()));
         html! {
-            <div class="widget-session-control-list-item">
+            <div {onclick} class="widget-session-control-list-item">
                 { info.created.to_string() }
             </div>
         }

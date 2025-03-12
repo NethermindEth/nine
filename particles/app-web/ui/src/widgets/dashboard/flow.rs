@@ -18,6 +18,11 @@ impl DashboardSub {
         let msg = DashboardMessage::SetActivePeer { peer };
         self.action(msg);
     }
+
+    pub fn set_chat(&self, chat: Option<Fqn>) {
+        let msg = DashboardMessage::SetActiveChat { chat };
+        self.action(msg);
+    }
 }
 
 #[derive(Deref, DerefMut, From, Into)]
@@ -52,6 +57,9 @@ impl Flow for Dashboard {
             DashboardMessage::SetActivePeer { peer } => {
                 self.active_peer = peer;
             }
+            DashboardMessage::SetActiveChat { chat } => {
+                self.active_chat = chat;
+            }
         }
     }
 }
@@ -59,4 +67,5 @@ impl Flow for Dashboard {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum DashboardMessage {
     SetActivePeer { peer: Option<PeerId> },
+    SetActiveChat { chat: Option<Fqn> },
 }

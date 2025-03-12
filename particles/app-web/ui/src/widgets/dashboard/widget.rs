@@ -24,14 +24,20 @@ impl SubComponent for DashboardComponent {
         let app_content = {
             if let Some(active_peer) = state.active_peer {
                 let peer = active_peer.to_string();
-                let session_control_link = FqnLink::remote(SessionControl::fqn(), active_peer);
                 let chat_link = FqnLink::remote(Chat::fqn(), active_peer);
                 let jobs_link = FqnLink::remote(Job::fqn(), active_peer);
                 let chat_interaction: FqnLink = Dashboard::fqn().into();
+                let session_control = {
+                    let first = FqnLink::remote(SessionControl::fqn(), active_peer);
+                    let second: FqnLink = Dashboard::fqn().into();
+                    html! {
+                        <widgets::SessionControl {first} {second} />
+                    }
+                };
                 html! {
                     <div class="app-content">
                         <div class="app-content-left">
-                            <widgets::SessionControl link={session_control_link} />
+                            { session_control }
                         </div>
                         <div class="app-content-center">
                             <widgets::ChatInteraction link={chat_interaction} />

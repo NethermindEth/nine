@@ -44,6 +44,12 @@ pub struct ChatControl {
     pub messages: Vec<Message>,
 }
 
+impl ChatControl {
+    pub fn is_empty(&self) -> bool {
+        self.messages.is_empty()
+    }
+}
+
 impl Flow for ChatControl {
     type Event = ChatControlEvent;
     type Action = ChatControlAction;

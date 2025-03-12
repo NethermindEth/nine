@@ -23,9 +23,7 @@ impl SubComponent for ChatInteractionComponent {
     fn render(&self, state: single::State<Dashboard>, _ctx: &SubContext<Self>) -> Option<Html> {
         if let Some(link) = state.active_chat.clone() {
             html! {
-                <div class="widget-chat">
-                    <widgets::Chat {link} />
-                </div>
+                <widgets::Chat {link} />
             }
             .into()
         } else {

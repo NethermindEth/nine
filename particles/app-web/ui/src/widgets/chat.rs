@@ -20,16 +20,29 @@ impl SubComponent for ChatComponent {
     }
 
     fn render(&self, state: single::State<ChatControl>, _ctx: &SubContext<Self>) -> Option<Html> {
-        Some(html! {
+        let body = {
+            if state.is_empty() {
+                html! {
+                    <div class="widget-chat-empty">
+                        <textarea />
+                    </div>
+                }
+            } else {
+                html! {
+                    <div class="widget-chat-filled">
+                        <div class="widget-chat-dialog">
+                            { for state.messages.iter().map(|msg| self.render(msg)) }
+                        </div>
+                    </div>
+                }
+            }
+        };
+        html! {
             <div class="widget-chat">
-                <div class="widget-chat-header">
-                    { "What can I help with?" }
-                </div>
-                <div class="widget-chat-dialog">
-                    { for state.messages.iter().map(|msg| self.render(msg)) }
-                </div>
+                { body }
             </div>
-        })
+        }
+        .into()
     }
 }
 

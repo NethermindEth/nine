@@ -3,22 +3,24 @@
   flex-direction: column;
   gap: 2rem;
 
-  .widget-chat-header {
+  .widget-chat-empty {
   }
 
-  .widget-chat-dialog {
-    .widget-chat-message {
-      padding: 1rem;
-    }
+  .widget-chat-filled {
+    .widget-chat-dialog {
+      .widget-chat-message {
+        padding: 1rem;
+      }
 
-    .widget-chat-request {
-      margin-left: 20%;
-      padding: 2rem;
-      background: #1a2934;
-      border-radius: 1rem;
-    }
+      .widget-chat-request {
+        margin-left: 20%;
+        padding: 2rem;
+        background: #1a2934;
+        border-radius: 1rem;
+      }
 
-    .widget-chat-response {
+      .widget-chat-response {
+      }
     }
   }
 }

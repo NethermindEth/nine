@@ -1,0 +1,24 @@
+.widget-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  .widget-chat-header {
+  }
+
+  .widget-chat-dialog {
+    .widget-chat-message {
+      padding: 1rem;
+    }
+
+    .widget-chat-request {
+      margin-left: 20%;
+      padding: 2rem;
+      background: #1a2934;
+      border-radius: 1rem;
+    }
+
+    .widget-chat-response {
+    }
+  }
+}

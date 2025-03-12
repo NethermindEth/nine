@@ -22,8 +22,12 @@ impl SubComponent for ChatComponent {
     fn render(&self, state: single::State<ChatControl>, _ctx: &SubContext<Self>) -> Option<Html> {
         Some(html! {
             <div class="widget-chat">
-                { "Messages:" }
-                { for state.messages.iter().map(|msg| self.render(msg)) }
+                <div class="widget-chat-header">
+                    { "What can I help with?" }
+                </div>
+                <div class="widget-chat-dialog">
+                    { for state.messages.iter().map(|msg| self.render(msg)) }
+                </div>
             </div>
         })
     }

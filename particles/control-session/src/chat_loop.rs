@@ -59,7 +59,7 @@ struct SendRequest {
 #[async_trait]
 impl DoAsync<SendRequest> for ChatControlLoop {
     async fn handle(&mut self, msg: SendRequest, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let op = Operation::start("Sending a prompt");
+        // let op = Operation::start("Sending a prompt");
         self.chat.start_thinking("Sending a prompt");
 
         let request = ChatRequest::user(&msg.prompt);
@@ -67,7 +67,7 @@ impl DoAsync<SendRequest> for ChatControlLoop {
         let req = session.chat(request);
         self.chat.add(msg.prompt, Role::Request);
 
-        op.end();
+        // op.end();
         let state = WaitResponse { req };
         Ok(Next::do_async(state))
     }
@@ -86,13 +86,14 @@ struct WaitResponse {
 #[async_trait]
 impl DoAsync<WaitResponse> for ChatControlLoop {
     async fn handle(&mut self, msg: WaitResponse, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let op = Operation::start("Waiting for the response");
-        self.chat.start_thinking("Waiting for the response");
+        // TODO: Use chat scoped operations
+        // let op = Operation::start("Waiting for a response");
+        self.chat.start_thinking("Waiting for a response");
 
         let resp = msg.req.await?.squash();
         self.chat.add(resp, Role::Response);
 
-        op.end();
+        // op.end();
         self.chat.stop_thinking();
         Ok(Next::events())
     }

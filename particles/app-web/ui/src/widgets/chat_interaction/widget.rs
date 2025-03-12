@@ -35,20 +35,3 @@ impl SubComponent for ChatInteractionComponent {
         }
     }
 }
-
-/*
-impl ChatInteractionComponent {
-    fn render(&self, msg: &Message) -> Html {
-        let class = match msg.role {
-            Role::Request => "widget-chat-request",
-            Role::Response => "widget-chat-response",
-        };
-        let content = self.render.block(&msg.content);
-        html! {
-            <div class="widget-chat-message">
-                <div {class}>{ content }</div>
-            </div>
-        }
-    }
-}
-*/

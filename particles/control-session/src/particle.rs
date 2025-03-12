@@ -1,23 +1,14 @@
+use crate::chat_loop::ChatControlLoop;
 use crate::flow::chat_control::ChatControl;
 use crate::flow::session_control::{SessionControl, SessionControlAction, SessionInfo, SessionKey};
 use anyhow::Result;
 use async_trait::async_trait;
 use chrono::Utc;
-use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
-use crb::superagent::{StreamSession, Supervisor};
+use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent, Address, Equip};
+use crb::superagent::{StreamSession, Supervisor, SupervisorSession};
 use n9_core::{Particle, SubstanceLinks};
 use std::collections::HashMap;
 use ui9_dui::{Act, Pub};
-
-struct SessionRecord {
-}
-
-impl SessionRecord {
-    pub fn new(key: SessionKey) -> Self {
-        Self {
-        }
-    }
-}
 
 pub struct SessionParticle {
     substance: SubstanceLinks,
@@ -36,12 +27,12 @@ impl Particle for SessionParticle {
 }
 
 impl Supervisor for SessionParticle {
-    type BasedOn = AgentSession<Self>;
-    type GroupBy = ();
+    type BasedOn = StreamSession<Self>;
+    type GroupBy = SessionKey;
 }
 
 impl Agent for SessionParticle {
-    type Context = StreamSession<Self>;
+    type Context = SupervisorSession<Self>;
 
     fn begin(&mut self) -> Next<Self> {
         Next::do_async(Initialize)
@@ -66,8 +57,10 @@ impl OnEvent<Act<SessionControl>> for SessionParticle {
         match msg.action {
             SessionControlAction::Create { key } => {
                 if !self.sessions.contains_key(&key) {
-                    let session = SessionRecord::new(key.clone());
+
+                    let session = self.spawn_session(key.clone(), ctx);
                     self.sessions.insert(key.clone(), session);
+
                     let utc_now = Utc::now();
                     let info = SessionInfo {
                         created: utc_now.naive_utc(),
@@ -78,5 +71,19 @@ impl OnEvent<Act<SessionControl>> for SessionParticle {
             }
         }
         Ok(())
+    }
+}
+
+struct SessionRecord {
+    address: Address<ChatControlLoop>,
+}
+
+impl SessionParticle {
+    fn spawn_session(&mut self, key: SessionKey, ctx: &mut Context<Self>) -> SessionRecord {
+        let router = self.substance.router.clone();
+        let chat_control = ChatControlLoop::new(router, key.clone());
+        let address = ctx.spawn_agent(chat_control, key).equip();
+        let record = SessionRecord { address };
+        record
     }
 }

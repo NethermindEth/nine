@@ -1,4 +1,4 @@
-use crate::render::{double, SubComponent, SubContext, SubWidget};
+use crate::render::{double, FqnLink, SubComponent, SubContext, SubWidget};
 use crate::widgets::dashboard::Dashboard;
 use crb::core::uuid::Uuid;
 use n9_control_session::{SessionControl, SessionInfo, SessionKey};
@@ -24,16 +24,26 @@ impl SubComponent for SessionControlComponent {
         Self {}
     }
 
-    fn update(&mut self, msg: Self::Message, pro: &mut Self::Projection) -> bool {
+    fn update(
+        &mut self,
+        msg: Self::Message,
+        pro: &mut Self::Projection,
+        ctx: &SubContext<Self>,
+    ) -> bool {
         match msg {
             Msg::NewChat => {
                 let fqn: Fqn = vec!["user-chat".to_string(), Uuid::new_v4().to_string()].into();
                 pro.first.new_chat(fqn.clone());
-                pro.second.set_chat(Some(fqn));
+                ctx.send(Msg::Select(fqn));
+                // TODO: Select(fqn)
                 false
             }
             Msg::Select(fqn) => {
-                pro.second.set_chat(Some(fqn));
+                let peer = pro.second.state_view().and_then(|view| view.active_peer);
+                if let Some(peer) = peer {
+                    let link = FqnLink::remote(fqn, peer);
+                    pro.second.set_chat(Some(link));
+                }
                 false
             }
         }

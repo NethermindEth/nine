@@ -32,7 +32,12 @@ pub trait SubComponent: Sized + 'static {
     // TODO: Provide links (maybe mapped)
     fn create() -> Self;
 
-    fn update(&mut self, _msg: Self::Message, pro: &mut Self::Projection) -> bool {
+    fn update(
+        &mut self,
+        _msg: Self::Message,
+        pro: &mut Self::Projection,
+        _ctx: &SubContext<Self>,
+    ) -> bool {
         true
     }
 
@@ -99,17 +104,17 @@ impl<C: SubComponent> Component for SubWidget<C> {
                 false
             }
             _ => {
+                let ctx = SubContext { context: ctx };
                 if let Some(projection) = self.projection.as_mut() {
                     match msg {
                         Msg::Projection(event) => {
                             let render = projection.update(event);
                             if let Some(state) = projection.state() {
-                                let ctx = SubContext { context: ctx };
                                 self.component.discover(state, &ctx);
                             }
                             render
                         }
-                        Msg::Component(event) => self.component.update(event, projection),
+                        Msg::Component(event) => self.component.update(event, projection, &ctx),
                         _ => false,
                     }
                 } else {

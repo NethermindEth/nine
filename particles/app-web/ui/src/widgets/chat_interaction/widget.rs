@@ -1,4 +1,5 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
+use crate::widgets;
 use crate::widgets::dashboard::Dashboard;
 use ui9_markdown::MarkdownRender;
 use yew::{html, Html};
@@ -20,10 +21,10 @@ impl SubComponent for ChatInteractionComponent {
     }
 
     fn render(&self, state: single::State<Dashboard>, _ctx: &SubContext<Self>) -> Option<Html> {
-        if let Some(active_peer) = &state.active_chat {
+        if let Some(link) = state.active_chat.clone() {
             html! {
                 <div class="widget-chat">
-                    // { for state.messages.iter().map(|msg| self.render(msg)) }
+                    <widgets::Chat {link} />
                 </div>
             }
             .into()

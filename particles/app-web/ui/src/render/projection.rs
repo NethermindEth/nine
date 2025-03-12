@@ -2,13 +2,14 @@ use crb::core::watch::Ref;
 use derive_more::Deref;
 use futures::Stream;
 use libp2p::PeerId;
+use serde::{Deserialize, Serialize};
 use std::pin::Pin;
 use ui9::names::Fqn;
 use ui9_dui::{State, Sub, SubEvent, Subscriber};
 use ui9_net::RemoteExt;
 use yew::Properties;
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FqnLink {
     pub fqn: Fqn,
     pub peer: Option<PeerId>,

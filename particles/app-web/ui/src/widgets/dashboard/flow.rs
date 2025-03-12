@@ -1,3 +1,4 @@
+use crate::render::FqnLink;
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use ui9::names::Fqn;
@@ -19,7 +20,7 @@ impl DashboardSub {
         self.action(msg);
     }
 
-    pub fn set_chat(&self, chat: Option<Fqn>) {
+    pub fn set_chat(&self, chat: Option<FqnLink>) {
         let msg = DashboardMessage::SetActiveChat { chat };
         self.action(msg);
     }
@@ -39,7 +40,7 @@ impl DashboardPub {}
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
 pub struct Dashboard {
     pub active_peer: Option<PeerId>,
-    pub active_chat: Option<Fqn>,
+    pub active_chat: Option<FqnLink>,
 }
 
 impl Unified for Dashboard {
@@ -67,5 +68,5 @@ impl Flow for Dashboard {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum DashboardMessage {
     SetActivePeer { peer: Option<PeerId> },
-    SetActiveChat { chat: Option<Fqn> },
+    SetActiveChat { chat: Option<FqnLink> },
 }

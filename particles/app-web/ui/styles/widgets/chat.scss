@@ -66,7 +66,23 @@
 
   .widget-chat-filled {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
     .widget-chat-dialog {
+      flex-grow: 1;
+      position: relative;
+
+      .widget-chat-dialog-viewport {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        overflow-y: scroll;
+      }
+
       .widget-chat-message {
         padding: 1rem;
       }

@@ -73,9 +73,12 @@ impl SubComponent for ChatComponent {
                 html! {
                     <div class="widget-chat-filled">
                         <div class="widget-chat-dialog">
-                            { for state.messages.iter().map(|msg| self.render_message(msg)) }
-                            { thinking }
+                            <div class="widget-chat-dialog-viewport">
+                                { for state.messages.iter().map(|msg| self.render_message(msg)) }
+                                { thinking }
+                            </div>
                         </div>
+                        { self.render_input(ctx) }
                     </div>
                 }
             }

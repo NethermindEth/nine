@@ -29,7 +29,6 @@ impl SubComponent for ChatInteractionComponent {
         } else {
             html! {
                 <div class="widget-chat">
-                    { "No chat selected" }
                 </div>
             }
             .into()

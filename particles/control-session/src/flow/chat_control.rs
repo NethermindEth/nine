@@ -12,12 +12,10 @@ impl Subscriber for ChatControl {
 }
 
 impl ChatControlSub {
-    /*
-    pub fn create(&mut self, key: ChatKey) {
-        let event = ChatControlAction::Create { key };
+    pub fn prompt(&self, prompt: String) {
+        let event = ChatControlAction::Prompt { prompt };
         self.listener.action(event);
     }
-    */
 }
 
 #[derive(Deref, DerefMut, From, Into)]

@@ -13,6 +13,7 @@ pub struct ChatComponent {
 #[derive(Clone)]
 pub enum Msg {
     UpdateText(String),
+    Send,
 }
 
 impl SubComponent for ChatComponent {
@@ -29,12 +30,16 @@ impl SubComponent for ChatComponent {
     fn update(
         &mut self,
         msg: Self::Message,
-        _pro: &mut Self::Projection,
+        pro: &mut Self::Projection,
         _ctx: &SubContext<Self>,
     ) -> bool {
         match msg {
             Msg::UpdateText(text) => {
                 self.text = text;
+            }
+            Msg::Send => {
+                let text = self.text.clone();
+                pro.prompt(text);
             }
         }
         true
@@ -70,15 +75,27 @@ impl SubComponent for ChatComponent {
     }
 }
 
+fn text(e: InputEvent) -> String {
+    let input: web_sys::HtmlTextAreaElement = e.target_unchecked_into();
+    input.value()
+}
+
 impl ChatComponent {
     fn render_input(&self, ctx: &SubContext<Self>) -> Html {
-        let oninput = ctx.callback(|e: InputEvent| {
-            let input: web_sys::HtmlTextAreaElement = e.target_unchecked_into();
-            Msg::UpdateText(input.value())
-        });
+        let oninput = ctx.callback(|e: InputEvent| Msg::UpdateText(text(e)));
+        let send = ctx.event(Msg::Send);
         let value = self.text.clone();
         html! {
-            <textarea {oninput} class="widget-chat-input" {value} />
+            <div class="widget-chat-input">
+                <textarea {oninput} {value} />
+                <div class="widget-chat-input-controls">
+                    <div class="widget-chat-input-controls-left">
+                    </div>
+                    <div class="widget-chat-input-controls-right">
+                        <div onclick={send} class="widget-chat-input-controls-send">{ "Send" }</div>
+                    </div>
+                </div>
+            </div>
         }
     }
 

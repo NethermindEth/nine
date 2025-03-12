@@ -24,7 +24,10 @@ impl SubComponent for ChatComponent {
             if state.is_empty() {
                 html! {
                     <div class="widget-chat-empty">
-                        <textarea />
+                        <div class="widget-chat-title">
+                            { "What can I help with?" }
+                        </div>
+                        <textarea class="widget-chat-input" />
                     </div>
                 }
             } else {

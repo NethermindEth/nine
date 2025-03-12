@@ -9,6 +9,10 @@ $background: #0d1c27;
 $foreground: #ededed;
 $logo-size: 48px;
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: $background;
   color: $foreground;

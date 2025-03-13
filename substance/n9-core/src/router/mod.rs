@@ -1,9 +1,9 @@
 pub mod keeper;
 pub mod model;
-pub mod session;
 pub mod tool;
 pub mod types;
 
+use crate::chain::{ReasoningSession, SessionLink};
 use crate::tracers::tools::Tools;
 use anyhow::{Error, Result};
 use async_trait::async_trait;
@@ -12,7 +12,6 @@ use crb::superagent::{InteractExt, OnRequest, Request, Responder, Supervisor, Su
 use derive_more::{Deref, DerefMut, From, Into};
 use keeper::KeeperLink;
 use model::ModelLink;
-use session::{ReasoningSession, SessionLink};
 use std::collections::HashMap;
 use tool::ToolRecord;
 use typed_slab::TypedSlab;

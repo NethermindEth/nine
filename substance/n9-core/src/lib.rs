@@ -1,3 +1,4 @@
+pub mod chain;
 pub mod essence;
 pub mod router;
 pub mod sequence;

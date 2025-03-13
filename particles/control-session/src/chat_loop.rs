@@ -9,6 +9,7 @@ use n9_core::chain::ReasoningFlow;
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
 use ui9::names::Fqn;
 use ui9_dui::{Act, Operation, Pub};
+use ui9_net::{FqnLink, MeshNode};
 
 pub struct ChatControlLoop {
     key: SessionKey,
@@ -37,12 +38,13 @@ impl Agent for ChatControlLoop {
 }
 
 impl ChatControlLoop {
-    pub fn create_tracer(&mut self) -> Fqn {
+    pub fn create_tracer(&mut self) -> Result<FqnLink> {
         let uuid = Uuid::new_v4();
         let fqn = self.key.push(uuid);
         let tracer = Pub::new(fqn.clone());
         self.tracer = Some(tracer);
-        fqn
+        let peer_id = MeshNode::link()?.peer_id;
+        Ok(FqnLink::remote(fqn, peer_id))
     }
 }
 
@@ -76,7 +78,7 @@ struct SendRequest {
 #[async_trait]
 impl DoAsync<SendRequest> for ChatControlLoop {
     async fn handle(&mut self, msg: SendRequest, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let tracer = self.create_tracer();
+        let tracer = self.create_tracer()?;
 
         // let op = Operation::start("Sending a prompt");
         self.chat.start_thinking("Sending a prompt");

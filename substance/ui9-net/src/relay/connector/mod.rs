@@ -48,13 +48,15 @@ impl ConnectorLink {
 }
 
 pub struct Connector {
+    key: Key,
     swarm: Slot<Swarm<Ui9Behaviour>>,
     peer_tracer: Pub<Peer>,
 }
 
 impl Connector {
-    pub fn new() -> Self {
+    pub fn new(key: Key) -> Self {
         Self {
+            key,
             swarm: Slot::empty(),
             peer_tracer: Pub::unified(),
         }
@@ -92,8 +94,7 @@ pub struct Initialize;
 #[async_trait]
 impl DoAsync<Initialize> for Connector {
     async fn handle(&mut self, _: Initialize, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let key = Key::generate();
-        let mut swarm = swarm_impl::swarm(&key).await?;
+        let mut swarm = swarm_impl::swarm(&self.key).await?;
 
         let topic = gossipsub::IdentTopic::new("n9");
         swarm.behaviour_mut().gossipsub.subscribe(&topic)?;

@@ -1,12 +1,13 @@
 use super::connector::{Connector, ConnectorLink};
 use super::router::Router;
+use crate::relay::keypair::Key;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{
     Address, Agent, AgentSession, Context, DoAsync, Equip, Next, Standalone, ToAddress,
 };
 use crb::superagent::{PingExt, Supervisor, SupervisorSession};
-
+use libp2p::PeerId;
 use std::sync::OnceLock;
 
 // TODO: Swam Connector/Router roles: Router has to spawn a Connector
@@ -15,9 +16,12 @@ static NODE: OnceLock<MeshNodeLink> = OnceLock::new();
 pub struct MeshNodeLink {
     pub node: Address<MeshNode>,
     pub connector: ConnectorLink,
+    pub peer_id: PeerId,
 }
 
-pub struct MeshNode {}
+pub struct MeshNode {
+    key: Key,
+}
 
 impl MeshNode {
     pub fn link() -> Result<&'static MeshNodeLink> {
@@ -41,7 +45,8 @@ impl MeshNode {
     }
 
     pub fn new() -> Self {
-        Self {}
+        let key = Key::generate();
+        Self { key }
     }
 }
 
@@ -65,7 +70,7 @@ struct Initialize;
 #[async_trait]
 impl DoAsync<Initialize> for MeshNode {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let connector = Connector::new();
+        let connector = Connector::new(self.key.clone());
         let connector: ConnectorLink = ctx.spawn_agent(connector, ()).equip();
 
         let router = Router::new(connector.clone());
@@ -74,6 +79,7 @@ impl DoAsync<Initialize> for MeshNode {
         let link = MeshNodeLink {
             node: ctx.to_address(),
             connector,
+            peer_id: self.key.peer,
         };
         NODE.set(link)
             .map_err(|_| anyhow!("Node is already activated"))?;

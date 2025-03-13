@@ -1,6 +1,7 @@
 use libp2p::identity::Keypair;
 use libp2p::PeerId;
 
+#[derive(Debug, Clone)]
 pub struct Key {
     pub pair: Keypair,
     pub peer: PeerId,

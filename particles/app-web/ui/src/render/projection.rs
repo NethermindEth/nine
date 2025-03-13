@@ -1,34 +1,10 @@
 use crb::core::watch::Ref;
 use derive_more::Deref;
 use futures::Stream;
-use libp2p::PeerId;
-use serde::{Deserialize, Serialize};
 use std::pin::Pin;
-use ui9::names::Fqn;
 use ui9_dui::{State, Sub, SubEvent, Subscriber};
-use ui9_net::RemoteExt;
+use ui9_net::{FqnLink, RemoteExt};
 use yew::Properties;
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct FqnLink {
-    pub fqn: Fqn,
-    pub peer: Option<PeerId>,
-}
-
-impl From<Fqn> for FqnLink {
-    fn from(fqn: Fqn) -> Self {
-        Self { fqn, peer: None }
-    }
-}
-
-impl FqnLink {
-    pub fn remote(fqn: Fqn, peer: PeerId) -> Self {
-        Self {
-            fqn,
-            peer: Some(peer),
-        }
-    }
-}
 
 #[derive(Deref)]
 pub struct StateTracker<F: Subscriber> {

@@ -5,11 +5,13 @@ use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
 use crb::superagent::{Fetcher, StreamSession, Supervisor};
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
+use n9_core::chain::ReasoningFlow;
 use ui9_dui::{Act, Operation, Pub};
 
 pub struct ChatControlLoop {
     router: RouterLink,
     chat: Pub<ChatControl>,
+    tracer: Option<Pub<ReasoningFlow>>,
 }
 
 impl ChatControlLoop {
@@ -17,6 +19,7 @@ impl ChatControlLoop {
         Self {
             router,
             chat: Pub::new(key),
+            tracer: None,
         }
     }
 }
@@ -64,6 +67,7 @@ impl DoAsync<SendRequest> for ChatControlLoop {
 
         let request = ChatRequest::user(&msg.prompt);
         let session = self.router.new_session().await?;
+        // TODO: Assign a tracer here
         let req = session.chat(request);
         self.chat.add(msg.prompt, Role::Request);
 

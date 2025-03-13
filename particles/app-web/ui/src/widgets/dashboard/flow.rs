@@ -1,9 +1,8 @@
-use crate::render::FqnLink;
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use ui9::names::Fqn;
 use ui9_dui::{Flow, Listener, Publisher, Subscriber, Tracer, Unified};
-use ui9_net::tracers::peer::PeerId;
+use ui9_net::{FqnLink, PeerId};
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct DashboardSub {

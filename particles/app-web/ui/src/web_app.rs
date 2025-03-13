@@ -1,6 +1,6 @@
-use crate::render::FqnLink;
 use crate::widgets::dashboard::{Dashboard, DashboardWidget};
 use ui9_dui::Unified;
+use ui9_net::FqnLink;
 use yew::{html, Component, Context, Html};
 
 pub struct WebApp {}

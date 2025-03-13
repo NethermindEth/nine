@@ -1,7 +1,8 @@
-use super::projection::{FqnLink, Projection, ProjectionStream, StateTracker, StateView};
+use super::projection::{Projection, ProjectionStream, StateTracker, StateView};
 use derive_more::{Deref, DerefMut};
 use futures::StreamExt;
 use ui9_dui::{SubEvent, Subscriber};
+use ui9_net::FqnLink;
 use yew::Properties;
 
 #[derive(Deref, DerefMut)]

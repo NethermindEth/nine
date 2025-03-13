@@ -11,16 +11,16 @@ use ui9_dui::subscriber::{Listener, Subscriber};
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ReasoningSub {
-    listener: Listener<Reasoning>,
+    listener: Listener<ReasoningFlow>,
 }
 
-impl Subscriber for Reasoning {
+impl Subscriber for ReasoningFlow {
     type Driver = ReasoningSub;
 }
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ReasoningPub {
-    tracer: Tracer<Reasoning>,
+    tracer: Tracer<ReasoningFlow>,
 }
 
 impl ReasoningPub {
@@ -30,16 +30,16 @@ impl ReasoningPub {
     }
 }
 
-impl Publisher for Reasoning {
+impl Publisher for ReasoningFlow {
     type Driver = ReasoningPub;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Reasoning {
+pub struct ReasoningFlow {
     pub operations: Vec<ReasoningInfo>,
 }
 
-impl Default for Reasoning {
+impl Default for ReasoningFlow {
     fn default() -> Self {
         Self {
             operations: Vec::new(),
@@ -47,7 +47,7 @@ impl Default for Reasoning {
     }
 }
 
-impl Flow for Reasoning {
+impl Flow for ReasoningFlow {
     type Event = ReasoningEvent;
     type Action = ();
 

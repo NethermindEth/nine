@@ -1,6 +1,7 @@
 mod connector;
 mod drainer;
 mod flex;
+mod keypair;
 mod node;
 mod protocol;
 mod relay_player;

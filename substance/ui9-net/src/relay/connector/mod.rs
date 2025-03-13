@@ -10,6 +10,7 @@ use swarm_web as swarm_impl;
 
 pub mod behaviour;
 
+use crate::relay::keypair::Key;
 use crate::tracers::peer::Peer;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -91,7 +92,8 @@ pub struct Initialize;
 #[async_trait]
 impl DoAsync<Initialize> for Connector {
     async fn handle(&mut self, _: Initialize, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let mut swarm = swarm_impl::swarm().await?;
+        let key = Key::generate();
+        let mut swarm = swarm_impl::swarm(&key).await?;
 
         let topic = gossipsub::IdentTopic::new("n9");
         swarm.behaviour_mut().gossipsub.subscribe(&topic)?;

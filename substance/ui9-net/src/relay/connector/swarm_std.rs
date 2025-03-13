@@ -1,4 +1,5 @@
 use super::behaviour::Ui9Behaviour;
+use crate::relay::keypair::Key;
 use anyhow::Result;
 use futures::future::Either;
 use libp2p::{
@@ -7,15 +8,9 @@ use libp2p::{
 };
 use std::time::Duration;
 
-pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
-    // Generate a new identity keypair
-    let local_key = Keypair::generate_ed25519();
-    let local_peer_id = PeerId::from(local_key.public());
-    log::info!("Local peer id: {local_peer_id}");
-    let key = local_key.clone();
-
+pub(super) async fn swarm(key: &Key) -> Result<Swarm<Ui9Behaviour>> {
     // Create Noise for encryption
-    let noise = noise::Config::new(&key)?;
+    let noise = noise::Config::new(&key.pair)?;
     let mplex = yamux::Config::default();
 
     // Create TCP transport with tokio
@@ -52,13 +47,13 @@ pub(super) async fn swarm() -> Result<Swarm<Ui9Behaviour>> {
         })
         .boxed();
 
-    let behaviour = Ui9Behaviour::new(&key)?;
+    let behaviour = Ui9Behaviour::new(&key.pair)?;
 
     // Create a Swarm directly without using a builder
     let swarm = Swarm::new(
         transport,
         behaviour,
-        local_peer_id,
+        key.peer,
         libp2p::swarm::Config::with_tokio_executor(),
     );
 

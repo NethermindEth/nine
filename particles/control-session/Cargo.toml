@@ -17,6 +17,7 @@ n9-core.workspace = true
 serde.workspace = true
 ui9.workspace = true
 ui9-dui.workspace = true
+ui9-net.workspace = true
 vectorize.workspace = true
 
 [features]
@@ -25,9 +26,11 @@ std = [
     "crb/std",
     "n9-core/std",
     "ui9-dui/std",
+    "ui9-net/std",
 ]
 web = [
     "crb/web",
     "n9-core/web",
     "ui9-dui/web",
+    "ui9-net/web",
 ]

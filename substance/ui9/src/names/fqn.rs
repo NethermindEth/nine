@@ -56,6 +56,12 @@ impl Fqn {
         let components = self.iter().chain(pqn.iter());
         Self::from_iter(components)
     }
+
+    pub fn push(&self, section: impl ToString) -> Self {
+        let mut this = self.clone();
+        this.components.push(section.to_string());
+        this
+    }
 }
 
 impl FromStr for Fqn {

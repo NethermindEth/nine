@@ -3,12 +3,15 @@ use crate::flow::session_control::SessionKey;
 use anyhow::{Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
+use crb::core::uuid::Uuid;
 use crb::superagent::{Fetcher, StreamSession, Supervisor};
-use n9_core::{ChatRequest, ChatResponse, RouterLink};
 use n9_core::chain::ReasoningFlow;
+use n9_core::{ChatRequest, ChatResponse, RouterLink};
+use ui9::names::Fqn;
 use ui9_dui::{Act, Operation, Pub};
 
 pub struct ChatControlLoop {
+    key: SessionKey,
     router: RouterLink,
     chat: Pub<ChatControl>,
     tracer: Option<Pub<ReasoningFlow>>,
@@ -17,6 +20,7 @@ pub struct ChatControlLoop {
 impl ChatControlLoop {
     pub fn new(router: RouterLink, key: SessionKey) -> Self {
         Self {
+            key: key.clone(),
             router,
             chat: Pub::new(key),
             tracer: None,
@@ -29,6 +33,16 @@ impl Agent for ChatControlLoop {
 
     fn begin(&mut self) -> Next<Self> {
         Next::do_async(Initialize)
+    }
+}
+
+impl ChatControlLoop {
+    pub fn create_tracer(&mut self) -> Fqn {
+        let uuid = Uuid::new_v4();
+        let fqn = self.key.push(uuid);
+        let tracer = Pub::new(fqn.clone());
+        self.tracer = Some(tracer);
+        fqn
     }
 }
 
@@ -62,6 +76,8 @@ struct SendRequest {
 #[async_trait]
 impl DoAsync<SendRequest> for ChatControlLoop {
     async fn handle(&mut self, msg: SendRequest, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
+        let tracer = self.create_tracer();
+
         // let op = Operation::start("Sending a prompt");
         self.chat.start_thinking("Sending a prompt");
 

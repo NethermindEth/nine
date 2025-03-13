@@ -5177,6 +5177,7 @@ dependencies = [
  "serde",
  "ui9",
  "ui9-dui",
+ "ui9-net",
  "vectorize",
 ]
 

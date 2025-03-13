@@ -1,6 +1,7 @@
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use ui9_dui::{Flow, Listener, Publisher, Subscriber, Tracer};
+use ui9_net::FqnLink;
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ChatControlSub {
@@ -51,6 +52,8 @@ impl ChatControlPub {
 pub struct ChatControl {
     pub thinking: Option<String>,
     pub messages: Vec<Message>,
+    // TODO: Use a typed link here?
+    pub tracer: Option<FqnLink>,
 }
 
 impl ChatControl {
@@ -71,6 +74,9 @@ impl Flow for ChatControl {
             ChatControlEvent::SetThinking { reason } => {
                 self.thinking = reason;
             }
+            ChatControlEvent::SetTracer { tracer } => {
+                self.tracer = tracer;
+            }
         }
     }
 }
@@ -79,6 +85,7 @@ impl Flow for ChatControl {
 pub enum ChatControlEvent {
     Add { message: Message },
     SetThinking { reason: Option<String> },
+    SetTracer { tracer: Option<FqnLink> },
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]

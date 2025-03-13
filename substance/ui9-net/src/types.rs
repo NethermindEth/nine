@@ -1,6 +1,6 @@
+use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
 use ui9::names::Fqn;
-use libp2p::PeerId;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FqnLink {

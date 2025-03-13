@@ -1,3 +1,5 @@
+use crate::router::types::{ToolingChatRequest, ToolingChatResponse};
+use chrono::NaiveDateTime;
 use crb::core::uuid::Uuid;
 use derive_more::{Deref, DerefMut, Display, From, Into};
 use serde::{Deserialize, Serialize};
@@ -8,36 +10,36 @@ use ui9_dui::publisher::{Publisher, Tracer};
 use ui9_dui::subscriber::{Listener, Subscriber};
 
 #[derive(Deref, DerefMut, From, Into)]
-pub struct OperationSub {
-    listener: Listener<Operation>,
+pub struct ReasoningSub {
+    listener: Listener<Reasoning>,
 }
 
-impl Subscriber for Operation {
-    type Driver = OperationSub;
+impl Subscriber for Reasoning {
+    type Driver = ReasoningSub;
 }
 
 #[derive(Deref, DerefMut, From, Into)]
-pub struct OperationPub {
-    tracer: Tracer<Operation>,
+pub struct ReasoningPub {
+    tracer: Tracer<Reasoning>,
 }
 
-impl OperationPub {
+impl ReasoningPub {
     pub fn start(&mut self, model: String) {
-        let event = OperationEvent::Start { model };
+        let event = ReasoningEvent::Start { model };
         self.event(event);
     }
 }
 
-impl Publisher for Operation {
-    type Driver = OperationPub;
+impl Publisher for Reasoning {
+    type Driver = ReasoningPub;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Operation {
-    pub operations: Vec<OperationInfo>,
+pub struct Reasoning {
+    pub operations: Vec<ReasoningInfo>,
 }
 
-impl Default for Operation {
+impl Default for Reasoning {
     fn default() -> Self {
         Self {
             operations: Vec::new(),
@@ -45,46 +47,71 @@ impl Default for Operation {
     }
 }
 
-impl Flow for Operation {
-    type Event = OperationEvent;
+impl Flow for Reasoning {
+    type Event = ReasoningEvent;
     type Action = ();
 
     fn apply(&mut self, event: Self::Event) {
         match event {
-            OperationEvent::Start { model } => {
-                let info = OperationInfo { model };
+            ReasoningEvent::Start { model } => {
+                let info = ReasoningInfo::new(model);
                 self.operations.push(info);
             }
+            ReasoningEvent::Request { request } => {}
+            ReasoningEvent::Response { response } => {}
         }
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum OperationEvent {
+pub enum ReasoningEvent {
     Start { model: String },
+    Request { request: ToolingChatRequest },
+    Response { response: ToolingChatResponse },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct OperationInfo {
+pub struct ReasoningInfo {
     pub model: String,
+    pub records: Vec<ReasoningRecord>,
+}
+
+impl ReasoningInfo {
+    fn new(model: String) -> Self {
+        Self {
+            model,
+            records: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReasoningRecord {
+    pub timestamp: NaiveDateTime,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ReasoningAction {
+    Request(ToolingChatRequest),
+    Response(ToolingChatResponse),
 }
 
 /*
 #[derive(
     Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash, Display,
 )]
-pub struct OperationId {
+pub struct ReasoningId {
     id: Uuid,
 }
 
-impl OperationId {
+impl ReasoningId {
     pub fn new() -> Self {
         Self { id: Uuid::new_v4() }
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct OperationRecord {
+pub struct ReasoningRecord {
     pub task: String,
 }
 */

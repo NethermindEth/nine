@@ -139,7 +139,7 @@ impl ChatResponse {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct ToolingChatRequest {
     pub messages: Vec<Message>,
     pub tools: Vec<ToolInfo>,
@@ -191,20 +191,20 @@ pub type CallId = String;
 
 pub type ToolId = String;
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ToolInfo {
     pub id: ToolId,
     pub meta: ToolMeta,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ToolMeta {
     pub name: String,
     pub description: Option<String>,
     pub parameters: Option<RootSchema>,
 }
 
-#[derive(Debug, Clone, From)]
+#[derive(Serialize, Deserialize, Debug, Clone, From)]
 pub struct ToolResponse {
     pub content: String,
 }

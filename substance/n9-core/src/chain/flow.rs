@@ -15,12 +15,12 @@ pub struct ReasoningSub {
 
 impl ReasoningSub {
     pub fn request(&self, req: ToolingChatRequest) {
-        let action = ReasoningAction::Request(req);
+        let action = ReasoningEvent::Request(req);
         self.action(action);
     }
 
     pub fn response(&self, res: ToolingChatResponse) {
-        let action = ReasoningAction::Response(res);
+        let action = ReasoningEvent::Response(res);
         self.action(action);
     }
 }
@@ -35,10 +35,11 @@ pub struct ReasoningPub {
 }
 
 impl ReasoningPub {
-    pub fn start(&mut self, model: String) {
-        let event = ReasoningEvent::Start { model };
+    /*
+    pub fn event(&self, event: ReasoningEvent) {
         self.event(event);
     }
+    */
 }
 
 impl Publisher for ReasoningFlow {
@@ -47,7 +48,7 @@ impl Publisher for ReasoningFlow {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReasoningFlow {
-    pub actions: Vec<ReasoningAction>,
+    pub actions: Vec<ReasoningEvent>,
 }
 
 impl Default for ReasoningFlow {
@@ -60,33 +61,17 @@ impl Default for ReasoningFlow {
 
 impl Flow for ReasoningFlow {
     type Event = ReasoningEvent;
-    type Action = ReasoningAction;
+    type Action = ReasoningEvent;
 
     fn apply(&mut self, event: Self::Event) {
-        match event {
-            ReasoningEvent::Start { model } => {
-                /*
-                let info = ReasoningInfo::new(model);
-                self.operations.push(info);
-                */
-            }
-            ReasoningEvent::Request { request } => {
-                let action = request.into();
-                self.actions.push(action);
-            }
-            ReasoningEvent::Response { response } => {
-                let action = response.into();
-                self.actions.push(action);
-            }
-        }
+        self.actions.push(event);
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ReasoningEvent {
-    Start { model: String },
-    Request { request: ToolingChatRequest },
-    Response { response: ToolingChatResponse },
+    Request(ToolingChatRequest),
+    Response(ToolingChatResponse),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -107,12 +92,6 @@ impl ReasoningInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReasoningRecord {
     pub timestamp: NaiveDateTime,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, From)]
-pub enum ReasoningAction {
-    Request(ToolingChatRequest),
-    Response(ToolingChatResponse),
 }
 
 /*

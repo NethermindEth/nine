@@ -38,10 +38,12 @@ impl Agent for ChatControlLoop {
 }
 
 impl ChatControlLoop {
-    pub fn create_tracer(&mut self) -> Result<Link<ReasoningFlow>> {
+    pub fn create_tracer(&mut self, ctx: &mut Context<Self>) -> Result<Link<ReasoningFlow>> {
         let uuid = Uuid::new_v4();
         let fqn = self.key.push(uuid);
-        let tracer = Pub::new(fqn.clone());
+        let mut tracer: Pub<ReasoningFlow> = Pub::new(fqn.clone());
+        // TODO: Don't let to mix! Use tags or a separate agent.
+        ctx.consume(tracer.actions()?);
         self.tracer = Some(tracer);
         let peer_id = MeshNode::link()?.peer_id;
         Ok(Link::new(fqn, peer_id))
@@ -71,14 +73,25 @@ impl OnEvent<Act<ChatControl>> for ChatControlLoop {
     }
 }
 
+#[async_trait]
+impl OnEvent<Act<ReasoningFlow>> for ChatControlLoop {
+    async fn handle(&mut self, msg: Act<ReasoningFlow>, ctx: &mut Context<Self>) -> Result<()> {
+        // TODO: Use a separate agent!
+        if let Some(tracer) = &self.tracer {
+            tracer.event(msg.action);
+        }
+        Ok(())
+    }
+}
+
 struct SendRequest {
     prompt: String,
 }
 
 #[async_trait]
 impl DoAsync<SendRequest> for ChatControlLoop {
-    async fn handle(&mut self, msg: SendRequest, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let tracer = self.create_tracer()?;
+    async fn handle(&mut self, msg: SendRequest, ctx: &mut Context<Self>) -> Result<Next<Self>> {
+        let tracer = self.create_tracer(ctx)?;
         self.chat.assign_tracer(tracer.clone());
 
         // let op = Operation::start("Sending a prompt");

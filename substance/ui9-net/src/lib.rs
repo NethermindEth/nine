@@ -1,3 +1,4 @@
+mod connect;
 mod relay;
 mod remote;
 pub mod tracers;

@@ -29,6 +29,10 @@ impl MeshNode {
             .ok_or_else(|| anyhow!("MeshNode is not assigned"))
     }
 
+    pub fn peer_id() -> Option<PeerId> {
+        Self::link().ok().map(|link| link.peer_id)
+    }
+
     pub async fn activate() -> Result<()> {
         let connector = Self::new();
         connector.spawn().ping().await?;

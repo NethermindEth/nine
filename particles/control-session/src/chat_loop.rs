@@ -79,6 +79,7 @@ struct SendRequest {
 impl DoAsync<SendRequest> for ChatControlLoop {
     async fn handle(&mut self, msg: SendRequest, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let tracer = self.create_tracer()?;
+        self.chat.assign_tracer(tracer.clone());
 
         // let op = Operation::start("Sending a prompt");
         self.chat.start_thinking("Sending a prompt");

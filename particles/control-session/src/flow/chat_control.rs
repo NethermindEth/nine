@@ -1,6 +1,7 @@
 use derive_more::{Deref, DerefMut, From, Into};
+use n9_core::chain::ReasoningFlow;
 use serde::{Deserialize, Serialize};
-use ui9_dui::{Flow, FqnLink, Listener, Publisher, Subscriber, Tracer};
+use ui9_dui::{Flow, Link, Listener, Publisher, Subscriber, Tracer};
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ChatControlSub {
@@ -45,6 +46,11 @@ impl ChatControlPub {
         let event = ChatControlEvent::SetThinking { reason };
         self.tracer.event(event);
     }
+
+    pub fn assign_tracer(&mut self, link: Link<ReasoningFlow>) {
+        let event = ChatControlEvent::SetTracer { link: Some(link) };
+        self.tracer.event(event);
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
@@ -52,7 +58,7 @@ pub struct ChatControl {
     pub thinking: Option<String>,
     pub messages: Vec<Message>,
     // TODO: Use a typed link here?
-    pub tracer: Option<FqnLink>,
+    pub tracer: Option<Link<ReasoningFlow>>,
 }
 
 impl ChatControl {
@@ -73,8 +79,8 @@ impl Flow for ChatControl {
             ChatControlEvent::SetThinking { reason } => {
                 self.thinking = reason;
             }
-            ChatControlEvent::SetTracer { tracer } => {
-                self.tracer = tracer;
+            ChatControlEvent::SetTracer { link } => {
+                self.tracer = link;
             }
         }
     }
@@ -84,7 +90,7 @@ impl Flow for ChatControl {
 pub enum ChatControlEvent {
     Add { message: Message },
     SetThinking { reason: Option<String> },
-    SetTracer { tracer: Option<FqnLink> },
+    SetTracer { link: Option<Link<ReasoningFlow>> },
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]

@@ -1,6 +1,6 @@
 <img src="https://nethermindeth.github.io/nine/assets/nine-logo.png" width="300px"/>
 
-# Nine - Nethermind Intelligent Nodes Environment
+# NINE - Neural Interconnected Nodes Engine
 
 A flexible framework for building a distributed network of AI agents that work everywhere (STD, WASM, TEE) with a dynamic interface and hot-swappable components.
 

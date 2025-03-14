@@ -112,8 +112,13 @@ impl RequestPerformer {
         let model = self.router.get_model().await?;
         let tools = self.router.get_tools().await?;
         let request_with_tools = self.request.clone().with_tools(tools);
-        if let Some(tracer) = &self.tracer {}
+        if let Some(tracer) = &self.tracer {
+            tracer.request(request_with_tools.clone());
+        }
         let response = model.chat(request_with_tools).await?;
+        if let Some(tracer) = &self.tracer {
+            tracer.response(response.clone());
+        }
 
         for message in response.messages {
             let mut callers = Vec::new();

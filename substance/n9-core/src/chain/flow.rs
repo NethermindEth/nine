@@ -8,19 +8,18 @@ use ui9::names::Fqn;
 use ui9_dui::flow::{Flow, Unified};
 use ui9_dui::publisher::{Publisher, Tracer};
 use ui9_dui::subscriber::{Listener, Subscriber};
-
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ReasoningSub {
     listener: Listener<ReasoningFlow>,
 }
 
 impl ReasoningSub {
-    pub fn request(&mut self, req: ToolingChatRequest) {
+    pub fn request(&self, req: ToolingChatRequest) {
         let action = ReasoningAction::Request(req);
         self.action(action);
     }
 
-    pub fn response(&mut self, res: ToolingChatResponse) {
+    pub fn response(&self, res: ToolingChatResponse) {
         let action = ReasoningAction::Response(res);
         self.action(action);
     }
@@ -48,13 +47,13 @@ impl Publisher for ReasoningFlow {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReasoningFlow {
-    pub operations: Vec<ReasoningInfo>,
+    pub actions: Vec<ReasoningAction>,
 }
 
 impl Default for ReasoningFlow {
     fn default() -> Self {
         Self {
-            operations: Vec::new(),
+            actions: Vec::new(),
         }
     }
 }
@@ -66,11 +65,19 @@ impl Flow for ReasoningFlow {
     fn apply(&mut self, event: Self::Event) {
         match event {
             ReasoningEvent::Start { model } => {
+                /*
                 let info = ReasoningInfo::new(model);
                 self.operations.push(info);
+                */
             }
-            ReasoningEvent::Request { request } => {}
-            ReasoningEvent::Response { response } => {}
+            ReasoningEvent::Request { request } => {
+                let action = request.into();
+                self.actions.push(action);
+            }
+            ReasoningEvent::Response { response } => {
+                let action = response.into();
+                self.actions.push(action);
+            }
         }
     }
 }
@@ -102,7 +109,7 @@ pub struct ReasoningRecord {
     pub timestamp: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, From)]
 pub enum ReasoningAction {
     Request(ToolingChatRequest),
     Response(ToolingChatResponse),

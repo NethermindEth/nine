@@ -8,7 +8,7 @@ use crb::superagent::{Fetcher, StreamSession, Supervisor};
 use n9_core::chain::ReasoningFlow;
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
 use ui9::names::Fqn;
-use ui9_dui::{Act, FqnLink, Operation, Pub};
+use ui9_dui::{Act, Link, Operation, Pub};
 use ui9_net::MeshNode;
 
 pub struct ChatControlLoop {
@@ -38,13 +38,13 @@ impl Agent for ChatControlLoop {
 }
 
 impl ChatControlLoop {
-    pub fn create_tracer(&mut self) -> Result<FqnLink> {
+    pub fn create_tracer(&mut self) -> Result<Link<ReasoningFlow>> {
         let uuid = Uuid::new_v4();
         let fqn = self.key.push(uuid);
         let tracer = Pub::new(fqn.clone());
         self.tracer = Some(tracer);
         let peer_id = MeshNode::link()?.peer_id;
-        Ok(FqnLink::remote(fqn, peer_id))
+        Ok(Link::new(fqn, peer_id))
     }
 }
 
@@ -84,7 +84,7 @@ impl DoAsync<SendRequest> for ChatControlLoop {
         self.chat.start_thinking("Sending a prompt");
 
         let request = ChatRequest::user(&msg.prompt);
-        let session = self.router.new_session().await?;
+        let session = self.router.new_session_with_tracer(tracer).await?;
         // TODO: Assign a tracer here
         let req = session.chat(request);
         self.chat.add(msg.prompt, Role::Request);

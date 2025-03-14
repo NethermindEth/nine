@@ -3,7 +3,7 @@ pub mod model;
 pub mod tool;
 pub mod types;
 
-use crate::chain::{ReasoningSession, SessionLink};
+use crate::chain::{ReasoningFlow, ReasoningSession, SessionLink};
 use crate::tracers::tools::Tools;
 use anyhow::{Error, Result};
 use async_trait::async_trait;
@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use tool::ToolRecord;
 use typed_slab::TypedSlab;
 use types::{ChatResponse, ToolId};
-use ui9_dui::{FqnLink, Pub};
+use ui9_dui::{Link, Pub};
 
 #[derive(From, Into)]
 pub struct ReqId(usize);
@@ -65,7 +65,10 @@ impl RouterLink {
         self.interact(msg).await.map_err(Error::from)
     }
 
-    pub async fn new_session_with_tracer(&self, tracer: FqnLink) -> Result<SessionLink> {
+    pub async fn new_session_with_tracer(
+        &self,
+        tracer: Link<ReasoningFlow>,
+    ) -> Result<SessionLink> {
         let msg = NewSession {
             tracer: Some(tracer),
         };
@@ -74,7 +77,7 @@ impl RouterLink {
 }
 
 struct NewSession {
-    tracer: Option<FqnLink>,
+    tracer: Option<Link<ReasoningFlow>>,
 }
 
 impl Request for NewSession {

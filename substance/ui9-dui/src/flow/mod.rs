@@ -4,7 +4,7 @@ pub mod link;
 pub mod packed;
 
 pub use flow::Flow;
-pub use link::FqnLink;
+pub use link::{FqnLink, Link};
 pub use packed::{PackedAction, PackedEvent, PackedState};
 
 use ui9::names::Fqn;

@@ -86,9 +86,13 @@ impl Request for NewSession {
 
 #[async_trait]
 impl OnRequest<NewSession> for ReasoningRouter {
-    async fn on_request(&mut self, _: NewSession, ctx: &mut Context<Self>) -> Result<SessionLink> {
+    async fn on_request(
+        &mut self,
+        msg: NewSession,
+        ctx: &mut Context<Self>,
+    ) -> Result<SessionLink> {
         let link = ctx.equip();
-        let session = ReasoningSession::new(link);
+        let session = ReasoningSession::new(link, msg.tracer);
         let addr = ctx.spawn_agent(session, ());
         Ok(addr.equip())
     }

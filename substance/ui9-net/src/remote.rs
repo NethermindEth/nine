@@ -4,6 +4,7 @@ use ui9::names::Fqn;
 use ui9_dui::{Flow, Listener, Sub, Subscriber, Unified};
 
 pub trait RemoteExt {
+    // TODO: Use `Link` here instead
     fn remote(peer: PeerId, fqn: Fqn) -> Self;
 }
 

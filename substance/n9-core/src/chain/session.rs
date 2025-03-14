@@ -1,3 +1,4 @@
+use crate::chain::ReasoningFlow;
 use crate::router::types::{ChatRequest, ChatResponse, Message, Role, ToolCall};
 use crate::router::RouterLink;
 use anyhow::Result;
@@ -6,7 +7,8 @@ use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};
 use crb::superagent::{Fetcher, InteractExt, OnRequest};
 use derive_more::{Deref, DerefMut};
 use futures::future::join_all;
-use ui9_dui::Operate;
+use ui9_dui::{Link, Operate, Sub};
+use ui9_net::RemoteExt;
 
 #[derive(Deref, DerefMut)]
 pub struct SessionLink {
@@ -29,11 +31,13 @@ impl SessionLink {
 
 pub struct ReasoningSession {
     router: RouterLink,
+    tracer: Option<Sub<ReasoningFlow>>,
 }
 
 impl ReasoningSession {
-    pub fn new(router: RouterLink) -> Self {
-        Self { router }
+    pub fn new(router: RouterLink, link: Option<Link<ReasoningFlow>>) -> Self {
+        let tracer = link.map(|link| Sub::remote(link.peer, link.fqn));
+        Self { router, tracer }
     }
 }
 

@@ -25,14 +25,17 @@ typedmap = "0.6.0"
 ui9.workspace = true
 ui9-dui.workspace = true
 ui9-tracers.workspace = true
+ui9-net.workspace = true
 
 [features]
 default = ["std"]
 std = [
     "crb/std",
     "ui9-dui/std",
+    "ui9-net/std",
 ]
 web = [
     "crb/web",
     "ui9-dui/web",
+    "ui9-net/web",
 ]

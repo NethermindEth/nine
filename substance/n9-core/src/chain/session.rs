@@ -31,13 +31,12 @@ impl SessionLink {
 
 pub struct ReasoningSession {
     router: RouterLink,
-    tracer: Option<Sub<ReasoningFlow>>,
+    link: Option<Link<ReasoningFlow>>,
 }
 
 impl ReasoningSession {
     pub fn new(router: RouterLink, link: Option<Link<ReasoningFlow>>) -> Self {
-        let tracer = link.map(|link| Sub::remote(link.peer, link.fqn));
-        Self { router, tracer }
+        Self { router, link }
     }
 }
 
@@ -56,7 +55,9 @@ impl OnRequest<ChatRequest> for ReasoningSession {
         request: ChatRequest,
         _ctx: &mut Context<Self>,
     ) -> Result<ChatResponse> {
-        let extra_messages = RequestPerformer::new(self.router.clone(), request)
+        let router = self.router.clone();
+        let link = self.link.take();
+        let extra_messages = RequestPerformer::new(router, request, link)
             .entrypoint()
             .await?;
         let response = ChatResponse {
@@ -71,15 +72,18 @@ struct RequestPerformer {
     extra_messages: Vec<Message>,
     request: ChatRequest,
     one_more_step: bool,
+    tracer: Option<Sub<ReasoningFlow>>,
 }
 
 impl RequestPerformer {
-    fn new(router: RouterLink, request: ChatRequest) -> Self {
+    fn new(router: RouterLink, request: ChatRequest, link: Option<Link<ReasoningFlow>>) -> Self {
+        let tracer = link.map(|link| Sub::remote(link.peer, link.fqn));
         Self {
             router,
             extra_messages: Vec::new(),
             request,
             one_more_step: false,
+            tracer,
         }
     }
 
@@ -108,6 +112,7 @@ impl RequestPerformer {
         let model = self.router.get_model().await?;
         let tools = self.router.get_tools().await?;
         let request_with_tools = self.request.clone().with_tools(tools);
+        if let Some(tracer) = &self.tracer {}
         let response = model.chat(request_with_tools).await?;
 
         for message in response.messages {

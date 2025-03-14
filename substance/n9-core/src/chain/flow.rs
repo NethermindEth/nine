@@ -14,6 +14,18 @@ pub struct ReasoningSub {
     listener: Listener<ReasoningFlow>,
 }
 
+impl ReasoningSub {
+    pub fn request(&mut self, req: ToolingChatRequest) {
+        let action = ReasoningAction::Request(req);
+        self.action(action);
+    }
+
+    pub fn response(&mut self, res: ToolingChatResponse) {
+        let action = ReasoningAction::Response(res);
+        self.action(action);
+    }
+}
+
 impl Subscriber for ReasoningFlow {
     type Driver = ReasoningSub;
 }
@@ -49,7 +61,7 @@ impl Default for ReasoningFlow {
 
 impl Flow for ReasoningFlow {
     type Event = ReasoningEvent;
-    type Action = ();
+    type Action = ReasoningAction;
 
     fn apply(&mut self, event: Self::Event) {
         match event {

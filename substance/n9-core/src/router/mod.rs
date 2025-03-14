@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use tool::ToolRecord;
 use typed_slab::TypedSlab;
 use types::{ChatResponse, ToolId};
-use ui9_dui::Pub;
+use ui9_dui::{FqnLink, Pub};
 
 #[derive(From, Into)]
 pub struct ReqId(usize);
@@ -61,11 +61,21 @@ impl Agent for ReasoningRouter {
 
 impl RouterLink {
     pub async fn new_session(&self) -> Result<SessionLink> {
-        self.interact(NewSession).await.map_err(Error::from)
+        let msg = NewSession { tracer: None };
+        self.interact(msg).await.map_err(Error::from)
+    }
+
+    pub async fn new_session_with_tracer(&self, tracer: FqnLink) -> Result<SessionLink> {
+        let msg = NewSession {
+            tracer: Some(tracer),
+        };
+        self.interact(msg).await.map_err(Error::from)
     }
 }
 
-struct NewSession;
+struct NewSession {
+    tracer: Option<FqnLink>,
+}
 
 impl Request for NewSession {
     type Response = SessionLink;

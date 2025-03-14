@@ -8,8 +8,8 @@ use crb::superagent::{Fetcher, StreamSession, Supervisor};
 use n9_core::chain::ReasoningFlow;
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
 use ui9::names::Fqn;
-use ui9_dui::{Act, Operation, Pub};
-use ui9_net::{FqnLink, MeshNode};
+use ui9_dui::{Act, FqnLink, Operation, Pub};
+use ui9_net::MeshNode;
 
 pub struct ChatControlLoop {
     key: SessionKey,

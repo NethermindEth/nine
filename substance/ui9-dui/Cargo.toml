@@ -12,6 +12,7 @@ chrono.workspace = true
 crb.workspace = true
 derive_more.workspace = true
 futures.workspace = true
+libp2p.workspace = true
 log.workspace = true
 serde.workspace = true
 tokio-stream.workspace = true # TODO: Consider moving this out
@@ -20,5 +21,9 @@ ui9-codec.workspace = true
 
 [features]
 default = ["std"]
-std = ["crb/std"]
-web = ["crb/web"]
+std = [
+    "crb/std",
+]
+web = [
+    "crb/web",
+]

@@ -1,8 +1,10 @@
 pub mod encoding;
 pub mod flow;
+pub mod link;
 pub mod packed;
 
 pub use flow::Flow;
+pub use link::FqnLink;
 pub use packed::{PackedAction, PackedEvent, PackedState};
 
 use ui9::names::Fqn;

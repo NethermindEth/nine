@@ -1,7 +1,6 @@
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
-use ui9_dui::{Flow, Listener, Publisher, Subscriber, Tracer};
-use ui9_net::FqnLink;
+use ui9_dui::{Flow, FqnLink, Listener, Publisher, Subscriber, Tracer};
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ChatControlSub {

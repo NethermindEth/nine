@@ -22,6 +22,15 @@ impl<F: Flow> Link<F> {
     }
 }
 
+impl<F: Flow> From<Link<F>> for FqnLink {
+    fn from(link: Link<F>) -> Self {
+        Self {
+            fqn: link.fqn,
+            peer: Some(link.peer),
+        }
+    }
+}
+
 // TODO: Remove
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FqnLink {

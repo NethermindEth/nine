@@ -1,6 +1,8 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
+use crate::widgets;
 use n9_control_session::{ChatControl, Message, Role};
 use std::mem::swap;
+use ui9_dui::FqnLink;
 use ui9_markdown::MarkdownRender;
 use yew::{html, Html, InputEvent, TargetCast};
 
@@ -61,9 +63,10 @@ impl SubComponent for ChatComponent {
         };
         let reasoning = {
             if let Some(tracer) = &state.tracer {
+                let link = FqnLink::from(tracer.clone());
                 Some(html! {
                     <div class="widget-chat-reasoning">
-                        { "Reasoning" }
+                        <widgets::ReasoningSummary {link} />
                     </div>
                 })
             } else {

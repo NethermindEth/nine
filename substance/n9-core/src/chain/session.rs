@@ -8,7 +8,7 @@ use crb::superagent::{Fetcher, InteractExt, OnRequest};
 use derive_more::{Deref, DerefMut};
 use futures::future::join_all;
 use ui9_dui::{Link, Operate, Sub};
-use ui9_net::RemoteExt;
+use ui9_net::ConnectExt;
 
 #[derive(Deref, DerefMut)]
 pub struct SessionLink {
@@ -77,7 +77,7 @@ struct RequestPerformer {
 
 impl RequestPerformer {
     fn new(router: RouterLink, request: ChatRequest, link: Option<Link<ReasoningFlow>>) -> Self {
-        let tracer = link.map(|link| Sub::remote(link.peer, link.fqn));
+        let tracer = link.map(Sub::connect);
         Self {
             router,
             extra_messages: Vec::new(),

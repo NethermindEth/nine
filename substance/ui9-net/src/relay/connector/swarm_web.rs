@@ -1,9 +1,7 @@
 use super::behaviour::Ui9Behaviour;
 use crate::relay::keypair::Key;
 use anyhow::Result;
-use libp2p::{
-    core::upgrade, identity::Keypair, noise, websocket_websys, yamux, PeerId, Swarm, Transport,
-};
+use libp2p::{core::upgrade, noise, websocket_websys, yamux, Swarm, Transport};
 
 pub(super) async fn swarm(key: &Key) -> Result<Swarm<Ui9Behaviour>> {
     // Create Noise for encryption
@@ -25,7 +23,7 @@ pub(super) async fn swarm(key: &Key) -> Result<Swarm<Ui9Behaviour>> {
     let swarm = Swarm::new(
         transport,
         behaviour,
-        local_peer_id,
+        key.peer,
         libp2p::swarm::Config::with_wasm_executor(),
     );
 

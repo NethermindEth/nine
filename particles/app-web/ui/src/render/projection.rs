@@ -2,8 +2,8 @@ use crb::core::watch::Ref;
 use derive_more::Deref;
 use futures::Stream;
 use std::pin::Pin;
-use ui9_dui::{State, Sub, SubEvent, Subscriber};
-use ui9_net::{FqnLink, RemoteExt};
+use ui9_dui::{FqnLink, State, Sub, SubEvent, Subscriber};
+use ui9_net::RemoteExt;
 use yew::Properties;
 
 #[derive(Deref)]

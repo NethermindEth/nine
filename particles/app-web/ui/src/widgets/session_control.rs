@@ -4,7 +4,7 @@ use crb::core::uuid::Uuid;
 use n9_control_session::{SessionControl, SessionInfo, SessionKey};
 use ui9::names::Fqn;
 use ui9_dui::tracers::event::Event;
-use ui9_net::FqnLink;
+use ui9_dui::FqnLink;
 use yew::{html, Html};
 
 pub type SessionControlWidget = SubWidget<SessionControlComponent>;

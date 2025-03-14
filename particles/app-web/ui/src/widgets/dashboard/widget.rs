@@ -4,9 +4,9 @@ use crate::widgets;
 use n9_control_chat::Chat;
 use n9_control_session::SessionControl;
 use ui9_dui::tracers::job::Job;
-use ui9_dui::Unified;
+use ui9_dui::{FqnLink, Unified};
 use ui9_net::tracers::peer::Peer;
-use ui9_net::{FqnLink, PeerId};
+use ui9_net::PeerId;
 use yew::{html, Html};
 
 pub type DashboardWidget = SubWidget<DashboardComponent>;

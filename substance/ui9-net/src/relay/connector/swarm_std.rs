@@ -3,8 +3,7 @@ use crate::relay::keypair::Key;
 use anyhow::Result;
 use futures::future::Either;
 use libp2p::{
-    core::muxing::StreamMuxerBox, core::upgrade, identity::Keypair, noise, tcp, websocket, yamux,
-    PeerId, Swarm, Transport,
+    core::muxing::StreamMuxerBox, core::upgrade, noise, tcp, websocket, yamux, Swarm, Transport,
 };
 use std::time::Duration;
 

@@ -2298,6 +2298,7 @@ dependencies = [
  "serde",
  "ui9",
  "ui9-dui",
+ "ui9-net",
  "vectorize",
 ]
 
@@ -2322,6 +2323,7 @@ dependencies = [
  "typedmap",
  "ui9",
  "ui9-dui",
+ "ui9-net",
  "ui9-tracers",
 ]
 
@@ -3738,6 +3740,7 @@ dependencies = [
  "crb",
  "derive_more 2.0.1",
  "futures",
+ "libp2p",
  "log",
  "serde",
  "tokio-stream",

@@ -59,6 +59,17 @@ impl SubComponent for ChatComponent {
                 None
             }
         };
+        let reasoning = {
+            if let Some(tracer) = &state.tracer {
+                Some(html! {
+                    <div class="widget-chat-reasoning">
+                        { "Reasoning" }
+                    </div>
+                })
+            } else {
+                None
+            }
+        };
         let body = {
             if state.is_empty() {
                 html! {
@@ -76,6 +87,7 @@ impl SubComponent for ChatComponent {
                             <div class="widget-chat-dialog-viewport">
                                 { for state.messages.iter().map(|msg| self.render_message(msg)) }
                                 { thinking }
+                                { reasoning }
                             </div>
                         </div>
                         { self.render_input(ctx) }

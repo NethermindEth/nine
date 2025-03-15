@@ -5,7 +5,7 @@ use anyhow::{Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next, OnEvent};
 use crb::core::uuid::Uuid;
-use crb::superagent::{Fetcher, StreamSession, Supervisor, SupervisorSession};
+use crb::superagent::{Fetcher, PingExt, StreamSession, Supervisor, SupervisorSession};
 use n9_core::chain::ReasoningFlow;
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
 use std::collections::HashMap;
@@ -45,11 +45,12 @@ impl Agent for ChatControlLoop {
 }
 
 impl ChatControlLoop {
-    pub fn create_tracer(&mut self, ctx: &mut Context<Self>) -> Result<Link<ReasoningFlow>> {
+    pub async fn create_tracer(&mut self, ctx: &mut Context<Self>) -> Result<Link<ReasoningFlow>> {
         let uuid = Uuid::new_v4();
         let fqn = self.key.push(uuid);
         let tracer = TraceAgent::new(fqn.clone());
-        let addr = ctx.spawn_agent(tracer, ()).equip();
+        let addr: Address<_> = ctx.spawn_agent(tracer, ()).equip();
+        addr.ping().await?;
         self.tracers.insert(fqn.clone(), addr);
         let peer_id = MeshNode::link()?.peer_id;
         Ok(Link::new(fqn, peer_id))
@@ -86,7 +87,7 @@ struct SendRequest {
 #[async_trait]
 impl DoAsync<SendRequest> for ChatControlLoop {
     async fn handle(&mut self, msg: SendRequest, ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let tracer = self.create_tracer(ctx)?;
+        let tracer = self.create_tracer(ctx).await?;
         self.chat.start_thinking(tracer.clone());
 
         let request = ChatRequest::user(&msg.prompt);

@@ -48,13 +48,21 @@ impl OnEvent<Act<ReasoningFlow>> for TraceAgent {
                 let info = OperationInfo {
                     id: Uuid::new_v4(),
                     timestamp: Utc::now().naive_utc(),
-                    // TODO: Make a better reason
-                    task: "Reason".into(),
+                    task: self.reason(&operation),
                 };
                 self.operations.push(operation);
                 self.tracer.operation(info);
             }
         }
         Ok(())
+    }
+}
+
+impl TraceAgent {
+    fn reason(&self, op: &Operation) -> String {
+        match op {
+            Operation::Request(request) => "Sending a request".into(),
+            Operation::Response(response) => "Fetching a response".into(),
+        }
     }
 }

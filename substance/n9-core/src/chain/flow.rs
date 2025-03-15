@@ -67,7 +67,11 @@ impl Flow for ReasoningFlow {
     type Action = ReasoningAction;
 
     fn apply(&mut self, event: Self::Event) {
-        // self.operations.push(event);
+        match event {
+            ReasoningEvent::Add(operation) => {
+                self.operations.push(operation);
+            }
+        }
     }
 }
 

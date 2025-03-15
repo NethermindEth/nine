@@ -63,6 +63,7 @@ impl TraceAgent {
         match op {
             Operation::Request(request) => "Sending a request".into(),
             Operation::Response(response) => "Fetching a response".into(),
+            Operation::ToolCall(call) => "Calling a tool".into(),
         }
     }
 }

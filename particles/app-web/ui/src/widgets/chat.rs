@@ -50,17 +50,6 @@ impl SubComponent for ChatComponent {
     }
 
     fn render(&self, state: single::State<ChatControl>, ctx: &SubContext<Self>) -> Option<Html> {
-        let thinking = {
-            if let Some(reason) = &state.thinking {
-                Some(html! {
-                    <div class="widget-chat-thinking">
-                        { reason }
-                    </div>
-                })
-            } else {
-                None
-            }
-        };
         let reasoning = {
             if let Some(tracer) = &state.tracer {
                 let link = FqnLink::from(tracer.clone());
@@ -89,7 +78,6 @@ impl SubComponent for ChatComponent {
                         <div class="widget-chat-dialog">
                             <div class="widget-chat-dialog-viewport">
                                 { for state.messages.iter().map(|msg| self.render_message(msg)) }
-                                { thinking }
                                 { reasoning }
                             </div>
                         </div>

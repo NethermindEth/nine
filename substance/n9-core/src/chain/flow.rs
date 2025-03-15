@@ -14,13 +14,8 @@ pub struct ReasoningSub {
 }
 
 impl ReasoningSub {
-    pub fn request(&self, req: ToolingChatRequest) {
-        let action = ReasoningEvent::Request(req);
-        self.action(action);
-    }
-
-    pub fn response(&self, res: ToolingChatResponse) {
-        let action = ReasoningEvent::Response(res);
+    pub fn operation(&self, info: OperationInfo) {
+        let action = ReasoningAction::Add(info);
         self.action(action);
     }
 }
@@ -35,11 +30,10 @@ pub struct ReasoningPub {
 }
 
 impl ReasoningPub {
-    /*
-    pub fn event(&self, event: ReasoningEvent) {
+    pub fn operation(&self, info: OperationInfo) {
+        let event = ReasoningEvent::Add(info);
         self.event(event);
     }
-    */
 }
 
 impl Publisher for ReasoningFlow {
@@ -48,30 +42,49 @@ impl Publisher for ReasoningFlow {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReasoningFlow {
-    pub actions: Vec<ReasoningEvent>,
+    pub operations: Vec<OperationInfo>,
+    pub operation: Option<ReasoningOperation>,
 }
 
 impl Default for ReasoningFlow {
     fn default() -> Self {
         Self {
-            actions: Vec::new(),
+            operations: Vec::new(),
+            operation: None,
         }
     }
 }
 
 impl Flow for ReasoningFlow {
     type Event = ReasoningEvent;
-    type Action = ReasoningEvent;
+    type Action = ReasoningAction;
 
     fn apply(&mut self, event: Self::Event) {
-        self.actions.push(event);
+        // self.operations.push(event);
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum ReasoningEvent {
+pub struct OperationInfo {
+    pub id: Uuid,
+    pub timestamp: NaiveDateTime,
+    pub task: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ReasoningOperation {
     Request(ToolingChatRequest),
     Response(ToolingChatResponse),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ReasoningEvent {
+    Add(OperationInfo),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ReasoningAction {
+    Add(OperationInfo),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

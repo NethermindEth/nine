@@ -1,6 +1,6 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use crate::widgets;
-use n9_control_session::{ChatControl, Message, Role};
+use n9_control_session::{ChatControl, ChatItem, Message, Role};
 use std::mem::swap;
 use ui9_dui::FqnLink;
 use ui9_markdown::MarkdownRender;
@@ -50,18 +50,6 @@ impl SubComponent for ChatComponent {
     }
 
     fn render(&self, state: single::State<ChatControl>, ctx: &SubContext<Self>) -> Option<Html> {
-        let reasoning = {
-            if let Some(tracer) = &state.tracer {
-                let link = FqnLink::from(tracer.clone());
-                Some(html! {
-                    <div class="widget-chat-reasoning">
-                        <widgets::ReasoningSummary {link} />
-                    </div>
-                })
-            } else {
-                None
-            }
-        };
         let body = {
             if state.is_empty() {
                 html! {
@@ -77,8 +65,7 @@ impl SubComponent for ChatComponent {
                     <div class="widget-chat-filled">
                         <div class="widget-chat-dialog">
                             <div class="widget-chat-dialog-viewport">
-                                { for state.messages.iter().map(|msg| self.render_message(msg)) }
-                                { reasoning }
+                                { for state.items.iter().map(|item| self.render_item(item)) }
                             </div>
                         </div>
                         { self.render_input(ctx) }
@@ -116,6 +103,20 @@ impl ChatComponent {
                     </div>
                 </div>
             </div>
+        }
+    }
+
+    fn render_item(&self, item: &ChatItem) -> Html {
+        match item {
+            ChatItem::Message(message) => self.render_message(message),
+            ChatItem::Tracer(tracer) => {
+                let link = FqnLink::from(tracer.clone());
+                html! {
+                    <div class="widget-chat-reasoning">
+                        <widgets::ReasoningSummary {link} />
+                    </div>
+                }
+            }
         }
     }
 

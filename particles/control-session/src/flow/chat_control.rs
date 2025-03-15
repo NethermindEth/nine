@@ -31,30 +31,29 @@ impl Publisher for ChatControl {
 impl ChatControlPub {
     pub fn add(&mut self, content: String, role: Role) {
         let message = Message { content, role };
-        let event = ChatControlEvent::Add { message };
+        let item = ChatItem::Message(message);
+        let event = ChatControlEvent::AddItem { item };
         self.tracer.event(event);
     }
 
     pub fn start_thinking(&mut self, link: Link<ReasoningFlow>) {
-        let event = ChatControlEvent::SetTracer { link: Some(link) };
+        let item = ChatItem::Tracer(link);
+        let event = ChatControlEvent::AddItem { item };
         self.tracer.event(event);
     }
 
     pub fn stop_thinking(&mut self) {
-        let event = ChatControlEvent::SetTracer { link: None };
-        self.tracer.event(event);
     }
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
 pub struct ChatControl {
-    pub messages: Vec<Message>,
-    pub tracer: Option<Link<ReasoningFlow>>,
+    pub items: Vec<ChatItem>,
 }
 
 impl ChatControl {
     pub fn is_empty(&self) -> bool {
-        self.messages.is_empty()
+        self.items.is_empty()
     }
 }
 
@@ -64,20 +63,22 @@ impl Flow for ChatControl {
 
     fn apply(&mut self, event: Self::Event) {
         match event {
-            ChatControlEvent::Add { message } => {
-                self.messages.push(message);
-            }
-            ChatControlEvent::SetTracer { link } => {
-                self.tracer = link;
+            ChatControlEvent::AddItem { item } => {
+                self.items.push(item);
             }
         }
     }
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+pub enum ChatItem {
+    Message(Message),
+    Tracer(Link<ReasoningFlow>),
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum ChatControlEvent {
-    Add { message: Message },
-    SetTracer { link: Option<Link<ReasoningFlow>> },
+    AddItem { item: ChatItem },
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]

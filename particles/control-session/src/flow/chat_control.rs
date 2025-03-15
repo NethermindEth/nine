@@ -42,8 +42,7 @@ impl ChatControlPub {
         self.tracer.event(event);
     }
 
-    pub fn stop_thinking(&mut self) {
-    }
+    pub fn stop_thinking(&mut self) {}
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]

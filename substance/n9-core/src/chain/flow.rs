@@ -14,8 +14,15 @@ pub struct ReasoningSub {
 }
 
 impl ReasoningSub {
-    pub fn operation(&self, info: OperationInfo) {
-        let action = ReasoningAction::Add(info);
+    pub fn request(&self, request: ToolingChatRequest) {
+        let operation = Operation::Request(request);
+        let action = ReasoningAction::Operation(operation);
+        self.action(action);
+    }
+
+    pub fn response(&self, response: ToolingChatResponse) {
+        let operation = Operation::Response(response);
+        let action = ReasoningAction::Operation(operation);
         self.action(action);
     }
 }
@@ -84,7 +91,13 @@ pub enum ReasoningEvent {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ReasoningAction {
-    Add(OperationInfo),
+    Operation(Operation),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum Operation {
+    Request(ToolingChatRequest),
+    Response(ToolingChatResponse),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

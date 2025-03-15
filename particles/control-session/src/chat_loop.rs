@@ -87,18 +87,13 @@ struct SendRequest {
 impl DoAsync<SendRequest> for ChatControlLoop {
     async fn handle(&mut self, msg: SendRequest, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let tracer = self.create_tracer(ctx)?;
-        self.chat.assign_tracer(tracer.clone());
-
-        // let op = Operation::start("Sending a prompt");
-        self.chat.start_thinking("Sending a prompt");
+        self.chat.start_thinking(tracer.clone());
 
         let request = ChatRequest::user(&msg.prompt);
         let session = self.router.new_session_with_tracer(tracer).await?;
-        // TODO: Assign a tracer here
         let req = session.chat(request);
         self.chat.add(msg.prompt, Role::Request);
 
-        // op.end();
         let state = WaitResponse { req };
         Ok(Next::do_async(state))
     }
@@ -117,14 +112,8 @@ struct WaitResponse {
 #[async_trait]
 impl DoAsync<WaitResponse> for ChatControlLoop {
     async fn handle(&mut self, msg: WaitResponse, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        // TODO: Use chat scoped operations
-        // let op = Operation::start("Waiting for a response");
-        self.chat.start_thinking("Waiting for a response");
-
         let resp = msg.req.await?.squash();
         self.chat.add(resp, Role::Response);
-
-        // op.end();
         self.chat.stop_thinking();
         Ok(Next::events())
     }

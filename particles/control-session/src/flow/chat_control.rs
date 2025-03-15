@@ -35,29 +35,20 @@ impl ChatControlPub {
         self.tracer.event(event);
     }
 
-    pub fn start_thinking(&mut self, reason: impl ToString) {
-        let reason = Some(reason.to_string());
-        let event = ChatControlEvent::SetThinking { reason };
+    pub fn start_thinking(&mut self, link: Link<ReasoningFlow>) {
+        let event = ChatControlEvent::SetTracer { link: Some(link) };
         self.tracer.event(event);
     }
 
     pub fn stop_thinking(&mut self) {
-        let reason = None;
-        let event = ChatControlEvent::SetThinking { reason };
-        self.tracer.event(event);
-    }
-
-    pub fn assign_tracer(&mut self, link: Link<ReasoningFlow>) {
-        let event = ChatControlEvent::SetTracer { link: Some(link) };
+        let event = ChatControlEvent::SetTracer { link: None };
         self.tracer.event(event);
     }
 }
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
 pub struct ChatControl {
-    pub thinking: Option<String>,
     pub messages: Vec<Message>,
-    // TODO: Use a typed link here?
     pub tracer: Option<Link<ReasoningFlow>>,
 }
 
@@ -76,9 +67,6 @@ impl Flow for ChatControl {
             ChatControlEvent::Add { message } => {
                 self.messages.push(message);
             }
-            ChatControlEvent::SetThinking { reason } => {
-                self.thinking = reason;
-            }
             ChatControlEvent::SetTracer { link } => {
                 self.tracer = link;
             }
@@ -89,7 +77,6 @@ impl Flow for ChatControl {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum ChatControlEvent {
     Add { message: Message },
-    SetThinking { reason: Option<String> },
     SetTracer { link: Option<Link<ReasoningFlow>> },
 }
 

@@ -133,6 +133,7 @@ impl RequestPerformer {
                     let caller = Caller {
                         router: self.router.clone(),
                         tool_call,
+                        tracer: self.tracer.as_ref(),
                     };
                     callers.push(caller.call());
                 }
@@ -148,12 +149,13 @@ impl RequestPerformer {
     }
 }
 
-struct Caller {
+struct Caller<'a> {
     router: RouterLink,
     tool_call: ToolCall,
+    tracer: Option<&'a Sub<ReasoningFlow>>,
 }
 
-impl Caller {
+impl<'a> Caller<'a> {
     async fn call(self) -> Message {
         let call_id = self.tool_call.call_id.clone();
         match self.call_or_fail().await {
@@ -169,7 +171,9 @@ impl Caller {
 
     async fn call_or_fail(mut self) -> Result<Message> {
         let id = self.tool_call.tool_id.clone();
-        // tracer.tool_call(self.too_call.clone());
+        if let Some(tracer) = self.tracer {
+            tracer.tool_call(self.tool_call.clone());
+        }
         let fetcher = self.router.get_tool(self.tool_call.tool_id);
         let link = fetcher.await?;
         let response = link.call_tool(self.tool_call.args).await?;

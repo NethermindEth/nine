@@ -1,12 +1,14 @@
 use crate::flow::chat_control::{ChatControl, ChatControlAction, Role};
 use crate::flow::session_control::SessionKey;
+use crate::trace_agent::TraceAgent;
 use anyhow::{Error, Result};
 use async_trait::async_trait;
-use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
+use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next, OnEvent};
 use crb::core::uuid::Uuid;
-use crb::superagent::{Fetcher, StreamSession, Supervisor};
+use crb::superagent::{Fetcher, StreamSession, Supervisor, SupervisorSession};
 use n9_core::chain::ReasoningFlow;
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
+use std::collections::HashMap;
 use ui9::names::Fqn;
 use ui9_dui::{Act, Link, Operation, Pub};
 use ui9_net::MeshNode;
@@ -15,7 +17,7 @@ pub struct ChatControlLoop {
     key: SessionKey,
     router: RouterLink,
     chat: Pub<ChatControl>,
-    tracer: Option<Pub<ReasoningFlow>>,
+    tracers: HashMap<Fqn, Address<TraceAgent>>,
 }
 
 impl ChatControlLoop {
@@ -24,13 +26,18 @@ impl ChatControlLoop {
             key: key.clone(),
             router,
             chat: Pub::new(key),
-            tracer: None,
+            tracers: HashMap::new(),
         }
     }
 }
 
+impl Supervisor for ChatControlLoop {
+    type BasedOn = StreamSession<Self>;
+    type GroupBy = ();
+}
+
 impl Agent for ChatControlLoop {
-    type Context = StreamSession<Self>;
+    type Context = SupervisorSession<Self>;
 
     fn begin(&mut self) -> Next<Self> {
         Next::do_async(Initialize)
@@ -41,10 +48,9 @@ impl ChatControlLoop {
     pub fn create_tracer(&mut self, ctx: &mut Context<Self>) -> Result<Link<ReasoningFlow>> {
         let uuid = Uuid::new_v4();
         let fqn = self.key.push(uuid);
-        let mut tracer: Pub<ReasoningFlow> = Pub::new(fqn.clone());
-        // TODO: Don't let to mix! Use tags or a separate agent.
-        ctx.consume(tracer.actions()?);
-        self.tracer = Some(tracer);
+        let tracer = TraceAgent::new(fqn.clone());
+        let addr = ctx.spawn_agent(tracer, ()).equip();
+        self.tracers.insert(fqn.clone(), addr);
         let peer_id = MeshNode::link()?.peer_id;
         Ok(Link::new(fqn, peer_id))
     }
@@ -68,17 +74,6 @@ impl OnEvent<Act<ChatControl>> for ChatControlLoop {
                 let ask = SendRequest { prompt };
                 ctx.do_next(Next::do_async(ask));
             }
-        }
-        Ok(())
-    }
-}
-
-#[async_trait]
-impl OnEvent<Act<ReasoningFlow>> for ChatControlLoop {
-    async fn handle(&mut self, msg: Act<ReasoningFlow>, ctx: &mut Context<Self>) -> Result<()> {
-        // TODO: Use a separate agent!
-        if let Some(tracer) = &self.tracer {
-            tracer.event(msg.action);
         }
         Ok(())
     }

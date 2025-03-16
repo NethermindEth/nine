@@ -70,6 +70,23 @@ impl Flow for ChatControl {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct ChatTurn {
+    pub request: Option<ChatRequest>,
+    pub response: Option<ChatResponse>,
+    pub tracer: Option<Link<ReasoningFlow>>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct ChatRequest {
+    pub content: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct ChatResponse {
+    pub content: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum ChatItem {
     Message(Message),
     Tracer(Link<ReasoningFlow>),

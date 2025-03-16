@@ -1,6 +1,6 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use crate::widgets;
-use n9_control_session::{ChatControl, ChatItem, Message, Role};
+use n9_control_session::{ChatControl, ChatTurn, Message, Role};
 use std::mem::swap;
 use ui9_dui::FqnLink;
 use ui9_markdown::MarkdownRender;
@@ -106,20 +106,37 @@ impl ChatComponent {
         }
     }
 
-    fn render_item(&self, item: &ChatItem) -> Html {
-        match item {
-            ChatItem::Message(message) => self.render_message(message),
-            ChatItem::Tracer(tracer) => {
+    fn render_item(&self, item: &ChatTurn) -> Html {
+        let tracer = {
+            if let Some(tracer) = &item.tracer {
                 let link = FqnLink::from(tracer.clone());
-                html! {
+                Some(html! {
                     <div class="widget-chat-reasoning">
                         <widgets::ReasoningSummary {link} />
                     </div>
-                }
+                })
+            } else {
+                None
             }
+        };
+        html! {
+            <div class="widget-chat-turn">
+                <div class="widget-chat-message">
+                    <div class="widget-chat-request">
+                        { item.request.as_ref().map(|req| &req.content) }
+                    </div>
+                </div>
+                { tracer }
+                <div class="widget-chat-message">
+                    <div class="widget-chat-response">
+                        { item.request.as_ref().map(|req| &req.content) }
+                    </div>
+                </div>
+            </div>
         }
     }
 
+    /*
     fn render_message(&self, msg: &Message) -> Html {
         let class = match msg.role {
             Role::Request => "widget-chat-request",
@@ -132,4 +149,5 @@ impl ChatComponent {
             </div>
         }
     }
+    */
 }

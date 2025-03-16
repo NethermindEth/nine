@@ -31,14 +31,12 @@ impl Publisher for ChatControl {
 impl ChatControlPub {
     pub fn add(&mut self, content: String, role: Role) {
         let message = Message { content, role };
-        let item = ChatItem::Message(message);
-        let event = ChatControlEvent::AddItem { item };
+        let event = ChatControlEvent::Message(message);
         self.tracer.event(event);
     }
 
     pub fn start_thinking(&mut self, link: Link<ReasoningFlow>) {
-        let item = ChatItem::Tracer(link);
-        let event = ChatControlEvent::AddItem { item };
+        let event = ChatControlEvent::Tracer(link);
         self.tracer.event(event);
     }
 
@@ -47,7 +45,7 @@ impl ChatControlPub {
 
 #[derive(Clone, Serialize, Deserialize, Default, Debug)]
 pub struct ChatControl {
-    pub items: Vec<ChatItem>,
+    pub items: Vec<ChatTurn>,
 }
 
 impl ChatControl {
@@ -62,14 +60,38 @@ impl Flow for ChatControl {
 
     fn apply(&mut self, event: Self::Event) {
         match event {
-            ChatControlEvent::AddItem { item } => {
-                self.items.push(item);
+            ChatControlEvent::NewTurn => {
+                let turn = ChatTurn::default();
+                self.items.push(turn);
+            }
+            ChatControlEvent::Tracer(link) => {
+                if let Some(last) = self.items.last_mut() {
+                    last.tracer = Some(link);
+                }
+            }
+            ChatControlEvent::Message(message) => {
+                if let Some(last) = self.items.last_mut() {
+                    match message.role {
+                        Role::Request => {
+                            let request = ChatRequest {
+                                content: message.content,
+                            };
+                            last.request = Some(request);
+                        }
+                        Role::Response => {
+                            let response = ChatResponse {
+                                content: message.content,
+                            };
+                            last.response = Some(response);
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug, Default)]
 pub struct ChatTurn {
     pub request: Option<ChatRequest>,
     pub response: Option<ChatResponse>,
@@ -87,14 +109,10 @@ pub struct ChatResponse {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub enum ChatItem {
-    Message(Message),
-    Tracer(Link<ReasoningFlow>),
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum ChatControlEvent {
-    AddItem { item: ChatItem },
+    NewTurn,
+    Tracer(Link<ReasoningFlow>),
+    Message(Message),
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]

@@ -87,6 +87,9 @@ struct SendRequest {
 #[async_trait]
 impl DoAsync<SendRequest> for ChatControlLoop {
     async fn handle(&mut self, msg: SendRequest, ctx: &mut Context<Self>) -> Result<Next<Self>> {
+        // TODO: Add prompt to the turn
+        self.chat.new_turn();
+
         let tracer = self.create_tracer(ctx).await?;
         self.chat.start_thinking(tracer.clone());
 

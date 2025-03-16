@@ -129,7 +129,7 @@ impl ChatComponent {
                 { tracer }
                 <div class="widget-chat-message">
                     <div class="widget-chat-response">
-                        { item.request.as_ref().map(|req| &req.content) }
+                        { item.response.as_ref().map(|res| &res.content) }
                     </div>
                 </div>
             </div>

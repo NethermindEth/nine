@@ -29,6 +29,12 @@ impl Publisher for ChatControl {
 }
 
 impl ChatControlPub {
+    pub fn new_turn(&mut self) {
+        // TODO: Add prompt here
+        let event = ChatControlEvent::NewTurn;
+        self.tracer.event(event);
+    }
+
     pub fn add(&mut self, content: String, role: Role) {
         let message = Message { content, role };
         let event = ChatControlEvent::Message(message);

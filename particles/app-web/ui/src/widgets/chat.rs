@@ -1,6 +1,6 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use crate::widgets;
-use n9_control_session::{ChatControl, ChatTurn, Message, Role};
+use n9_control_session::{ChatControl, ChatRequest, ChatResponse, ChatTurn};
 use std::mem::swap;
 use ui9_dui::FqnLink;
 use ui9_markdown::MarkdownRender;
@@ -121,33 +121,32 @@ impl ChatComponent {
         };
         html! {
             <div class="widget-chat-turn">
-                <div class="widget-chat-message">
-                    <div class="widget-chat-request">
-                        { item.request.as_ref().map(|req| &req.content) }
-                    </div>
-                </div>
+                { item.request.as_ref().map(|req| self.render_request(req)) }
                 { tracer }
-                <div class="widget-chat-message">
-                    <div class="widget-chat-response">
-                        { item.response.as_ref().map(|res| &res.content) }
-                    </div>
+                { item.response.as_ref().map(|res| self.render_response(res)) }
+            </div>
+        }
+    }
+
+    fn render_request(&self, req: &ChatRequest) -> Html {
+        let content = self.render.block(&req.content);
+        html! {
+            <div class="widget-chat-message">
+                <div class="widget-chat-request">
+                    { content }
                 </div>
             </div>
         }
     }
 
-    /*
-    fn render_message(&self, msg: &Message) -> Html {
-        let class = match msg.role {
-            Role::Request => "widget-chat-request",
-            Role::Response => "widget-chat-response",
-        };
-        let content = self.render.block(&msg.content);
+    fn render_response(&self, res: &ChatResponse) -> Html {
+        let content = self.render.block(&res.content);
         html! {
             <div class="widget-chat-message">
-                <div {class}>{ content }</div>
+                <div class="widget-chat-response">
+                    { content }
+                </div>
             </div>
         }
     }
-    */
 }

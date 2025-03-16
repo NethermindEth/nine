@@ -107,14 +107,26 @@ impl ChatComponent {
     }
 
     fn render_item(&self, item: &ChatTurn) -> Html {
+        // TODO: Use a better indicator + errors reporting
+        let completed = item.response.is_some();
         let tracer = {
             if let Some(tracer) = &item.tracer {
-                let link = FqnLink::from(tracer.clone());
-                Some(html! {
-                    <div class="widget-chat-reasoning">
-                        <widgets::ReasoningSummary {link} />
-                    </div>
-                })
+                if completed {
+                    Some(html! {
+                        <div class="widget-chat-reasoning">
+                            <div>{ "" }</div>
+                            <div class="widget-chat-reasoning-open">{ "Open traces" }</div>
+                        </div>
+                    })
+                } else {
+                    let link = FqnLink::from(tracer.clone());
+                    Some(html! {
+                        <div class="widget-chat-reasoning">
+                            <widgets::ReasoningSummary {link} />
+                            <div class="widget-chat-reasoning-open">{ "Open traces" }</div>
+                        </div>
+                    })
+                }
             } else {
                 None
             }

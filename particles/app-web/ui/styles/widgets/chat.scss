@@ -6,6 +6,18 @@
   max-width: 800px;
   margin: 0 auto;
 
+  .widget-chat-reasoning {
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+    justify-content: space-between;
+
+    .widget-chat-reasoning-open {
+      color: #52A021;
+      cursor: pointer;
+    }
+  }
+
   .widget-chat-input {
     width: 100%;
     padding: 1rem;

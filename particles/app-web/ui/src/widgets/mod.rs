@@ -7,6 +7,7 @@ mod jobs;
 mod peers;
 mod reasoning;
 mod session_control;
+mod tracer;
 
 pub use chat::ChatWidget as Chat;
 pub use chat_interaction::ChatInteraction;

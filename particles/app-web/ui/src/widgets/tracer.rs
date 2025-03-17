@@ -1,0 +1,40 @@
+use crate::render::{single, SubComponent, SubContext, SubWidget};
+use n9_core::chain::ReasoningFlow;
+use std::mem::swap;
+use ui9_markdown::MarkdownRender;
+use yew::{html, Html, InputEvent, TargetCast};
+
+pub type TracerWidget = SubWidget<TracerComponent>;
+
+pub struct TracerComponent {}
+
+#[derive(Clone)]
+pub enum Msg {}
+
+impl SubComponent for TracerComponent {
+    type Projection = single::Flow<ReasoningFlow>;
+    type Message = Msg;
+
+    fn create() -> Self {
+        Self {}
+    }
+
+    fn update(
+        &mut self,
+        msg: Self::Message,
+        pro: &mut Self::Projection,
+        _ctx: &SubContext<Self>,
+    ) -> bool {
+        true
+    }
+
+    fn render(&self, state: single::State<ReasoningFlow>, ctx: &SubContext<Self>) -> Option<Html> {
+        let operation = state.operations.last().map(|info| &info.task);
+        html! {
+            <div>
+                { operation}
+            </div>
+        }
+        .into()
+    }
+}

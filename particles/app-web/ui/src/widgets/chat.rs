@@ -1,8 +1,10 @@
-use crate::render::{single, SubComponent, SubContext, SubWidget};
+use crate::render::{double, single, SubComponent, SubContext, SubWidget};
 use crate::widgets;
+use crate::widgets::dashboard::Dashboard;
 use n9_control_session::{ChatControl, ChatRequest, ChatResponse, ChatTurn};
+use n9_core::chain::ReasoningFlow;
 use std::mem::swap;
-use ui9_dui::FqnLink;
+use ui9_dui::{FqnLink, Link};
 use ui9_markdown::MarkdownRender;
 use yew::{html, Html, InputEvent, TargetCast};
 
@@ -17,10 +19,11 @@ pub struct ChatComponent {
 pub enum Msg {
     UpdateText(String),
     Send,
+    OpenTraces(Link<ReasoningFlow>),
 }
 
 impl SubComponent for ChatComponent {
-    type Projection = single::Flow<ChatControl>;
+    type Projection = double::Flow<ChatControl, Dashboard>;
     type Message = Msg;
 
     fn create() -> Self {
@@ -43,13 +46,20 @@ impl SubComponent for ChatComponent {
             Msg::Send => {
                 let mut text = String::new();
                 swap(&mut text, &mut self.text);
-                pro.prompt(text);
+                pro.first.prompt(text);
+            }
+            Msg::OpenTraces(link) => {
+                pro.second.open_traces(Some(link));
             }
         }
         true
     }
 
-    fn render(&self, state: single::State<ChatControl>, ctx: &SubContext<Self>) -> Option<Html> {
+    fn render(
+        &self,
+        state: double::State<ChatControl, Dashboard>,
+        ctx: &SubContext<Self>,
+    ) -> Option<Html> {
         let body = {
             if state.is_empty() {
                 html! {

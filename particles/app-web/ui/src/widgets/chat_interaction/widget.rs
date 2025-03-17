@@ -1,7 +1,7 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use crate::widgets;
 use crate::widgets::dashboard::Dashboard;
-use ui9_dui::FqnLink;
+use ui9_dui::{FqnLink, Unified};
 use ui9_markdown::MarkdownRender;
 use yew::{html, Html};
 
@@ -28,9 +28,10 @@ impl SubComponent for ChatInteractionComponent {
                 <widgets::Traces {link} />
             }
             .into()
-        } else if let Some(link) = state.active_chat.clone() {
+        } else if let Some(first) = state.active_chat.clone() {
+            let second: FqnLink = Dashboard::fqn().into();
             html! {
-                <widgets::Chat {link} />
+                <widgets::Chat {first} {second} />
             }
             .into()
         } else {

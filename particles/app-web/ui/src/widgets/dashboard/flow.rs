@@ -24,6 +24,11 @@ impl DashboardSub {
         let msg = DashboardMessage::SetActiveChat { chat };
         self.action(msg);
     }
+
+    pub fn open_traces(&self, traces: Option<Link<ReasoningFlow>>) {
+        let msg = DashboardMessage::SetActiveTraces { traces };
+        self.action(msg);
+    }
 }
 
 #[derive(Deref, DerefMut, From, Into)]

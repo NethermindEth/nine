@@ -1,7 +1,8 @@
 use derive_more::{Deref, DerefMut, From, Into};
+use n9_core::chain::ReasoningFlow;
 use serde::{Deserialize, Serialize};
 use ui9::names::Fqn;
-use ui9_dui::{Flow, FqnLink, Listener, Publisher, Subscriber, Tracer, Unified};
+use ui9_dui::{Flow, FqnLink, Link, Listener, Publisher, Subscriber, Tracer, Unified};
 use ui9_net::PeerId;
 
 #[derive(Deref, DerefMut, From, Into)]
@@ -40,6 +41,7 @@ impl DashboardPub {}
 pub struct Dashboard {
     pub active_peer: Option<PeerId>,
     pub active_chat: Option<FqnLink>,
+    pub active_traces: Option<Link<ReasoningFlow>>,
 }
 
 impl Unified for Dashboard {
@@ -60,6 +62,9 @@ impl Flow for Dashboard {
             DashboardMessage::SetActiveChat { chat } => {
                 self.active_chat = chat;
             }
+            DashboardMessage::SetActiveTraces { traces } => {
+                self.active_traces = traces;
+            }
         }
     }
 }
@@ -68,4 +73,5 @@ impl Flow for Dashboard {
 pub enum DashboardMessage {
     SetActivePeer { peer: Option<PeerId> },
     SetActiveChat { chat: Option<FqnLink> },
+    SetActiveTraces { traces: Option<Link<ReasoningFlow>> },
 }

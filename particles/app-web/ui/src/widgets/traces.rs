@@ -4,14 +4,14 @@ use std::mem::swap;
 use ui9_markdown::MarkdownRender;
 use yew::{html, Html, InputEvent, TargetCast};
 
-pub type TracerWidget = SubWidget<TracerComponent>;
+pub type TracesWidget = SubWidget<TracesComponent>;
 
-pub struct TracerComponent {}
+pub struct TracesComponent {}
 
 #[derive(Clone)]
 pub enum Msg {}
 
-impl SubComponent for TracerComponent {
+impl SubComponent for TracesComponent {
     type Projection = single::Flow<ReasoningFlow>;
     type Message = Msg;
 

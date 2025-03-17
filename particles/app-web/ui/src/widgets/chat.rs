@@ -75,7 +75,7 @@ impl SubComponent for ChatComponent {
                     <div class="widget-chat-filled">
                         <div class="widget-chat-dialog">
                             <div class="widget-chat-dialog-viewport">
-                                { for state.items.iter().map(|item| self.render_item(item)) }
+                                { for state.items.iter().map(|item| self.render_item(item, ctx)) }
                             </div>
                         </div>
                         { self.render_input(ctx) }
@@ -116,16 +116,17 @@ impl ChatComponent {
         }
     }
 
-    fn render_item(&self, item: &ChatTurn) -> Html {
+    fn render_item(&self, item: &ChatTurn, ctx: &SubContext<Self>) -> Html {
         // TODO: Use a better indicator + errors reporting
         let completed = item.response.is_some();
         let tracer = {
             if let Some(tracer) = &item.tracer {
+                let onclick = ctx.event(Msg::OpenTraces(tracer.clone()));
                 if completed {
                     Some(html! {
                         <div class="widget-chat-reasoning">
                             <div>{ "" }</div>
-                            <div class="widget-chat-reasoning-open">{ "Open traces" }</div>
+                            <div {onclick} class="widget-chat-reasoning-open">{ "Open traces" }</div>
                         </div>
                     })
                 } else {
@@ -133,7 +134,7 @@ impl ChatComponent {
                     Some(html! {
                         <div class="widget-chat-reasoning">
                             <widgets::ReasoningSummary {link} />
-                            <div class="widget-chat-reasoning-open">{ "Open traces" }</div>
+                            <div {onclick} class="widget-chat-reasoning-open">{ "Open traces" }</div>
                         </div>
                     })
                 }

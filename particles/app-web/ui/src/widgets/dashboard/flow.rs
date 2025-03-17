@@ -66,6 +66,8 @@ impl Flow for Dashboard {
             }
             DashboardMessage::SetActiveChat { chat } => {
                 self.active_chat = chat;
+                // Close traces if other chat is opened
+                self.active_traces.take();
             }
             DashboardMessage::SetActiveTraces { traces } => {
                 self.active_traces = traces;

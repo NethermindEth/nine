@@ -29,6 +29,7 @@
     .app-content-left {
       padding: 2rem;
       width: 300px;
+      flex-shrink: 0;
     }
 
     .app-content-center {
@@ -41,6 +42,7 @@
     .app-content-right {
       padding: 2rem;
       width: 300px;
+      flex-shrink: 0;
     }
   }
 }

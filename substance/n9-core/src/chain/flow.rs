@@ -8,6 +8,7 @@ use ui9::names::Fqn;
 use ui9_dui::flow::{Flow, Unified};
 use ui9_dui::publisher::{Publisher, Tracer};
 use ui9_dui::subscriber::{Listener, Subscriber};
+
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ReasoningSub {
     listener: Listener<ReasoningFlow>,
@@ -31,6 +32,13 @@ impl ReasoningSub {
         let action = ReasoningAction::Operation(operation);
         self.action(action);
     }
+
+    // TODO: Take out to the separate service
+
+    pub fn show(&self, id: OperationId) {
+        let action = ReasoningAction::Show(id);
+        self.action(action);
+    }
 }
 
 impl Subscriber for ReasoningFlow {
@@ -47,6 +55,11 @@ impl ReasoningPub {
         let event = ReasoningEvent::Add(info);
         self.event(event);
     }
+
+    pub fn show(&self, operation: Option<OperationDetails>) {
+        let event = ReasoningEvent::Show(operation);
+        self.event(event);
+    }
 }
 
 impl Publisher for ReasoningFlow {
@@ -56,7 +69,7 @@ impl Publisher for ReasoningFlow {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReasoningFlow {
     pub operations: Vec<OperationInfo>,
-    pub operation: Option<ReasoningOperation>,
+    pub operation: Option<OperationDetails>,
 }
 
 impl Default for ReasoningFlow {
@@ -77,30 +90,35 @@ impl Flow for ReasoningFlow {
             ReasoningEvent::Add(operation) => {
                 self.operations.push(operation);
             }
+            ReasoningEvent::Show(operation) => {
+                self.operation = operation;
+            }
         }
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OperationInfo {
-    pub id: Uuid,
+    pub id: OperationId,
     pub timestamp: NaiveDateTime,
     pub task: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum ReasoningOperation {
-    Request(ToolingChatRequest),
-    Response(ToolingChatResponse),
+pub struct OperationDetails {
+    pub id: OperationId,
+    pub operation: Operation,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ReasoningEvent {
     Add(OperationInfo),
+    Show(Option<OperationDetails>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ReasoningAction {
+    Show(Uuid),
     Operation(Operation),
 }
 
@@ -131,22 +149,4 @@ pub struct ReasoningRecord {
     pub timestamp: NaiveDateTime,
 }
 
-/*
-#[derive(
-    Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash, Display,
-)]
-pub struct ReasoningId {
-    id: Uuid,
-}
-
-impl ReasoningId {
-    pub fn new() -> Self {
-        Self { id: Uuid::new_v4() }
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ReasoningRecord {
-    pub task: String,
-}
-*/
+pub type OperationId = Uuid;

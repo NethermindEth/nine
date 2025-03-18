@@ -1,0 +1,18 @@
+.widget-traces {
+  display: flex;
+  flex-direction: row;
+
+  .widget-traces-list {
+    display: flex;
+    flex-direction: column;
+
+    .widget-traces-list-item {
+      padding: 1rem;
+      cursor: pointer;
+    }
+  }
+
+  .widget-traces-details {
+    flex-grow: 1;
+  }
+}

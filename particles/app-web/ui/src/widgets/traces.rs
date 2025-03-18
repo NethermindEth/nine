@@ -30,8 +30,12 @@ impl SubComponent for TracesComponent {
 
     fn render(&self, state: single::State<ReasoningFlow>, ctx: &SubContext<Self>) -> Option<Html> {
         html! {
-            <div>
-                { for state.operations.iter().map(|op| self.render_operation(op)) }
+            <div class="widget-traces">
+                <div class="widget-traces-list">
+                    { for state.operations.iter().map(|op| self.render_operation(op)) }
+                </div>
+                <div class="widget-traces-details">
+                </div>
             </div>
         }
         .into()
@@ -41,7 +45,7 @@ impl SubComponent for TracesComponent {
 impl TracesComponent {
     fn render_operation(&self, op: &OperationInfo) -> Html {
         html! {
-            <div>
+            <div class="widget-traces-list-item">
                 { &op.task }
             </div>
         }

@@ -58,6 +58,9 @@ impl OnEvent<Act<ReasoningFlow>> for TraceAgent {
                 self.tracer.operation(info);
                 self.load(id);
             }
+            ReasoningAction::Done => {
+                self.tracer.complete();
+            }
             ReasoningAction::Show(id) => {
                 self.load(id);
             }

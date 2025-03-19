@@ -122,22 +122,13 @@ impl ChatComponent {
         let tracer = {
             if let Some(tracer) = &item.tracer {
                 let onclick = ctx.event(Msg::OpenTraces(tracer.clone()));
-                if completed {
-                    Some(html! {
-                        <div class="widget-chat-reasoning">
-                            <div>{ "" }</div>
-                            <div {onclick} class="widget-chat-reasoning-open">{ "Open traces" }</div>
-                        </div>
-                    })
-                } else {
-                    let link = FqnLink::from(tracer.clone());
-                    Some(html! {
-                        <div class="widget-chat-reasoning">
-                            <widgets::ReasoningSummary {link} />
-                            <div {onclick} class="widget-chat-reasoning-open">{ "Open traces" }</div>
-                        </div>
-                    })
-                }
+                let link = FqnLink::from(tracer.clone());
+                Some(html! {
+                    <div class="widget-chat-reasoning">
+                        <widgets::ReasoningSummary {link} />
+                        <div {onclick} class="widget-chat-reasoning-open">{ "Open traces" }</div>
+                    </div>
+                })
             } else {
                 None
             }

@@ -29,10 +29,22 @@ impl SubComponent for ReasoningSummaryComponent {
     }
 
     fn render(&self, state: single::State<ReasoningFlow>, ctx: &SubContext<Self>) -> Option<Html> {
-        let operation = state.operations.last().map(|info| &info.task);
+        let operation = {
+            if state.completed {
+                None
+            } else {
+                let operation = state.operations.last().map(|info| &info.task);
+                html! {
+                    <div>{ operation }</div>
+                }
+                .into()
+            }
+        };
         html! {
             <div>
-                { operation}
+                <div>{ "Requests: "}{ state.stat.requests }</div>
+                <div>{ "Calls: "}{ state.stat.calls }</div>
+                <div>{ operation }</div>
             </div>
         }
         .into()

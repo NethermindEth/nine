@@ -40,6 +40,11 @@ impl ReasoningSub {
         self.action(action);
     }
 
+    pub fn done(&self) {
+        let action = ReasoningAction::Done;
+        self.action(action);
+    }
+
     // TODO: Take out to the separate service
 
     pub fn show(&self, id: OperationId) {
@@ -60,6 +65,11 @@ pub struct ReasoningPub {
 impl ReasoningPub {
     pub fn operation(&self, info: OperationInfo) {
         let event = ReasoningEvent::Add(info);
+        self.event(event);
+    }
+
+    pub fn complete(&self) {
+        let event = ReasoningEvent::Complete;
         self.event(event);
     }
 
@@ -84,6 +94,8 @@ pub struct ReasoningFlow {
     pub operations: Vec<OperationInfo>,
     pub operation: Option<OperationDetails>,
     pub stat: ReasoningStat,
+    // TODO: Add Reason (or error)
+    pub completed: bool,
 }
 
 impl Default for ReasoningFlow {
@@ -92,6 +104,7 @@ impl Default for ReasoningFlow {
             operations: Vec::new(),
             operation: None,
             stat: ReasoningStat::default(),
+            completed: false,
         }
     }
 }
@@ -114,6 +127,9 @@ impl Flow for ReasoningFlow {
                     }
                 }
                 self.operations.push(operation);
+            }
+            ReasoningEvent::Complete => {
+                self.completed = true;
             }
             ReasoningEvent::Show(operation) => {
                 self.operation = operation;
@@ -147,6 +163,7 @@ pub struct OperationDetails {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ReasoningEvent {
     Add(OperationInfo),
+    Complete,
     Show(Option<OperationDetails>),
 }
 
@@ -154,6 +171,7 @@ pub enum ReasoningEvent {
 pub enum ReasoningAction {
     Show(Uuid),
     Operation(Operation),
+    Done,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -108,6 +108,9 @@ impl RequestPerformer {
                 break;
             }
         }
+        if let Some(tracer) = &self.tracer {
+            tracer.done();
+        }
         Ok(())
     }
 

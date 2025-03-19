@@ -1,2 +1,2 @@
 serve:
-    RUST_LOG=info trunk serve
+    RUST_LOG=info trunk serve --watch ../../..

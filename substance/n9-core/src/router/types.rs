@@ -32,6 +32,7 @@ pub struct ActionableMessage {
     pub reason: Reason,
 }
 
+// TODO: Rename to `ToolRequest`
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ToolCall {
     pub call_id: CallId,
@@ -42,7 +43,7 @@ pub struct ToolCall {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Message {
     pub role: Role,
-    // TODO: Use enum here, since options are different
+    // TODO: Use enum here, since options are different, and use `Value` for tool call response
     pub content: String,
     pub call_id: Option<CallId>,
     pub tool_calls: Vec<ToolCall>,
@@ -69,7 +70,8 @@ impl From<(CallId, ToolResponse)> for Message {
     fn from((call_id, response): (CallId, ToolResponse)) -> Self {
         Self {
             role: Role::Tool,
-            content: response.content,
+            // Use the raw `Value` here
+            content: serde_json::to_string(&response.value).unwrap(),
             call_id: Some(call_id),
             tool_calls: Vec::new(),
         }
@@ -206,5 +208,8 @@ pub struct ToolMeta {
 
 #[derive(Serialize, Deserialize, Debug, Clone, From)]
 pub struct ToolResponse {
-    pub content: String,
+    // TODO: Add these fields
+    // pub call_id: CallId,
+    // pub tool_id: ToolId,
+    pub value: Value,
 }

@@ -1,8 +1,9 @@
-use crate::router::types::{ToolCall, ToolingChatRequest, ToolingChatResponse};
+use crate::router::types::{ToolCall, ToolResponse, ToolingChatRequest, ToolingChatResponse};
 use chrono::NaiveDateTime;
 use crb::core::uuid::Uuid;
 use derive_more::{Deref, DerefMut, Display, From, Into};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::BTreeMap;
 use ui9::names::Fqn;
 use ui9_dui::flow::{Flow, Unified};
@@ -29,6 +30,12 @@ impl ReasoningSub {
 
     pub fn tool_call(&self, call: ToolCall) {
         let operation = Operation::ToolCall(call);
+        let action = ReasoningAction::Operation(operation);
+        self.action(action);
+    }
+
+    pub fn tool_call_result(&self, response: ToolResponse) {
+        let operation = Operation::ToolCallResult(response);
         let action = ReasoningAction::Operation(operation);
         self.action(action);
     }
@@ -127,6 +134,7 @@ pub enum Operation {
     Request(ToolingChatRequest),
     Response(ToolingChatResponse),
     ToolCall(ToolCall),
+    ToolCallResult(ToolResponse),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

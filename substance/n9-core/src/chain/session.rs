@@ -177,6 +177,9 @@ impl<'a> Caller<'a> {
         let fetcher = self.router.get_tool(self.tool_call.tool_id);
         let link = fetcher.await?;
         let response = link.call_tool(self.tool_call.args).await?;
+        if let Some(tracer) = self.tracer {
+            tracer.tool_call_result(response.clone());
+        }
         let message = Message::from((self.tool_call.call_id, response));
         Ok(message)
     }

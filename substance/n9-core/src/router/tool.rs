@@ -82,8 +82,8 @@ where
         ctx: &mut Context<Self>,
     ) -> Result<()> {
         let output = self.call_tool(msg, ctx).await?;
-        let content = serde_json::to_string(&output)?;
-        let res = ToolResponse { content };
+        let value = serde_json::to_value(&output)?;
+        let res = ToolResponse { value };
         responder.send_result(Ok(res))
     }
 
@@ -186,6 +186,7 @@ impl OnRequest<AddTool> for ReasoningRouter {
     }
 }
 
+// TODO: Reuse a struct from `types`: `ToolCall` renamed to `ToolRequest`
 pub struct ToolRequest {
     pub value: Value,
 }

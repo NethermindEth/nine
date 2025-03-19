@@ -13,7 +13,7 @@
     justify-content: space-between;
 
     .widget-chat-reasoning-open {
-      color: #52A021;
+      color: var(--fg-link);
       cursor: pointer;
     }
   }
@@ -22,7 +22,7 @@
     width: 100%;
     padding: 1rem;
     border-radius: 1rem;
-    background: #0D2438;
+    background: var(--bg-input);
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -31,10 +31,9 @@
       width: 100%;
       height: 4rem;
       border: 0px;
-      background: #0D2438;
+      background: var(--bg-input);
       outline: none;
       resize: none;
-      color: white;
       font-size: 1rem;
     }
 
@@ -54,7 +53,7 @@
         background: white;
         height: 2rem;
         border-radius: 0.6rem;
-        background: #38536b;
+        background: var(--bg-button);
         padding: 0.2rem 1rem;
         cursor: pointer;
       }
@@ -102,7 +101,7 @@
       .widget-chat-request {
         margin-left: 30%;
         padding: 1rem 2rem;
-        background: #1a2934;
+        background: var(--bg-bubble);
         border-radius: 1rem;
       }
 

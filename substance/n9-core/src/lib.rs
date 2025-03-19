@@ -15,6 +15,6 @@ pub use router::model::{Model, ModelLink};
 pub use router::tool::{Prompt, Tool, ToolLink};
 pub use router::types::{
     ActionableMessage, ChatRequest, ChatResponse, Message, Reason, Role, ToolCall, ToolInfo,
-    ToolMeta, ToolResponse, ToolingChatRequest, ToolingChatResponse,
+    ToolMeta, ToolResult, ToolingChatRequest, ToolingChatResponse,
 };
 pub use router::RouterLink;

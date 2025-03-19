@@ -1,4 +1,4 @@
-use super::types::{ToolId, ToolInfo, ToolMeta, ToolResponse};
+use super::types::{ToolId, ToolInfo, ToolMeta, ToolResult};
 use super::{ReasoningRouter, RouterLink};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -78,12 +78,12 @@ where
     async fn handle_response(
         &mut self,
         msg: P,
-        responder: Responder<ToolResponse>,
+        responder: Responder<ToolResult>,
         ctx: &mut Context<Self>,
     ) -> Result<()> {
         let output = self.call_tool(msg, ctx).await?;
         let value = serde_json::to_value(&output)?;
-        let res = ToolResponse { value };
+        let res = ToolResult { value };
         responder.send_result(Ok(res))
     }
 
@@ -98,7 +98,7 @@ pub struct ToolLink {
 }
 
 pub trait ToolAddress: Sync + Send {
-    fn call_tool(&self, value: Value) -> Fetcher<ToolResponse>;
+    fn call_tool(&self, value: Value) -> Fetcher<ToolResult>;
 }
 
 struct ToolLinkRaw<P> {
@@ -109,7 +109,7 @@ impl<P> ToolAddress for ToolLinkRaw<P>
 where
     P: Prompt,
 {
-    fn call_tool(&self, value: Value) -> Fetcher<ToolResponse> {
+    fn call_tool(&self, value: Value) -> Fetcher<ToolResult> {
         let request = ToolRequest { value };
         let (interplay, fetcher) = Interplay::new_pair(request);
         let interaction = Interaction { interplay };
@@ -192,7 +192,7 @@ pub struct ToolRequest {
 }
 
 impl Request for ToolRequest {
-    type Response = ToolResponse;
+    type Response = ToolResult;
 }
 
 struct CallTool<P> {

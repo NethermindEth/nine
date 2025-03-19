@@ -32,14 +32,6 @@ pub struct ActionableMessage {
     pub reason: Reason,
 }
 
-// TODO: Rename to `ToolRequest`
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ToolCall {
-    pub call_id: CallId,
-    pub tool_id: ToolId,
-    pub args: Value,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Message {
     pub role: Role,
@@ -66,8 +58,8 @@ impl From<ActionableMessage> for Message {
     }
 }
 
-impl From<(CallId, ToolResponse)> for Message {
-    fn from((call_id, response): (CallId, ToolResponse)) -> Self {
+impl From<(CallId, ToolResult)> for Message {
+    fn from((call_id, response): (CallId, ToolResult)) -> Self {
         Self {
             role: Role::Tool,
             // Use the raw `Value` here
@@ -206,8 +198,15 @@ pub struct ToolMeta {
     pub parameters: Option<RootSchema>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ToolCall {
+    pub call_id: CallId,
+    pub tool_id: ToolId,
+    pub args: Value,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, From)]
-pub struct ToolResponse {
+pub struct ToolResult {
     // TODO: Add these fields
     // pub call_id: CallId,
     // pub tool_id: ToolId,

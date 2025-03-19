@@ -52,6 +52,7 @@ impl OnEvent<Act<ReasoningFlow>> for TraceAgent {
                     id,
                     timestamp: Utc::now().naive_utc(),
                     task: self.reason(&operation),
+                    op_type: operation.get_type(),
                 };
                 self.operations.insert(id, operation);
                 self.tracer.operation(info);

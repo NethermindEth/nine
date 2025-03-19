@@ -5,6 +5,8 @@
   .widget-traces-list {
     display: flex;
     flex-direction: column;
+    width: 200px;
+    flex-shrink: 0;
 
     .widget-traces-list-item {
       padding: 1rem;

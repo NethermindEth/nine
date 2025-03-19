@@ -73,10 +73,17 @@ impl Publisher for ReasoningFlow {
     type Driver = ReasoningPub;
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ReasoningStat {
+    pub calls: u32,
+    pub requests: u32,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ReasoningFlow {
     pub operations: Vec<OperationInfo>,
     pub operation: Option<OperationDetails>,
+    pub stat: ReasoningStat,
 }
 
 impl Default for ReasoningFlow {
@@ -84,6 +91,7 @@ impl Default for ReasoningFlow {
         Self {
             operations: Vec::new(),
             operation: None,
+            stat: ReasoningStat::default(),
         }
     }
 }
@@ -95,6 +103,16 @@ impl Flow for ReasoningFlow {
     fn apply(&mut self, event: Self::Event) {
         match event {
             ReasoningEvent::Add(operation) => {
+                match &operation.op_type {
+                    OperationType::Request => {
+                        self.stat.requests += 1;
+                    }
+                    OperationType::ToolCall => {
+                        self.stat.calls += 1;
+                    }
+                    _ => {
+                    }
+                }
                 self.operations.push(operation);
             }
             ReasoningEvent::Show(operation) => {
@@ -109,6 +127,15 @@ pub struct OperationInfo {
     pub id: OperationId,
     pub timestamp: NaiveDateTime,
     pub task: String,
+    pub op_type: OperationType,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum OperationType {
+    Request,
+    Response,
+    ToolCall,
+    ToolResult,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -135,6 +162,25 @@ pub enum Operation {
     Response(ToolingChatResponse),
     ToolCall(ToolCall),
     ToolResult(ToolResult),
+}
+
+impl Operation {
+    pub fn get_type(&self) -> OperationType {
+        match self {
+            Self::Request(_) => {
+                OperationType::Request
+            }
+            Self::Response(_) => {
+                OperationType::Response
+            }
+            Self::ToolCall(_) => {
+                OperationType::ToolCall
+            }
+            Self::ToolResult(_) => {
+                OperationType::ToolResult
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,0 +1,25 @@
+.widget-reasoning-summary {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+
+  .widget-reasoning-summary-requests {
+    width: 3rem;
+    &::before {
+      font-family: "Font Awesome 6 Free";
+      content: "\e69b";
+      font-weight: 900;
+      margin-right: 0.5rem;
+    }
+  }
+
+  .widget-reasoning-summary-calls {
+    width: 3rem;
+    &::before {
+      font-family: "Font Awesome 6 Free";
+      content: "\f7d9";
+      font-weight: 900;
+      margin-right: 0.5rem;
+    }
+  }
+}

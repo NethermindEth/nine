@@ -41,9 +41,9 @@ impl SubComponent for ReasoningSummaryComponent {
             }
         };
         html! {
-            <div>
-                <div>{ "Requests: "}{ state.stat.requests }</div>
-                <div>{ "Calls: "}{ state.stat.calls }</div>
+            <div class="widget-reasoning-summary">
+                <div class="widget-reasoning-summary-requests">{ state.stat.requests }</div>
+                <div class="widget-reasoning-summary-calls">{ state.stat.calls }</div>
                 <div>{ operation }</div>
             </div>
         }

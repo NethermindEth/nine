@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
 use async_openai::types::*;
 use n9_core::{
-    ActionableMessage, Message as MessageN9, Reason, Role as RoleN9, ToolCall, ToolInfo,
+    ActionableMessage, CallInfo, Message as MessageN9, Reason, Role as RoleN9, ToolCall, ToolInfo,
 };
 use schemars::schema::RootSchema;
 use serde_json::{json, Value};
@@ -133,20 +133,20 @@ fn reason(finish_reason: Option<FinishReason>) -> Reason {
 
 fn tool_call_convert(call: ChatCompletionMessageToolCall) -> Result<ToolCall> {
     let args = serde_json::from_str(&call.function.arguments)?;
-    Ok(ToolCall {
+    let info = CallInfo {
         call_id: call.id,
         tool_id: call.function.name.into(),
-        args,
-    })
+    };
+    Ok(ToolCall { info, args })
 }
 
 fn tool_call_to_chat(tool_call: ToolCall) -> Result<ChatCompletionMessageToolCall> {
     let arguments = serde_json::to_string(&tool_call.args)?;
     Ok(ChatCompletionMessageToolCall {
-        id: tool_call.call_id,
+        id: tool_call.info.call_id,
         r#type: ChatCompletionToolType::Function,
         function: FunctionCall {
-            name: tool_call.tool_id,
+            name: tool_call.info.tool_id,
             arguments,
         },
     })

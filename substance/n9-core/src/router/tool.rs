@@ -1,4 +1,4 @@
-use super::types::{ToolId, ToolInfo, ToolMeta, ToolResult};
+use super::types::{CallInfo, ToolCall, ToolId, ToolInfo, ToolMeta, ToolResult};
 use super::{ReasoningRouter, RouterLink};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -63,12 +63,13 @@ where
     async fn handle_request(
         &mut self,
         // TODO: Use a custom wrapper for `Interplay`
-        msg: Interaction<ToolRequest>,
+        msg: Interaction<ToolCall>,
         ctx: &mut Context<Self>,
     ) -> Result<()> {
-        match serde_json::from_value(msg.interplay.request.value) {
+        let info = msg.interplay.request.info;
+        match serde_json::from_value(msg.interplay.request.args) {
             Ok(request) => {
-                self.handle_response(request, msg.interplay.responder, ctx)
+                self.handle_response(info, request, msg.interplay.responder, ctx)
                     .await
             }
             Err(err) => msg.interplay.responder.send_result(Err(err.into())),
@@ -77,13 +78,14 @@ where
 
     async fn handle_response(
         &mut self,
+        info: CallInfo,
         msg: P,
         responder: Responder<ToolResult>,
         ctx: &mut Context<Self>,
     ) -> Result<()> {
         let output = self.call_tool(msg, ctx).await?;
         let value = serde_json::to_value(&output)?;
-        let res = ToolResult { value };
+        let res = ToolResult { info, value };
         responder.send_result(Ok(res))
     }
 
@@ -98,7 +100,7 @@ pub struct ToolLink {
 }
 
 pub trait ToolAddress: Sync + Send {
-    fn call_tool(&self, value: Value) -> Fetcher<ToolResult>;
+    fn call_tool(&self, request: ToolCall) -> Fetcher<ToolResult>;
 }
 
 struct ToolLinkRaw<P> {
@@ -109,8 +111,7 @@ impl<P> ToolAddress for ToolLinkRaw<P>
 where
     P: Prompt,
 {
-    fn call_tool(&self, value: Value) -> Fetcher<ToolResult> {
-        let request = ToolRequest { value };
+    fn call_tool(&self, request: ToolCall) -> Fetcher<ToolResult> {
         let (interplay, fetcher) = Interplay::new_pair(request);
         let interaction = Interaction { interplay };
         let msg = CallTool {
@@ -186,18 +187,13 @@ impl OnRequest<AddTool> for ReasoningRouter {
     }
 }
 
-// TODO: Reuse a struct from `types`: `ToolCall` renamed to `ToolRequest`
-pub struct ToolRequest {
-    pub value: Value,
-}
-
-impl Request for ToolRequest {
+impl Request for ToolCall {
     type Response = ToolResult;
 }
 
 struct CallTool<P> {
     _type: PhantomData<P>,
-    interaction: Interaction<ToolRequest>,
+    interaction: Interaction<ToolCall>,
 }
 
 #[async_trait]

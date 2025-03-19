@@ -157,7 +157,7 @@ struct Caller<'a> {
 
 impl<'a> Caller<'a> {
     async fn call(self) -> Message {
-        let call_id = self.tool_call.call_id.clone();
+        let call_id = self.tool_call.info.call_id.clone();
         match self.call_or_fail().await {
             Ok(message) => message,
             Err(err) => Message {
@@ -170,17 +170,17 @@ impl<'a> Caller<'a> {
     }
 
     async fn call_or_fail(mut self) -> Result<Message> {
-        let id = self.tool_call.tool_id.clone();
+        let id = self.tool_call.info.tool_id.clone();
         if let Some(tracer) = self.tracer {
             tracer.tool_call(self.tool_call.clone());
         }
-        let fetcher = self.router.get_tool(self.tool_call.tool_id);
+        let fetcher = self.router.get_tool(self.tool_call.info.tool_id.clone());
         let link = fetcher.await?;
-        let response = link.call_tool(self.tool_call.args).await?;
+        let response = link.call_tool(self.tool_call.clone()).await?;
         if let Some(tracer) = self.tracer {
             tracer.tool_call_result(response.clone());
         }
-        let message = Message::from((self.tool_call.call_id, response));
+        let message = Message::from((self.tool_call.info.call_id, response));
         Ok(message)
     }
 }

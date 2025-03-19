@@ -199,16 +199,19 @@ pub struct ToolMeta {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ToolCall {
+pub struct CallInfo {
     pub call_id: CallId,
     pub tool_id: ToolId,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ToolCall {
+    pub info: CallInfo,
     pub args: Value,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, From)]
 pub struct ToolResult {
-    // TODO: Add these fields
-    // pub call_id: CallId,
-    // pub tool_id: ToolId,
+    pub info: CallInfo,
     pub value: Value,
 }

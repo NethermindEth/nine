@@ -2,19 +2,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Niramit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
 
+@import 'themes';
 @import 'widgets';
 
-$background: #0d1c27;
-$foreground: #ededed;
-$logo-size: 48px;
+$logo-size: 32px;
 
 * {
   box-sizing: border-box;
 }
 
 body {
-  background: $background;
-  color: $foreground;
   margin: 0;
   padding: 0;
   // font-family: "League Spartan", sans-serif;
@@ -71,7 +68,6 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  background: $background;
   opacity: 0.5;
   height: 0;
   // animation: grow 5s forwards;

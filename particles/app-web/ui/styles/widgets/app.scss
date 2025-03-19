@@ -2,16 +2,17 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+  color: var(--fg-text);
 
   .app-header {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    background: var(--bg-bar);
 
-    padding: 0.5rem 1rem;
-    background: #09151d;
-    border-bottom: 1px solid #2e280b;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--fg-line);
     box-shadow: 0px 1px 32px #1d1c19;
 
     .app-header-title {
@@ -30,19 +31,21 @@
       padding: 2rem;
       width: 300px;
       flex-shrink: 0;
+      background: var(--bg-panel);
     }
 
     .app-content-center {
       height: 100%;
       padding: 2rem;
       flex-grow: 1;
-      background: #0D151B;
+      background: var(--bg-chat);
     }
 
     .app-content-right {
       padding: 2rem;
       width: 300px;
       flex-shrink: 0;
+      background: var(--bg-panel);
     }
   }
 }

@@ -69,11 +69,11 @@ impl SubComponent for DashboardComponent {
             }
         };
         html! {
-            <div class="app">
+            <div class="app theme-light">
                 <div class="app-header">
                     <div class="loader">
                         <div class="loader-container">
-                            <img src="static/logo.png" />
+                            <img src="static/logos/SVG/Nine_Icon.svg" />
                             <div class="loader-overlay"></div>
                         </div>
                     </div>

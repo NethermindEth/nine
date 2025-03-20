@@ -1,2 +1,6 @@
 target
 .idea
+.cargo
+.env
+nine*toml
+particles

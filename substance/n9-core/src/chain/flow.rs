@@ -1,12 +1,9 @@
 use crate::router::types::{ToolCall, ToolResult, ToolingChatRequest, ToolingChatResponse};
 use chrono::NaiveDateTime;
 use crb::core::uuid::Uuid;
-use derive_more::{Deref, DerefMut, Display, From, Into};
+use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::collections::BTreeMap;
-use ui9::names::Fqn;
-use ui9_dui::flow::{Flow, Unified};
+use ui9_dui::flow::Flow;
 use ui9_dui::publisher::{Publisher, Tracer};
 use ui9_dui::subscriber::{Listener, Subscriber};
 
@@ -123,8 +120,7 @@ impl Flow for ReasoningFlow {
                     OperationType::ToolCall => {
                         self.stat.calls += 1;
                     }
-                    _ => {
-                    }
+                    _ => {}
                 }
                 self.operations.push(operation);
             }
@@ -185,18 +181,10 @@ pub enum Operation {
 impl Operation {
     pub fn get_type(&self) -> OperationType {
         match self {
-            Self::Request(_) => {
-                OperationType::Request
-            }
-            Self::Response(_) => {
-                OperationType::Response
-            }
-            Self::ToolCall(_) => {
-                OperationType::ToolCall
-            }
-            Self::ToolResult(_) => {
-                OperationType::ToolResult
-            }
+            Self::Request(_) => OperationType::Request,
+            Self::Response(_) => OperationType::Response,
+            Self::ToolCall(_) => OperationType::ToolCall,
+            Self::ToolResult(_) => OperationType::ToolResult,
         }
     }
 }

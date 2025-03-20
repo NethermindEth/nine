@@ -1,10 +1,9 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
 use crb::core::Slot;
 use n9_core::{ChatRequest, Message, Particle, Prompt, Role, SubstanceBond, SubstanceLinks, Tool};
 use schemars::{schema_for, JsonSchema};
-use serde_json::Value;
 use std::marker::PhantomData;
 
 #[async_trait]

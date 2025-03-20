@@ -1,12 +1,9 @@
-use crate::chain::flow::OperationInfo;
 use crate::chain::ReasoningFlow;
 use crate::router::types::{ChatRequest, ChatResponse, Message, Role, ToolCall};
 use crate::router::RouterLink;
 use anyhow::Result;
 use async_trait::async_trait;
-use chrono::Utc;
 use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};
-use crb::core::uuid::Uuid;
 use crb::superagent::{Fetcher, InteractExt, OnRequest};
 use derive_more::{Deref, DerefMut};
 use futures::future::join_all;
@@ -173,7 +170,7 @@ impl<'a> Caller<'a> {
     }
 
     async fn call_or_fail(mut self) -> Result<Message> {
-        let id = self.tool_call.info.tool_id.clone();
+        // let id = self.tool_call.info.tool_id.clone();
         if let Some(tracer) = self.tracer {
             tracer.tool_call(self.tool_call.clone());
         }

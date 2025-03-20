@@ -3,14 +3,14 @@ use crate::flow::session_control::SessionKey;
 use crate::trace_agent::TraceAgent;
 use anyhow::{Error, Result};
 use async_trait::async_trait;
-use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next, OnEvent};
+use crb::agent::{Address, Agent, Context, DoAsync, Equip, Next, OnEvent};
 use crb::core::uuid::Uuid;
 use crb::superagent::{Fetcher, PingExt, StreamSession, Supervisor, SupervisorSession};
 use n9_core::chain::ReasoningFlow;
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
 use std::collections::HashMap;
 use ui9::names::Fqn;
-use ui9_dui::{Act, Link, Operation, Pub};
+use ui9_dui::{Act, Link, Pub};
 use ui9_net::MeshNode;
 
 pub struct ChatControlLoop {

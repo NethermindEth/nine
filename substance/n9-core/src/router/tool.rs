@@ -10,7 +10,6 @@ use crb::superagent::{
 use derive_more::{Deref, DerefMut};
 use schemars::{schema::RootSchema, schema_for, JsonSchema};
 use serde::{de::DeserializeOwned, Serialize};
-use serde_json::Value;
 use std::any::type_name;
 use std::marker::PhantomData;
 use std::sync::Arc;

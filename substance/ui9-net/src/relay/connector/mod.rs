@@ -144,7 +144,7 @@ impl Connector {
                 self.peer_tracer.del_peer(peer_id);
                 log::debug!("Connection to {peer_id} has closed");
             }
-            SwarmEvent::IncomingConnection { connection_id, .. } => {}
+            SwarmEvent::IncomingConnection { .. } => {}
             other => {
                 log::warn!("Not handeled p2p event: {other:?}");
             }

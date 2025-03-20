@@ -1,4 +1,4 @@
-<img src="https://nethermindeth.github.io/nine/assets/nine-logo.png" width="300px"/>
+<img src="https://nethermindeth.github.io/nine/assets/logo/PNG/Nine_Logo_Full_Dark@2x.png" width="300px"/>
 
 # NINE - Neural Interconnected Nodes Engine
 

@@ -26,6 +26,7 @@ ui9.workspace = true
 ui9-dui.workspace = true
 ui9-tracers.workspace = true
 ui9-net.workspace = true
+strum.workspace = true
 
 [features]
 default = ["std"]

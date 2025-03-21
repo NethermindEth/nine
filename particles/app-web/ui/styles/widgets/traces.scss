@@ -1,6 +1,7 @@
 .widget-traces {
   display: flex;
   flex-direction: row;
+  gap: 2rem;
 
   .widget-traces-list {
     display: flex;
@@ -16,5 +17,21 @@
 
   .widget-traces-details {
     flex-grow: 1;
+  }
+}
+
+.widget-traces-message {
+  padding: 1rem;
+  background: white;
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+
+  .widget-traces-message-role {
+    font-size: 0.6rem;
+    width: 10%;
+  }
+
+  .widget-traces-message-content {
   }
 }

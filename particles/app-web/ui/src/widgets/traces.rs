@@ -1,8 +1,7 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
-use n9_core::chain::{OperationDetails, OperationId, OperationInfo, ReasoningFlow};
-use std::mem::swap;
-use ui9_markdown::MarkdownRender;
-use yew::{html, Html, InputEvent, TargetCast};
+use n9_core::chain::{Operation, OperationDetails, OperationId, OperationInfo, ReasoningFlow};
+use n9_core::{Message, ToolCall, ToolResult, ToolingChatRequest, ToolingChatResponse};
+use yew::{html, Html};
 
 pub type TracesWidget = SubWidget<TracesComponent>;
 
@@ -61,9 +60,45 @@ impl TracesComponent {
         }
     }
 
-    fn render_details(&self, op: &OperationDetails, ctx: &SubContext<Self>) -> Html {
+    fn render_details(&self, details: &OperationDetails, ctx: &SubContext<Self>) -> Html {
+        match &details.operation {
+            Operation::Request(value) => self.render_request(value, ctx),
+            Operation::Response(value) => self.render_response(value, ctx),
+            Operation::ToolCall(value) => self.render_tool_call(value, ctx),
+            Operation::ToolResult(value) => self.render_tool_result(value, ctx),
+        }
+    }
+
+    fn render_request(&self, request: &ToolingChatRequest, ctx: &SubContext<Self>) -> Html {
         html! {
-            { format!("{op:?}") }
+            <div class="widget-traces-request">
+                { for request.messages.iter().map(|msg| self.render_message(msg, ctx)) }
+            </div>
+        }
+    }
+
+    fn render_response(&self, response: &ToolingChatResponse, ctx: &SubContext<Self>) -> Html {
+        html! {}
+    }
+
+    fn render_tool_call(&self, tool_call: &ToolCall, ctx: &SubContext<Self>) -> Html {
+        html! {}
+    }
+
+    fn render_tool_result(&self, tool_result: &ToolResult, ctx: &SubContext<Self>) -> Html {
+        html! {}
+    }
+
+    fn render_message(&self, message: &Message, ctx: &SubContext<Self>) -> Html {
+        html! {
+            <div class="widget-traces-message">
+                <div class="widget-traces-message-content">
+                    { &message.content }
+                </div>
+                <div class="widget-traces-message-role">
+                    { message.role.to_string() }
+                </div>
+            </div>
         }
     }
 }

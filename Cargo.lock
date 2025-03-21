@@ -2046,7 +2046,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with 3.12.0",
- "strum",
+ "strum 0.26.3",
  "thiserror 2.0.12",
  "tokio",
  "tokio-tungstenite",
@@ -5216,6 +5216,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "strum 0.27.1",
  "toml",
  "typed-slab",
  "typedmap",
@@ -5357,7 +5358,7 @@ dependencies = [
  "log",
  "rustc-hash 1.1.0",
  "spirv",
- "strum",
+ "strum 0.26.3",
  "termcolor",
  "thiserror 2.0.12",
  "unicode-xid",
@@ -6604,7 +6605,7 @@ dependencies = [
  "itertools",
  "lru",
  "paste",
- "strum",
+ "strum 0.26.3",
  "unicode-segmentation",
  "unicode-truncate",
  "unicode-width 0.2.0",
@@ -7757,6 +7758,12 @@ checksum = "8fec0f0aef304996cf250b31b5a10dee7980c85da9d759361292b8bca5a18f06"
 dependencies = [
  "strum_macros",
 ]
+
+[[package]]
+name = "strum"
+version = "0.27.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f64def088c51c9510a8579e3c5d67c65349dcf755e5479ad3d010aa6454e2c32"
 
 [[package]]
 name = "strum_macros"

@@ -3,8 +3,9 @@ use derive_more::From;
 use schemars::schema::RootSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use strum::Display;
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Display, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Role {
     /// System
     Developer,

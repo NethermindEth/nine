@@ -1,5 +1,5 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
-use n9_core::chain::{OperationId, OperationInfo, ReasoningFlow};
+use n9_core::chain::{OperationDetails, OperationId, OperationInfo, ReasoningFlow};
 use std::mem::swap;
 use ui9_markdown::MarkdownRender;
 use yew::{html, Html, InputEvent, TargetCast};
@@ -37,18 +37,13 @@ impl SubComponent for TracesComponent {
     }
 
     fn render(&self, state: single::State<ReasoningFlow>, ctx: &SubContext<Self>) -> Option<Html> {
-        let details = state.operation.as_ref().map(|operation| {
-            html! {
-                { format!("{operation:?}") }
-            }
-        });
         html! {
             <div class="widget-traces">
                 <div class="widget-traces-list">
                     { for state.operations.iter().map(|op| self.render_operation(op, ctx)) }
                 </div>
                 <div class="widget-traces-details">
-                    { details }
+                    { state.operation.as_ref().map(|op| self.render_details(op, ctx)) }
                 </div>
             </div>
         }
@@ -63,6 +58,12 @@ impl TracesComponent {
             <div {onclick} class="widget-traces-list-item">
                 { &op.task }
             </div>
+        }
+    }
+
+    fn render_details(&self, op: &OperationDetails, ctx: &SubContext<Self>) -> Html {
+        html! {
+            { format!("{op:?}") }
         }
     }
 }

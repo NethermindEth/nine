@@ -1,6 +1,8 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use n9_core::chain::{Operation, OperationDetails, OperationId, OperationInfo, ReasoningFlow};
-use n9_core::{Message, ToolCall, ToolResult, ToolingChatRequest, ToolingChatResponse};
+use n9_core::{
+    ActionableMessage, Message, ToolCall, ToolResult, ToolingChatRequest, ToolingChatResponse,
+};
 use yew::{html, Html};
 
 pub type TracesWidget = SubWidget<TracesComponent>;
@@ -78,7 +80,11 @@ impl TracesComponent {
     }
 
     fn render_response(&self, response: &ToolingChatResponse, ctx: &SubContext<Self>) -> Html {
-        html! {}
+        html! {
+            <div class="widget-traces-response">
+                { for response.messages.iter().map(|msg| self.render_actionable(msg, ctx)) }
+            </div>
+        }
     }
 
     fn render_tool_call(&self, tool_call: &ToolCall, ctx: &SubContext<Self>) -> Html {
@@ -97,6 +103,17 @@ impl TracesComponent {
                 </div>
                 <div class="widget-traces-message-role">
                     { message.role.to_string() }
+                </div>
+            </div>
+        }
+    }
+
+    fn render_actionable(&self, message: &ActionableMessage, ctx: &SubContext<Self>) -> Html {
+        html! {
+            <div class="widget-traces-actionable-message">
+                { self.render_message(&message.message, ctx) }
+                <div class="widget-traces-reason">
+                    { message.reason.to_string() }
                 </div>
             </div>
         }

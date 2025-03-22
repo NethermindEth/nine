@@ -15,7 +15,7 @@ pub enum Role {
     Tool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Display, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Reason {
     Stop,
     Call,

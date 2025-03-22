@@ -25,13 +25,28 @@
   background: white;
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: 3rem;
 
   .widget-traces-message-role {
-    font-size: 0.6rem;
+    font-size: 0.8rem;
     width: 10%;
+    opacity: 0.6;
+    text-align: right;
   }
 
   .widget-traces-message-content {
+    flex-grow: 1;
   }
+}
+
+.widget-traces-actionable-message {
+  display: flex;
+  flex-direction: column;
+  background: #F8F8F8;
+}
+
+.widget-traces-reason {
+  padding: 0.5rem 1rem;
+  color: red;
 }

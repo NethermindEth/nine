@@ -1,0 +1,12 @@
+[package]
+name = "n9-wasmer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords.workspace = true
+
+[dependencies]
+wasmer = "5.0.4"
+wasmer-wasi = "3.1.1"

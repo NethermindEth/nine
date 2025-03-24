@@ -8,10 +8,10 @@ rust-version = "1.84.1"
 keywords = ["ai", "ai-agent", "framework"]
 
 [dependencies]
-anyhow = "1.0.96"
-async-trait = "0.1.86"
+anyhow = "1.0.97"
+async-trait = "0.1.88"
 crb = { version = "0.0.31", default-features = false, features = ["web"] }
-log = "0.4.26"
+log = "0.4.27"
 wasm-logger = "0.2.0"
 yew = { version = "0.21.0", features = ["csr"] }
 ui9 = { path = "../../../substance/ui9" }
@@ -28,5 +28,5 @@ n9-control-session = { path = "../../../particles/control-session", default-feat
 derive_more = "2.0.1"
 web-sys = "0.3.77"
 libp2p = "0.55.0"
-serde = "1.0.218"
+serde = "1.0.219"
 futures = "0.3.31"

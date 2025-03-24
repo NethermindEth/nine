@@ -21,18 +21,18 @@ keywords = ["ai", "ai-agent", "framework"]
 
 [workspace.dependencies]
 anyhow = "1.0.97"
-async-trait = "0.1.87"
-bytes = "1.10.0"
+async-trait = "0.1.88"
+bytes = "1.10.1"
 chrono = { version = "0.4.40", features = ["serde"] }
 console-subscriber = "0.4.1"
-clap = { version = "4.5.31", features = ["derive"] }
+clap = { version = "4.5.32", features = ["derive"] }
 crb = { version = "0.0.31", default-features = false }
 crb-system = { version = "0.0.31" }
 derive_more = { version = "2.0.1", features = ["full"] }
 dotenvy = "0.15.7"
-eframe = "0.31.0"
-egui = "0.31.0"
-env_logger = "0.11.6"
+eframe = "0.31.1"
+egui = "0.31.1"
+env_logger = "0.11.7"
 envy = "0.4.2"
 flexbuffers = "25.2.10"
 futures = "0.3.31"
@@ -50,15 +50,15 @@ n9-std = { version = "0.0.1", path = "substance/n9-std" }
 libp2p = { version = "0.55.0", default-features = false, features = ["gossipsub", "macros", "noise", "plaintext", "serde", "quic", "yamux"] }
 libp2p-stream = "0.3.0-alpha"
 futures-bounded = "0.2.4"
-log = "0.4.26"
+log = "0.4.27"
 regex = "1.11.1"
 schemars = { version = "0.8.22", features = ["derive"] }
-serde = { version = "1.0.218", features = ["derive"] }
+serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 strum = { version = "0.27.1", features = ["derive"] }
 smallvec = "1.14.0"
 thiserror = "2.0.12"
-tokio = "1.43.0"
+tokio = "1.44.1"
 tokio-stream = "0.1.17"
 toml = "0.8.20"
 tracing = "0.1.41"

@@ -5912,6 +5912,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-runtime-wasm"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "crb",
+ "n9-core",
+ "wasmer 5.0.4",
+ "wasmer-wasi",
+]
+
+[[package]]
 name = "n9-system-info"
 version = "0.0.1"
 dependencies = [
@@ -5923,14 +5935,6 @@ dependencies = [
  "serde",
  "ui9-app",
  "ui9-dui",
-]
-
-[[package]]
-name = "n9-wasmer"
-version = "0.0.1"
-dependencies = [
- "wasmer 5.0.4",
- "wasmer-wasi",
 ]
 
 [[package]]
@@ -9546,7 +9550,7 @@ dependencies = [
  "n9-exchange-dydx",
  "n9-model-anthropic",
  "n9-model-openai",
- "n9-wasmer",
+ "n9-runtime-wasm",
  "tokio",
  "ui9-mesh",
 ]

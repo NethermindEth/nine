@@ -1,5 +1,5 @@
 [package]
-name = "n9-wasmer"
+name = "n9-runtime-wasm"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -8,5 +8,9 @@ rust-version.workspace = true
 keywords.workspace = true
 
 [dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+crb = { workspace = true, features = ["std"] }
+n9-core.workspace = true
 wasmer = "5.0.4"
 wasmer-wasi = "3.1.1"

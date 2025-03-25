@@ -58,13 +58,16 @@ impl<A: Agent> SubstanceBond<A> {
         self.substance.router.add_model(address)
     }
 
-    pub async fn add_tool<P>(&mut self, tool: &A) -> Result<()>
+    // TODO: Add a methods `new_toolkit`, than use it to add tools
+    pub async fn add_tool<P>(&mut self, tool: &A, toolkit: &str, skill: &str) -> Result<()>
     where
         A: Tool<P>,
         P: Prompt,
     {
         let address = self.address.clone();
         let meta = ToolMeta {
+            toolkit: toolkit.to_string(),
+            skill: skill.to_string(),
             name: tool.name(),
             description: tool.description(),
             parameters: tool.parameters(),

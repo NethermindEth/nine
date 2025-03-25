@@ -9,6 +9,8 @@ use n9_core::{ConfigSegmentUpdates, Particle, SubstanceBond, SubstanceLinks, Too
 use n9_exchange::tools::{Price, Tickers};
 use ui9_dui::Operation;
 
+static TOOLKIT: &str = "dYdX";
+
 pub struct DyDxParticle {
     substance: SubstanceLinks,
     config_updates: Option<Entry<ConfigSegmentUpdates>>,
@@ -51,8 +53,10 @@ impl DoAsync<Initialize> for DyDxParticle {
         self.config_updates = Some(entry);
         self.update_config(config, ctx).await?;
 
-        bond.add_tool::<Price>(self).await?;
-        bond.add_tool::<Tickers>(self).await?;
+        // TODO: Move skillname to `Price` `Tickers`
+        bond.add_tool::<Price>(self, TOOLKIT, "Get Price").await?;
+        bond.add_tool::<Tickers>(self, TOOLKIT, "List Of Tickers")
+            .await?;
 
         self.bond.fill(bond)?;
         Ok(Next::events())

@@ -1,7 +1,6 @@
-use crate::router::types::ToolInfo;
 use derive_more::{Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use ui9::names::Fqn;
 use ui9_dui::flow::{Flow, Unified};
 use ui9_dui::publisher::{Publisher, Tracer};
@@ -32,18 +31,15 @@ impl Unified for Tools {
 }
 
 impl ToolsPub {
-    pub fn add_tool(&self, info: &ToolInfo) {
-        let event = ToolsEvent::Add {
-            id: info.id.clone(),
-            description: info.meta.description.clone().unwrap_or_default(),
-        };
+    pub fn add_tool(&self, toolkit: String, action: String) {
+        let event = ToolsEvent::Add { toolkit, action };
         self.event(event);
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tools {
-    pub tools_list: BTreeMap<String, String>,
+    pub tools_list: BTreeMap<String, BTreeSet<String>>,
 }
 
 impl Default for Tools {
@@ -61,11 +57,11 @@ impl Flow for Tools {
     fn apply(&mut self, event: Self::Event) {
         use ToolsEvent::*;
         match event {
-            Add { id, description } => {
-                self.tools_list.insert(id, description);
+            Add { toolkit, action } => {
+                self.tools_list.entry(toolkit).or_default().insert(action);
             }
-            Del { id } => {
-                self.tools_list.remove(&id);
+            Del { toolkit, action } => {
+                self.tools_list.entry(toolkit).or_default().remove(&action);
             }
         }
     }
@@ -73,6 +69,6 @@ impl Flow for Tools {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ToolsEvent {
-    Add { id: String, description: String },
-    Del { id: String },
+    Add { toolkit: String, action: String },
+    Del { toolkit: String, action: String },
 }

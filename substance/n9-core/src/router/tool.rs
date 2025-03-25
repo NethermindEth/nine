@@ -21,6 +21,9 @@ pub struct CallMeta {
     pub chat: Fqn,
 }
 
+// TODO:
+// 1. Rename to `Action`
+// 2. Add a method to get name (human readable)
 pub trait Prompt: ToolData {
     type Output: ToolData;
 
@@ -194,14 +197,14 @@ impl OnRequest<AddTool> for ReasoningRouter {
 
         let info = ToolInfo {
             id: id.clone(),
-            meta: msg.meta,
+            meta: msg.meta.clone(),
         };
         let record = ToolRecord {
             link: msg.link,
             info: info.clone(),
         };
         self.tools.insert(id, record);
-        self.tools_pub.add_tool(&info);
+        self.tools_pub.add_tool(msg.meta.toolkit, msg.meta.skill);
 
         op.end();
 

@@ -11,6 +11,8 @@ use std::collections::HashMap;
 use ui9::names::Fqn;
 use ui9_dui::{Operation, Pub};
 
+static TOOLKIT: &str = "Tasks";
+
 pub struct TaskRecord {
     parameters: TaskParameters,
     address: Address<ChatTask>,
@@ -70,9 +72,11 @@ struct Initialize;
 impl DoAsync<Initialize> for ControlTask {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let mut bond = self.substance.bond(&ctx);
-        bond.add_tool::<TasksList>(self).await?;
-        bond.add_tool::<TaskAdd>(self).await?;
-        bond.add_tool::<TaskDel>(self).await?;
+        bond.add_tool::<TasksList>(self, TOOLKIT, "Tasks List")
+            .await?;
+        bond.add_tool::<TaskAdd>(self, TOOLKIT, "Add Task").await?;
+        bond.add_tool::<TaskDel>(self, TOOLKIT, "Delete Task")
+            .await?;
         self.bond.fill(bond)?;
         Ok(Next::events())
     }

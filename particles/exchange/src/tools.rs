@@ -7,6 +7,7 @@ pub struct Tickers {
     // Must be a struct to fit open ai schema
 }
 
+// TODO: Rename `Prompt` to `Action`
 impl Prompt for Tickers {
     type Output = Vec<String>;
 

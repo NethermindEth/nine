@@ -7,8 +7,8 @@ pub struct ToolsList {}
 
 #[derive(Deserialize, Serialize, JsonSchema)]
 pub struct ToolInfo {
-    pub name: String,
-    pub description: String,
+    pub toolkit: String,
+    pub skill: String,
 }
 
 impl Prompt for ToolsList {

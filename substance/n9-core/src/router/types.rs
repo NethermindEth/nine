@@ -188,8 +188,15 @@ pub struct ToolInfo {
     pub meta: ToolMeta,
 }
 
+// TODO: Add `triggers` and `actions`
+// Task execution => Trigger
+// Schedule a task => Action
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ToolMeta {
+    pub toolkit: String,
+    pub skill: String,
+    /// A unique function name
     pub name: String,
     pub description: Option<String>,
     pub parameters: Option<RootSchema>,

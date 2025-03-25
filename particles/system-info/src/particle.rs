@@ -38,7 +38,8 @@ struct Initialize;
 impl DoAsync<Initialize> for SystemInfo {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let mut bond = self.substance.bond(&ctx);
-        bond.add_tool::<ToolsList>(self).await?;
+        bond.add_tool::<ToolsList>(self, "System", "List Of Tools")
+            .await?;
         self.bond.fill(bond)?;
         Ok(Next::events())
     }
@@ -53,10 +54,13 @@ impl Tool<ToolsList> for SystemInfo {
         let tools = tools
             .tools_list
             .iter()
-            .map(|(k, v)| ToolInfo {
-                name: k.clone(),
-                description: v.clone(),
+            .map(|(k, v)| {
+                v.iter().map(|s| ToolInfo {
+                    toolkit: k.clone(),
+                    skill: s.clone(),
+                })
             })
+            .flatten()
             .collect();
         Ok(tools)
     }

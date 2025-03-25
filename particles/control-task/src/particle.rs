@@ -1,13 +1,14 @@
 use crate::flow::Tasks;
 use crate::task::ChatTask;
 use crate::tools::{TaskAdd, TaskDel, TaskId, TaskInfo, TaskParameters, TasksList};
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next};
 use crb::core::Slot;
 use crb::superagent::{Supervisor, SupervisorSession};
 use n9_core::{CallMeta, Particle, SubstanceBond, SubstanceLinks, Tool};
 use std::collections::HashMap;
+use ui9::names::Fqn;
 use ui9_dui::{Operation, Pub};
 
 pub struct TaskRecord {
@@ -24,11 +25,16 @@ impl From<(&usize, &TaskRecord)> for TaskInfo {
     }
 }
 
+#[derive(Default)]
+struct ScopeRecord {
+    tasks: HashMap<TaskId, TaskRecord>,
+}
+
 pub struct ControlTask {
     substance: SubstanceLinks,
     bond: Slot<SubstanceBond<Self>>,
     task_id: usize,
-    tasks: HashMap<TaskId, TaskRecord>,
+    scopes: HashMap<Fqn, ScopeRecord>,
     state: Pub<Tasks>,
     // TODO: Add tasks flow (tracer) here
 }
@@ -39,7 +45,7 @@ impl Particle for ControlTask {
             substance,
             bond: Slot::empty(),
             task_id: 0,
-            tasks: HashMap::new(),
+            scopes: HashMap::new(),
             state: Pub::unified(),
         }
     }
@@ -47,7 +53,7 @@ impl Particle for ControlTask {
 
 impl Supervisor for ControlTask {
     type BasedOn = AgentSession<Self>;
-    type GroupBy = ();
+    type GroupBy = Fqn;
 }
 
 impl Agent for ControlTask {
@@ -74,8 +80,16 @@ impl DoAsync<Initialize> for ControlTask {
 
 #[async_trait]
 impl Tool<TasksList> for ControlTask {
-    async fn call_tool(&mut self, input: TasksList) -> Result<Vec<TaskInfo>> {
-        let tasks = self.tasks.iter().map(TaskInfo::from).collect();
+    async fn call_tool_meta(
+        &mut self,
+        input: TasksList,
+        meta: CallMeta,
+        ctx: &mut Context<Self>,
+    ) -> Result<Vec<TaskInfo>> {
+        let Some(scope) = self.scopes.get(&meta.chat) else {
+            return Ok(Vec::new());
+        };
+        let tasks = scope.tasks.iter().map(TaskInfo::from).collect();
         Ok(tasks)
     }
 }
@@ -88,17 +102,22 @@ impl Tool<TaskAdd> for ControlTask {
         meta: CallMeta,
         ctx: &mut Context<Self>,
     ) -> Result<TaskId> {
+        let chat_id = meta.chat;
         self.task_id += 1;
         let id = self.task_id;
         let parameters = TaskParameters::from(input);
         let state = self.state.create(id, parameters.clone());
-        let chat_task = ChatTask::new(state, meta.chat);
-        let address = ctx.spawn_agent(chat_task, ()).equip();
+        let chat_task = ChatTask::new(state, chat_id.clone());
+        let address = ctx.spawn_agent(chat_task, chat_id.clone()).equip();
         let record = TaskRecord {
             parameters: parameters.clone(),
             address,
         };
-        self.tasks.insert(id, record);
+        self.scopes
+            .entry(chat_id)
+            .or_default()
+            .tasks
+            .insert(id, record);
         Operation::event(format!("A task has added with id: {id}"));
         Ok(id)
     }
@@ -106,16 +125,26 @@ impl Tool<TaskAdd> for ControlTask {
 
 #[async_trait]
 impl Tool<TaskDel> for ControlTask {
-    async fn call_tool(&mut self, input: TaskDel) -> Result<bool> {
+    async fn call_tool_meta(
+        &mut self,
+        input: TaskDel,
+        meta: CallMeta,
+        ctx: &mut Context<Self>,
+    ) -> Result<bool> {
+        let Some(scope) = self.scopes.get_mut(&meta.chat) else {
+            return Err(anyhow!(
+                "This chat doesn't have a tasks scope to work with."
+            ));
+        };
         if let Some(id) = input.id {
             // Interrupt a specific task
-            let Some(record) = self.tasks.remove(&id) else {
+            let Some(record) = scope.tasks.remove(&id) else {
                 return Ok(false);
             };
             record.address.interrupt().ok();
         } else {
             // Interrupt all tasks
-            for (_, record) in self.tasks.drain() {
+            for (_, record) in scope.tasks.drain() {
                 record.address.interrupt().ok();
             }
         }

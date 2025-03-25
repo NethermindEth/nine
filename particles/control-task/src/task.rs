@@ -3,14 +3,14 @@ use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Agent, Context, DoAsync, ManagedContext, Next, OnEvent};
 use crb::superagent::{StreamSession, Timeout, Timer};
-use n9_control_chat::Chat;
+use n9_control_session::ChatControl;
 use ui9::names::Fqn;
 use ui9_dui::Sub;
 
 pub struct ChatTask {
     state: TaskPub,
     timer: Timer,
-    chat: Sub<Chat>,
+    chat: Sub<ChatControl>,
 }
 
 impl ChatTask {
@@ -18,7 +18,7 @@ impl ChatTask {
         Self {
             state,
             timer: Timer::new(),
-            chat: Sub::local_unified(),
+            chat: Sub::local(chat),
         }
     }
 }
@@ -65,7 +65,7 @@ impl DoAsync<Initialize> for ChatTask {
 impl OnEvent<Timeout> for ChatTask {
     async fn handle(&mut self, _: Timeout, ctx: &mut Context<Self>) -> Result<()> {
         let prompt = self.state.prompt.clone();
-        self.chat.request(prompt);
+        self.chat.prompt(prompt);
 
         if self.state.repeat {
             self.schedule()?;

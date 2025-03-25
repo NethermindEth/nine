@@ -21,3 +21,4 @@ ui9.workspace = true
 ui9-app.workspace = true
 ui9-dui.workspace = true
 chrono.workspace = true
+n9-control-session.workspace = true

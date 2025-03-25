@@ -5774,6 +5774,7 @@ dependencies = [
  "crb",
  "derive_more 2.0.1",
  "n9-control-chat",
+ "n9-control-session",
  "n9-core",
  "schemars",
  "serde",

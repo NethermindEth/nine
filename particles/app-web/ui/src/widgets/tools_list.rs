@@ -1,5 +1,6 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use n9_core::tracers::tools::Tools;
+use std::collections::BTreeSet;
 use yew::{html, Html};
 
 pub type ToolsListWidget = SubWidget<ToolsListComponent>;
@@ -28,7 +29,7 @@ impl SubComponent for ToolsListComponent {
                     </div>
                 </div>
                 <div class="widget-tools-list-list">
-                    { for pairs.map(|(k, v)| self.render_item(k, v, ctx)) }
+                    { for pairs.map(|(k, v)| self.render_toolkit(k, v, ctx)) }
                 </div>
             </div>
         })
@@ -36,10 +37,26 @@ impl SubComponent for ToolsListComponent {
 }
 
 impl ToolsListComponent {
-    fn render_item(&self, tool: &str, desc: &str, ctx: &SubContext<Self>) -> Html {
+    fn render_toolkit(
+        &self,
+        toolkit: &str,
+        skills: &BTreeSet<String>,
+        ctx: &SubContext<Self>,
+    ) -> Html {
         html! {
             <div class="widget-tools-list-list-item">
-                { tool }
+                { toolkit }
+                <div>
+                    { for skills.iter().map(|item| self.render_item(item, ctx)) }
+                </div>
+            </div>
+        }
+    }
+
+    fn render_item(&self, skill: &str, ctx: &SubContext<Self>) -> Html {
+        html! {
+            <div class="widget-tools-list-list-item">
+                { skill }
             </div>
         }
     }

@@ -37,7 +37,6 @@ impl ToolsListComponent {
         html! {
             <div class="widget-session-control-list-item">
                 { tool }
-                { desc }
             </div>
         }
     }

@@ -36,7 +36,7 @@ impl SubComponent for DashboardComponent {
                         <widgets::SessionControl {first} {second} />
                     }
                 };
-                let tools: FqnLink = Tools::fqn().into();
+                let tools = FqnLink::remote(Tools::fqn(), active_peer);
                 html! {
                     <div class="app-content">
                         <div class="app-content-left">

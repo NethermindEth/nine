@@ -95,7 +95,8 @@ impl DoAsync<SendRequest> for ChatControlLoop {
 
         let request = ChatRequest::user(&msg.prompt);
         let session = self.router.new_session_with_tracer(tracer).await?;
-        let req = session.chat(request);
+        let chat = self.key.clone();
+        let req = session.chat(chat, request);
         self.chat.add(msg.prompt, Role::Request);
 
         let state = WaitResponse { req };

@@ -13,6 +13,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use std::any::type_name;
 use std::marker::PhantomData;
 use std::sync::Arc;
+use ui9::names::Fqn;
 use ui9_dui::Operation;
 
 pub struct CallMeta {
@@ -114,7 +115,7 @@ pub struct ToolLink {
 }
 
 pub trait ToolAddress: Sync + Send {
-    fn call_tool(&self, request: ToolCall) -> Fetcher<ToolResult>;
+    fn call_tool(&self, chat: Fqn, request: ToolCall) -> Fetcher<ToolResult>;
 }
 
 struct ToolLinkRaw<P> {
@@ -125,8 +126,8 @@ impl<P> ToolAddress for ToolLinkRaw<P>
 where
     P: Prompt,
 {
-    fn call_tool(&self, request: ToolCall) -> Fetcher<ToolResult> {
-        let request = CallTool { request };
+    fn call_tool(&self, chat: Fqn, request: ToolCall) -> Fetcher<ToolResult> {
+        let request = CallTool { request, chat };
         let (interplay, fetcher) = Interplay::new_pair(request);
         let interaction = Interaction { interplay };
         let msg = CallToolTyped {
@@ -186,7 +187,9 @@ pub struct ToolRecord {
 impl OnRequest<AddTool> for ReasoningRouter {
     async fn on_request(&mut self, msg: AddTool, _ctx: &mut Context<Self>) -> Result<ToolAdded> {
         let id = ToolId::from(format!("{}_{}", msg.meta.name, self.tools.len()));
+
         let op = Operation::start(&format!("Add tool {id}"));
+
         let info = ToolInfo {
             id: id.clone(),
             meta: msg.meta,
@@ -197,14 +200,17 @@ impl OnRequest<AddTool> for ReasoningRouter {
         };
         self.tools.insert(id, record);
         self.tools_pub.add_tool(&info);
+
         op.end();
+
         Ok(ToolAdded { info })
     }
 }
 
 pub struct CallTool {
     pub request: ToolCall,
-    // TODO: Add Fqn here of the chat
+    // TODO: Consider to use a typed link here
+    pub chat: Fqn,
 }
 
 impl Request for CallTool {

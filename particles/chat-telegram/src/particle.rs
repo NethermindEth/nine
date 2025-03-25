@@ -112,7 +112,8 @@ impl OnEvent<Message> for TelegramParticle {
 
             let request = ChatRequest::user(&text);
             let session = self.substance.router.new_session().await?;
-            let task = session.chat(request);
+            let chat = todo!("Scoped chats for telegram is not implemented");
+            let task = session.chat(chat, request);
 
             ctx.assign(task, (), chat_id);
         }

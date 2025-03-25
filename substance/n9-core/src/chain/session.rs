@@ -4,9 +4,10 @@ use crate::router::RouterLink;
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};
-use crb::superagent::{Fetcher, InteractExt, OnRequest};
+use crb::superagent::{Fetcher, InteractExt, OnRequest, Request};
 use derive_more::{Deref, DerefMut};
 use futures::future::join_all;
+use ui9::names::Fqn;
 use ui9_dui::{Link, Operate, Sub};
 use ui9_net::ConnectExt;
 
@@ -24,9 +25,19 @@ impl From<Address<ReasoningSession>> for SessionLink {
 }
 
 impl SessionLink {
-    pub fn chat(&self, request: ChatRequest) -> Fetcher<ChatResponse> {
+    pub fn chat(&self, chat: Fqn, request: ChatRequest) -> Fetcher<ChatResponse> {
+        let request = ReasoningRequest { request, chat };
         self.interact(request)
     }
+}
+
+pub struct ReasoningRequest {
+    pub request: ChatRequest,
+    pub chat: Fqn,
+}
+
+impl Request for ReasoningRequest {
+    type Response = ChatResponse;
 }
 
 pub struct ReasoningSession {
@@ -49,15 +60,17 @@ impl Agent for ReasoningSession {
 }
 
 #[async_trait]
-impl OnRequest<ChatRequest> for ReasoningSession {
+impl OnRequest<ReasoningRequest> for ReasoningSession {
     async fn on_request(
         &mut self,
-        request: ChatRequest,
+        request: ReasoningRequest,
         _ctx: &mut Context<Self>,
     ) -> Result<ChatResponse> {
         let router = self.router.clone();
         let link = self.link.take();
-        let extra_messages = RequestPerformer::new(router, request, link)
+        let chat = request.chat;
+        let request = request.request;
+        let extra_messages = RequestPerformer::new(router, request, chat, link)
             .entrypoint()
             .await?;
         let response = ChatResponse {
@@ -71,17 +84,24 @@ struct RequestPerformer {
     router: RouterLink,
     extra_messages: Vec<Message>,
     request: ChatRequest,
+    chat: Fqn,
     one_more_step: bool,
     tracer: Option<Sub<ReasoningFlow>>,
 }
 
 impl RequestPerformer {
-    fn new(router: RouterLink, request: ChatRequest, link: Option<Link<ReasoningFlow>>) -> Self {
+    fn new(
+        router: RouterLink,
+        request: ChatRequest,
+        chat: Fqn,
+        link: Option<Link<ReasoningFlow>>,
+    ) -> Self {
         let tracer = link.map(Sub::connect);
         Self {
             router,
             extra_messages: Vec::new(),
             request,
+            chat,
             one_more_step: false,
             tracer,
         }
@@ -131,6 +151,7 @@ impl RequestPerformer {
                     // One more stop to process results with a model
                     self.one_more_step = true;
                     let caller = Caller {
+                        chat: self.chat.clone(),
                         router: self.router.clone(),
                         tool_call,
                         tracer: self.tracer.as_ref(),
@@ -150,6 +171,7 @@ impl RequestPerformer {
 }
 
 struct Caller<'a> {
+    chat: Fqn,
     router: RouterLink,
     tool_call: ToolCall,
     tracer: Option<&'a Sub<ReasoningFlow>>,
@@ -176,7 +198,7 @@ impl<'a> Caller<'a> {
         }
         let fetcher = self.router.get_tool(self.tool_call.info.tool_id.clone());
         let link = fetcher.await?;
-        let response = link.call_tool(self.tool_call.clone()).await?;
+        let response = link.call_tool(self.chat, self.tool_call.clone()).await?;
         if let Some(tracer) = self.tracer {
             tracer.tool_call_result(response.clone());
         }

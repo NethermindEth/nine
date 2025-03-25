@@ -107,10 +107,6 @@ impl ChatRequest {
     }
 }
 
-impl Request for ChatRequest {
-    type Response = ChatResponse;
-}
-
 #[derive(Default)]
 pub struct ChatResponse {
     pub messages: Vec<Message>,

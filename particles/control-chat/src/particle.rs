@@ -8,6 +8,7 @@ use ui9_dui::{Act, Operation, Pub};
 
 pub struct ChatParticle {
     substance: SubstanceLinks,
+    // TODO: Use a single control chat here
     chat: Pub<Chat>,
 }
 
@@ -62,7 +63,8 @@ impl DoAsync<SendRequest> for ChatParticle {
         self.chat.thinking(true);
         let request = ChatRequest::user(&msg.question);
         let session = self.substance.router.new_session().await?;
-        let req = session.chat(request);
+        let chat = todo!("Scoped chats are not supported by a global chat");
+        let req = session.chat(chat, request);
         self.chat.add(msg.question, Role::Request);
         op.end();
         let state = WaitResponse { req };

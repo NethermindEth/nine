@@ -18,6 +18,7 @@ use ui9_dui::Operation;
 
 pub struct CallMeta {
     pub info: CallInfo,
+    pub chat: Fqn,
 }
 
 pub trait Prompt: ToolData {
@@ -70,11 +71,12 @@ where
         msg: Interaction<CallTool>,
         ctx: &mut Context<Self>,
     ) -> Result<()> {
-        let request = msg.interplay.request.request;
-        let info = request.info;
+        let CallTool { request, chat } = msg.interplay.request;
+        let info = request.info.clone();
+        let meta = CallMeta { info, chat };
         match serde_json::from_value(request.args) {
             Ok(request) => {
-                self.handle_response(info, request, msg.interplay.responder, ctx)
+                self.handle_response(meta, request, msg.interplay.responder, ctx)
                     .await
             }
             Err(err) => msg.interplay.responder.send_result(Err(err.into())),
@@ -83,12 +85,12 @@ where
 
     async fn handle_response(
         &mut self,
-        info: CallInfo,
+        meta: CallMeta,
         msg: P,
         responder: Responder<ToolResult>,
         ctx: &mut Context<Self>,
     ) -> Result<()> {
-        let meta = CallMeta { info: info.clone() };
+        let info = meta.info.clone();
         let output = self.call_tool_meta(msg, meta, ctx).await?;
         let value = serde_json::to_value(&output)?;
         let res = ToolResult { info, value };

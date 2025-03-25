@@ -28,7 +28,7 @@ async fn main() -> Result<()> {
     // substance.add_particle::<n9_exchange::ExchangeParticle>()?;
 
     // TODO: Rename to *Control
-    substance.add_particle::<n9_control_chat::ChatParticle>()?;
+    // substance.add_particle::<n9_control_chat::ChatParticle>()?;
     substance.add_particle::<n9_control_task::ControlTask>()?;
     substance.add_particle::<n9_control_session::SessionParticle>()?;
 
@@ -39,7 +39,7 @@ async fn main() -> Result<()> {
     }
 
     // TODO: Rename to *Chat
-    substance.add_particle::<n9_chat_telegram::TelegramParticle>()?;
+    // substance.add_particle::<n9_chat_telegram::TelegramParticle>()?;
 
     // Stdio is not compatible with tracing and will be replaced with DUI
     // substance.add_particle::<StdioParticle>()?;

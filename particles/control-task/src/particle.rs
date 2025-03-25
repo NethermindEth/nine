@@ -92,7 +92,7 @@ impl Tool<TaskAdd> for ControlTask {
         let id = self.task_id;
         let parameters = TaskParameters::from(input);
         let state = self.state.create(id, parameters.clone());
-        let chat_task = ChatTask::new(state);
+        let chat_task = ChatTask::new(state, meta.chat);
         let address = ctx.spawn_agent(chat_task, ()).equip();
         let record = TaskRecord {
             parameters: parameters.clone(),

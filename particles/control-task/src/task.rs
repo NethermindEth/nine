@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use crb::agent::{Agent, Context, DoAsync, ManagedContext, Next, OnEvent};
 use crb::superagent::{StreamSession, Timeout, Timer};
 use n9_control_chat::Chat;
+use ui9::names::Fqn;
 use ui9_dui::Sub;
 
 pub struct ChatTask {
@@ -13,7 +14,7 @@ pub struct ChatTask {
 }
 
 impl ChatTask {
-    pub fn new(state: TaskPub) -> Self {
+    pub fn new(state: TaskPub, chat: Fqn) -> Self {
         Self {
             state,
             timer: Timer::new(),

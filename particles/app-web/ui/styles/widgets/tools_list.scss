@@ -1,0 +1,29 @@
+.widget-tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .widget-tools-list-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .widget-tools-list-header-title {
+      font-weight: bold;
+    }
+    .widget-tools-list-header-new {
+      color: var(--fg-link);
+      cursor: pointer;
+    }
+  }
+
+  .widget-tools-list-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .widget-tools-list-list-item {
+      cursor: pointer;
+    }
+  }
+}

@@ -18,13 +18,16 @@ impl SubComponent for ToolsListComponent {
         // TODO: Use custom classes
         let pairs = state.tools_list.iter();
         Some(html! {
-            <div class="widget-session-control">
-                <div class="widget-session-control-header">
-                    <div class="widget-session-control-header-title">
+            <div class="widget-tools-list">
+                <div class="widget-tools-list-header">
+                    <div class="widget-tools-list-header-title">
                         { "Tools" }
                     </div>
+                    <div class="widget-tools-list-header-new">
+                        { "Edit" }
+                    </div>
                 </div>
-                <div class="widget-session-control-list">
+                <div class="widget-tools-list-list">
                     { for pairs.map(|(k, v)| self.render_item(k, v, ctx)) }
                 </div>
             </div>
@@ -35,7 +38,7 @@ impl SubComponent for ToolsListComponent {
 impl ToolsListComponent {
     fn render_item(&self, tool: &str, desc: &str, ctx: &SubContext<Self>) -> Html {
         html! {
-            <div class="widget-session-control-list-item">
+            <div class="widget-tools-list-list-item">
                 { tool }
             </div>
         }

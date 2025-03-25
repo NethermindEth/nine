@@ -66,11 +66,12 @@ where
     async fn handle_request(
         &mut self,
         // TODO: Use a custom wrapper for `Interplay`
-        msg: Interaction<ToolCall>,
+        msg: Interaction<CallTool>,
         ctx: &mut Context<Self>,
     ) -> Result<()> {
-        let info = msg.interplay.request.info;
-        match serde_json::from_value(msg.interplay.request.args) {
+        let request = msg.interplay.request.request;
+        let info = request.info;
+        match serde_json::from_value(request.args) {
             Ok(request) => {
                 self.handle_response(info, request, msg.interplay.responder, ctx)
                     .await
@@ -117,7 +118,7 @@ pub trait ToolAddress: Sync + Send {
 }
 
 struct ToolLinkRaw<P> {
-    recipient: Recipient<CallTool<P>>,
+    recipient: Recipient<CallToolTyped<P>>,
 }
 
 impl<P> ToolAddress for ToolLinkRaw<P>
@@ -125,9 +126,10 @@ where
     P: Prompt,
 {
     fn call_tool(&self, request: ToolCall) -> Fetcher<ToolResult> {
+        let request = CallTool { request };
         let (interplay, fetcher) = Interplay::new_pair(request);
         let interaction = Interaction { interplay };
-        let msg = CallTool {
+        let msg = CallToolTyped {
             _type: PhantomData::<P>,
             interaction,
         };
@@ -200,17 +202,22 @@ impl OnRequest<AddTool> for ReasoningRouter {
     }
 }
 
-impl Request for ToolCall {
+pub struct CallTool {
+    pub request: ToolCall,
+    // TODO: Add Fqn here of the chat
+}
+
+impl Request for CallTool {
     type Response = ToolResult;
 }
 
-struct CallTool<P> {
+struct CallToolTyped<P> {
     _type: PhantomData<P>,
-    interaction: Interaction<ToolCall>,
+    interaction: Interaction<CallTool>,
 }
 
 #[async_trait]
-impl<A, P> MessageFor<A> for CallTool<P>
+impl<A, P> MessageFor<A> for CallToolTyped<P>
 where
     A: Tool<P>,
     P: Prompt,

@@ -7,6 +7,7 @@ mod jobs;
 mod peers;
 mod reasoning;
 mod session_control;
+mod tools_list;
 mod traces;
 
 pub use chat::ChatWidget as Chat;
@@ -17,4 +18,5 @@ pub use jobs::JobsWidget as Jobs;
 pub use peers::PeersWidget as Peers;
 pub use reasoning::ReasoningSummaryWidget as ReasoningSummary;
 pub use session_control::SessionControlWidget as SessionControl;
+pub use tools_list::ToolsListWidget as ToolsList;
 pub use traces::TracesWidget as Traces;

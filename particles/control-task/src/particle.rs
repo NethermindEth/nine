@@ -139,7 +139,6 @@ impl Tool<TaskDel> for ControlTask {
         if let Some(id) = input.id {
             // Interrupt a specific task
             let Some(record) = scope.tasks.remove(&id) else {
-                return Ok(false);
                 return Err(anyhow!("Task with id {id} has not found."));
             };
             record.address.interrupt().ok();

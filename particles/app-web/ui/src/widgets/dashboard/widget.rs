@@ -3,6 +3,7 @@ use crate::render::{single, SubComponent, SubContext, SubWidget};
 use crate::widgets;
 use n9_control_chat::Chat;
 use n9_control_session::SessionControl;
+use n9_core::tracers::tools::Tools;
 use ui9_dui::tracers::job::Job;
 use ui9_dui::{FqnLink, Unified};
 use ui9_net::tracers::peer::Peer;
@@ -35,6 +36,7 @@ impl SubComponent for DashboardComponent {
                         <widgets::SessionControl {first} {second} />
                     }
                 };
+                let tools: FqnLink = Tools::fqn().into();
                 html! {
                     <div class="app-content">
                         <div class="app-content-left">
@@ -49,6 +51,7 @@ impl SubComponent for DashboardComponent {
                             */
                         </div>
                         <div class="app-content-right">
+                            <widgets::ToolsList link={tools} />
                         </div>
                     </div>
                 }

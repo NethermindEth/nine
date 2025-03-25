@@ -107,7 +107,7 @@ where
     K: Toolkit,
     P: Prompt,
 {
-    async fn call_tool(&mut self, input: P, _ctx: &mut Context<Self>) -> Result<P::Output> {
+    async fn call_tool(&mut self, input: P) -> Result<P::Output> {
         let model = self.substance.router.get_model().await?;
         let input = schema::<P>()?;
         let output = schema::<P::Output>()?;

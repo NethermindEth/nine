@@ -46,11 +46,7 @@ impl DoAsync<Initialize> for SystemInfo {
 
 #[async_trait]
 impl Tool<ToolsList> for SystemInfo {
-    async fn call_tool(
-        &mut self,
-        input: ToolsList,
-        _ctx: &mut Context<Self>,
-    ) -> Result<Vec<ToolInfo>> {
+    async fn call_tool(&mut self, input: ToolsList) -> Result<Vec<ToolInfo>> {
         // TODO: Use state requests instead
         let ported = self.tools.borrow();
         let tools = ported.state()?;

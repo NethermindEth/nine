@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next};
 use crb::core::Slot;
 use crb::superagent::{Supervisor, SupervisorSession};
-use n9_core::{Particle, SubstanceBond, SubstanceLinks, Tool};
+use n9_core::{CallMeta, Particle, SubstanceBond, SubstanceLinks, Tool};
 use std::collections::HashMap;
 use ui9_dui::{Operation, Pub};
 
@@ -74,11 +74,7 @@ impl DoAsync<Initialize> for ControlTask {
 
 #[async_trait]
 impl Tool<TasksList> for ControlTask {
-    async fn call_tool(
-        &mut self,
-        input: TasksList,
-        _ctx: &mut Context<Self>,
-    ) -> Result<Vec<TaskInfo>> {
+    async fn call_tool(&mut self, input: TasksList) -> Result<Vec<TaskInfo>> {
         let tasks = self.tasks.iter().map(TaskInfo::from).collect();
         Ok(tasks)
     }
@@ -86,7 +82,12 @@ impl Tool<TasksList> for ControlTask {
 
 #[async_trait]
 impl Tool<TaskAdd> for ControlTask {
-    async fn call_tool(&mut self, input: TaskAdd, ctx: &mut Context<Self>) -> Result<TaskId> {
+    async fn call_tool_meta(
+        &mut self,
+        input: TaskAdd,
+        meta: CallMeta,
+        ctx: &mut Context<Self>,
+    ) -> Result<TaskId> {
         self.task_id += 1;
         let id = self.task_id;
         let parameters = TaskParameters::from(input);
@@ -105,7 +106,7 @@ impl Tool<TaskAdd> for ControlTask {
 
 #[async_trait]
 impl Tool<TaskDel> for ControlTask {
-    async fn call_tool(&mut self, input: TaskDel, _ctx: &mut Context<Self>) -> Result<bool> {
+    async fn call_tool(&mut self, input: TaskDel) -> Result<bool> {
         if let Some(id) = input.id {
             // Interrupt a specific task
             let Some(record) = self.tasks.remove(&id) else {

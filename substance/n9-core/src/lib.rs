@@ -12,7 +12,7 @@ pub use router::keeper::{
     Config, ConfigSegmentUpdates, GetConfig, Keeper, NewConfigSegment, UpdateConfig,
 };
 pub use router::model::{Model, ModelLink};
-pub use router::tool::{Prompt, Tool, ToolLink};
+pub use router::tool::{CallMeta, Prompt, Tool, ToolLink};
 pub use router::types::{
     ActionableMessage, CallInfo, ChatRequest, ChatResponse, Message, Reason, Role, ToolCall,
     ToolInfo, ToolMeta, ToolResult, ToolingChatRequest, ToolingChatResponse,

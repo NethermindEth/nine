@@ -72,7 +72,7 @@ impl UpdateConfig<DyDxConfig> for DyDxParticle {
 
 #[async_trait]
 impl Tool<Price> for DyDxParticle {
-    async fn call_tool(&mut self, input: Price, _ctx: &mut Context<Self>) -> Result<String> {
+    async fn call_tool(&mut self, input: Price) -> Result<String> {
         let ticker = input.ticker.into();
         let price = self
             .indexer
@@ -89,7 +89,7 @@ impl Tool<Price> for DyDxParticle {
 
 #[async_trait]
 impl Tool<Tickers> for DyDxParticle {
-    async fn call_tool(&mut self, input: Tickers, _ctx: &mut Context<Self>) -> Result<Vec<String>> {
+    async fn call_tool(&mut self, input: Tickers) -> Result<Vec<String>> {
         let markets = self
             .indexer
             .get()?

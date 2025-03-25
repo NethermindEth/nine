@@ -15,6 +15,10 @@ use std::marker::PhantomData;
 use std::sync::Arc;
 use ui9_dui::Operation;
 
+pub struct CallMeta {
+    pub info: CallInfo,
+}
+
 pub trait Prompt: ToolData {
     type Output: ToolData;
 
@@ -82,13 +86,23 @@ where
         responder: Responder<ToolResult>,
         ctx: &mut Context<Self>,
     ) -> Result<()> {
-        let output = self.call_tool(msg, ctx).await?;
+        let meta = CallMeta { info: info.clone() };
+        let output = self.call_tool_meta(msg, meta, ctx).await?;
         let value = serde_json::to_value(&output)?;
         let res = ToolResult { info, value };
         responder.send_result(Ok(res))
     }
 
-    async fn call_tool(&mut self, _input: P, _ctx: &mut Context<Self>) -> Result<P::Output> {
+    async fn call_tool_meta(
+        &mut self,
+        input: P,
+        _meta: CallMeta,
+        _ctx: &mut Context<Self>,
+    ) -> Result<P::Output> {
+        self.call_tool(input).await
+    }
+
+    async fn call_tool(&mut self, _input: P) -> Result<P::Output> {
         Err(anyhow!("Not implemented"))
     }
 }

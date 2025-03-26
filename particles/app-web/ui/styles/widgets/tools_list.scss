@@ -17,12 +17,22 @@
     }
   }
 
-  .widget-tools-list-list {
+  .widget-tools-list-toolkit {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
 
-    .widget-tools-list-list-item {
+    .widget-tools-list-toolkit-name {
+      font-weight: bold;
+    }
+
+    .widget-tools-list-toolkit-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .widget-tools-list-toolkit-action {
       cursor: pointer;
     }
   }

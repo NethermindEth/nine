@@ -22,15 +22,13 @@ impl SubComponent for ToolsListComponent {
             <div class="widget-tools-list">
                 <div class="widget-tools-list-header">
                     <div class="widget-tools-list-header-title">
-                        { "Tools" }
+                        { "Toolkits" }
                     </div>
                     <div class="widget-tools-list-header-new">
                         { "Edit" }
                     </div>
                 </div>
-                <div class="widget-tools-list-list">
-                    { for pairs.map(|(k, v)| self.render_toolkit(k, v, ctx)) }
-                </div>
+                { for pairs.map(|(k, v)| self.render_toolkit(k, v, ctx)) }
             </div>
         })
     }
@@ -40,23 +38,23 @@ impl ToolsListComponent {
     fn render_toolkit(
         &self,
         toolkit: &str,
-        skills: &BTreeSet<String>,
+        actions: &BTreeSet<String>,
         ctx: &SubContext<Self>,
     ) -> Html {
         html! {
-            <div class="widget-tools-list-list-item">
-                { toolkit }
+            <div class="widget-tools-list-toolkit">
+                <div class="widget-tools-list-toolkit-name">{ toolkit }</div>
                 <div>
-                    { for skills.iter().map(|item| self.render_item(item, ctx)) }
+                    { for actions.iter().map(|item| self.render_item(item, ctx)) }
                 </div>
             </div>
         }
     }
 
-    fn render_item(&self, skill: &str, ctx: &SubContext<Self>) -> Html {
+    fn render_item(&self, action: &str, ctx: &SubContext<Self>) -> Html {
         html! {
-            <div class="widget-tools-list-list-item">
-                { skill }
+            <div class="widget-tools-list-toolkit-action">
+                { action }
             </div>
         }
     }

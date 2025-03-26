@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, DoAsync, Equip, Next, OnEvent};
 use crb::core::uuid::Uuid;
 use crb::superagent::{Fetcher, PingExt, StreamSession, Supervisor, SupervisorSession};
-use n9_core::chain::ReasoningFlow;
+use n9_core::unroller::ReasoningFlow;
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
 use std::collections::HashMap;
 use ui9::names::Fqn;

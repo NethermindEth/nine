@@ -2,7 +2,7 @@ use crate::render::{double, SubComponent, SubContext, SubWidget};
 use crate::widgets;
 use crate::widgets::dashboard::Dashboard;
 use n9_control_session::{ChatControl, ChatRequest, ChatResponse, ChatTurn};
-use n9_core::chain::ReasoningFlow;
+use n9_core::unroller::ReasoningFlow;
 use std::mem::swap;
 use ui9_dui::{FqnLink, Link};
 use ui9_markdown::MarkdownRender;

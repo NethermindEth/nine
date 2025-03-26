@@ -1,5 +1,5 @@
 use derive_more::{Deref, DerefMut, From, Into};
-use n9_core::chain::ReasoningFlow;
+use n9_core::unroller::ReasoningFlow;
 use serde::{Deserialize, Serialize};
 use ui9_dui::{Flow, Link, Listener, Publisher, Subscriber, Tracer};
 

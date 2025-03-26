@@ -3,8 +3,8 @@ pub mod model;
 pub mod tool;
 pub mod types;
 
-use crate::chain::{ReasoningFlow, ReasoningSession, SessionLink};
 use crate::tracers::tools::Tools;
+use crate::unroller::{ReasoningFlow, ReasoningSession, SessionLink};
 use anyhow::{Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Equip, Next};

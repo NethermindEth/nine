@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use chrono::Utc;
 use crb::agent::{Agent, Context, DoAsync, Next, OnEvent};
 use crb::superagent::StreamSession;
-use n9_core::chain::{
+use n9_core::unroller::{
     Operation, OperationDetails, OperationId, OperationInfo, ReasoningAction, ReasoningFlow,
 };
 use std::collections::HashMap;

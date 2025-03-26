@@ -55,7 +55,6 @@ impl SubComponent for SessionControlComponent {
         state: double::State<SessionControl, Dashboard>,
         ctx: &SubContext<Self>,
     ) -> Option<Html> {
-        let typ = std::any::type_name::<Event>();
         let onclick = ctx.event(Msg::NewChat);
         let mut items: Vec<_> = state.active_sessions.iter().collect();
         items.sort_by_key(|(_, info)| info.created);

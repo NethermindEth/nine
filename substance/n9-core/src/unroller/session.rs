@@ -1,6 +1,6 @@
-use crate::chain::ReasoningFlow;
 use crate::router::types::{ChatRequest, ChatResponse, Message, Role, ToolCall};
 use crate::router::RouterLink;
+use super::flow::ReasoningFlow;
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};

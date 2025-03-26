@@ -1,5 +1,5 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
-use n9_core::chain::ReasoningFlow;
+use n9_core::unroller::ReasoningFlow;
 use yew::{html, Html};
 
 pub type ReasoningSummaryWidget = SubWidget<ReasoningSummaryComponent>;

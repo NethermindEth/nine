@@ -1,5 +1,5 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
-use n9_core::chain::{Operation, OperationDetails, OperationId, OperationInfo, ReasoningFlow};
+use n9_core::unroller::{Operation, OperationDetails, OperationId, OperationInfo, ReasoningFlow};
 use n9_core::{
     ActionableMessage, Message, ToolCall, ToolResult, ToolingChatRequest, ToolingChatResponse,
 };
@@ -87,15 +87,15 @@ impl TracesComponent {
         }
     }
 
-    fn render_tool_call(&self, tool_call: &ToolCall, ctx: &SubContext<Self>) -> Html {
+    fn render_tool_call(&self, _tool_call: &ToolCall, _ctx: &SubContext<Self>) -> Html {
         html! {}
     }
 
-    fn render_tool_result(&self, tool_result: &ToolResult, ctx: &SubContext<Self>) -> Html {
+    fn render_tool_result(&self, _tool_result: &ToolResult, _ctx: &SubContext<Self>) -> Html {
         html! {}
     }
 
-    fn render_message(&self, message: &Message, ctx: &SubContext<Self>) -> Html {
+    fn render_message(&self, message: &Message, _ctx: &SubContext<Self>) -> Html {
         html! {
             <div class="widget-traces-message">
                 <div class="widget-traces-message-content">

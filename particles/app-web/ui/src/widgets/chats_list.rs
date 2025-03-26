@@ -14,7 +14,7 @@ impl SubComponent for ChatsListComponent {
         Self {}
     }
 
-    fn render(&self, state: single::State<Event>, _ctx: &SubContext<Self>) -> Option<Html> {
+    fn render(&self, _state: single::State<Event>, _ctx: &SubContext<Self>) -> Option<Html> {
         let typ = std::any::type_name::<Event>();
         Some(html! {
             <div>{ format!("Loaded: {typ}") }</div>

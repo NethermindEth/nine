@@ -1,8 +1,6 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
 use n9_core::chain::ReasoningFlow;
-use std::mem::swap;
-use ui9_markdown::MarkdownRender;
-use yew::{html, Html, InputEvent, TargetCast};
+use yew::{html, Html};
 
 pub type ReasoningSummaryWidget = SubWidget<ReasoningSummaryComponent>;
 

@@ -43,16 +43,11 @@ pub trait SubComponent: Sized + 'static {
     fn update(
         &mut self,
         _msg: Self::Message,
-        pro: &mut Self::Projection,
+        _pro: &mut Self::Projection,
         _ctx: &SubContext<Self>,
     ) -> bool {
         true
     }
-
-    /*
-    fn on_sub(&mut self, _event: &Self::Projection::Event) {}
-
-    */
 
     fn discover(
         &mut self,

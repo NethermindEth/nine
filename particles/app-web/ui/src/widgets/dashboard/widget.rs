@@ -7,7 +7,6 @@ use n9_core::tracers::tools::Tools;
 use ui9_dui::tracers::job::Job;
 use ui9_dui::{FqnLink, Unified};
 use ui9_net::tracers::peer::Peer;
-use ui9_net::PeerId;
 use yew::{html, Html};
 
 pub type DashboardWidget = SubWidget<DashboardComponent>;
@@ -23,9 +22,10 @@ impl SubComponent for DashboardComponent {
     }
 
     fn render(&self, state: single::State<Dashboard>, _ctx: &SubContext<Self>) -> Option<Html> {
+        let mut peer = None;
         let app_content = {
             if let Some(active_peer) = state.active_peer {
-                let peer = active_peer.to_string();
+                peer = Some(active_peer.to_string());
                 let chat_link = FqnLink::remote(Chat::fqn(), active_peer);
                 let jobs_link = FqnLink::remote(Job::fqn(), active_peer);
                 let chat_interaction: FqnLink = Dashboard::fqn().into();
@@ -84,6 +84,9 @@ impl SubComponent for DashboardComponent {
                 </div>
 
                 { app_content }
+                <div class="app-footer">
+                    <div class="app-footer-peer">{ peer }</div>
+                </div>
             </div>
         }
         .into()

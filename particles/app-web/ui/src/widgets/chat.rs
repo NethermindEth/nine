@@ -1,4 +1,4 @@
-use crate::render::{double, single, SubComponent, SubContext, SubWidget};
+use crate::render::{double, SubComponent, SubContext, SubWidget};
 use crate::widgets;
 use crate::widgets::dashboard::Dashboard;
 use n9_control_session::{ChatControl, ChatRequest, ChatResponse, ChatTurn};
@@ -118,7 +118,6 @@ impl ChatComponent {
 
     fn render_item(&self, item: &ChatTurn, ctx: &SubContext<Self>) -> Html {
         // TODO: Use a better indicator + errors reporting
-        let completed = item.response.is_some();
         let tracer = {
             if let Some(tracer) = &item.tracer {
                 let onclick = ctx.event(Msg::OpenTraces(tracer.clone()));

@@ -1,16 +1,16 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
-use n9_core::unroller::ReasoningFlow;
+use n9_core::unroller::UnrollerFlow;
 use yew::{html, Html};
 
-pub type ReasoningSummaryWidget = SubWidget<ReasoningSummaryComponent>;
+pub type UnrollerSummaryWidget = SubWidget<UnrollerSummaryComponent>;
 
-pub struct ReasoningSummaryComponent {}
+pub struct UnrollerSummaryComponent {}
 
 #[derive(Clone)]
 pub enum Msg {}
 
-impl SubComponent for ReasoningSummaryComponent {
-    type Projection = single::Flow<ReasoningFlow>;
+impl SubComponent for UnrollerSummaryComponent {
+    type Projection = single::Flow<UnrollerFlow>;
     type Message = Msg;
 
     fn create() -> Self {
@@ -26,7 +26,7 @@ impl SubComponent for ReasoningSummaryComponent {
         true
     }
 
-    fn render(&self, state: single::State<ReasoningFlow>, ctx: &SubContext<Self>) -> Option<Html> {
+    fn render(&self, state: single::State<UnrollerFlow>, ctx: &SubContext<Self>) -> Option<Html> {
         let operation = {
             if state.completed {
                 None

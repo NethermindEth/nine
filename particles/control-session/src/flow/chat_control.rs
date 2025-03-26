@@ -1,5 +1,5 @@
 use derive_more::{Deref, DerefMut, From, Into};
-use n9_core::unroller::ReasoningFlow;
+use n9_core::unroller::UnrollerFlow;
 use serde::{Deserialize, Serialize};
 use ui9_dui::{Flow, Link, Listener, Publisher, Subscriber, Tracer};
 
@@ -41,7 +41,7 @@ impl ChatControlPub {
         self.tracer.event(event);
     }
 
-    pub fn start_thinking(&mut self, link: Link<ReasoningFlow>) {
+    pub fn start_thinking(&mut self, link: Link<UnrollerFlow>) {
         let event = ChatControlEvent::Tracer(link);
         self.tracer.event(event);
     }
@@ -101,7 +101,7 @@ impl Flow for ChatControl {
 pub struct ChatTurn {
     pub request: Option<ChatRequest>,
     pub response: Option<ChatResponse>,
-    pub tracer: Option<Link<ReasoningFlow>>,
+    pub tracer: Option<Link<UnrollerFlow>>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -117,7 +117,7 @@ pub struct ChatResponse {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum ChatControlEvent {
     NewTurn,
-    Tracer(Link<ReasoningFlow>),
+    Tracer(Link<UnrollerFlow>),
     Message(Message),
 }
 

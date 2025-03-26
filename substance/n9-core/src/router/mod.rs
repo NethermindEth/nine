@@ -4,7 +4,7 @@ pub mod tool;
 pub mod types;
 
 use crate::tracers::tools::Tools;
-use crate::unroller::{ReasoningFlow, ReasoningSession, SessionLink};
+use crate::unroller::{SessionLink, UnrollerFlow, UnrollerSession};
 use anyhow::{Error, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Equip, Next};
@@ -65,10 +65,7 @@ impl RouterLink {
         self.interact(msg).await.map_err(Error::from)
     }
 
-    pub async fn new_session_with_tracer(
-        &self,
-        tracer: Link<ReasoningFlow>,
-    ) -> Result<SessionLink> {
+    pub async fn new_session_with_tracer(&self, tracer: Link<UnrollerFlow>) -> Result<SessionLink> {
         let msg = NewSession {
             tracer: Some(tracer),
         };
@@ -77,7 +74,7 @@ impl RouterLink {
 }
 
 struct NewSession {
-    tracer: Option<Link<ReasoningFlow>>,
+    tracer: Option<Link<UnrollerFlow>>,
 }
 
 impl Request for NewSession {
@@ -92,7 +89,7 @@ impl OnRequest<NewSession> for ReasoningRouter {
         ctx: &mut Context<Self>,
     ) -> Result<SessionLink> {
         let link = ctx.equip();
-        let session = ReasoningSession::new(link, msg.tracer);
+        let session = UnrollerSession::new(link, msg.tracer);
         let addr = ctx.spawn_agent(session, ());
         Ok(addr.equip())
     }

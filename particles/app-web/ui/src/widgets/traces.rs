@@ -1,5 +1,5 @@
 use crate::render::{single, SubComponent, SubContext, SubWidget};
-use n9_core::unroller::{Operation, OperationDetails, OperationId, OperationInfo, ReasoningFlow};
+use n9_core::unroller::{Operation, OperationDetails, OperationId, OperationInfo, UnrollerFlow};
 use n9_core::{
     ActionableMessage, Message, ToolCall, ToolResult, ToolingChatRequest, ToolingChatResponse,
 };
@@ -15,7 +15,7 @@ pub enum Msg {
 }
 
 impl SubComponent for TracesComponent {
-    type Projection = single::Flow<ReasoningFlow>;
+    type Projection = single::Flow<UnrollerFlow>;
     type Message = Msg;
 
     fn create() -> Self {
@@ -37,7 +37,7 @@ impl SubComponent for TracesComponent {
         true
     }
 
-    fn render(&self, state: single::State<ReasoningFlow>, ctx: &SubContext<Self>) -> Option<Html> {
+    fn render(&self, state: single::State<UnrollerFlow>, ctx: &SubContext<Self>) -> Option<Html> {
         html! {
             <div class="widget-traces">
                 <div class="widget-traces-list">

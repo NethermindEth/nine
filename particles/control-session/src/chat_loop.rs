@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, DoAsync, Equip, Next, OnEvent};
 use crb::core::uuid::Uuid;
 use crb::superagent::{Fetcher, PingExt, StreamSession, Supervisor, SupervisorSession};
-use n9_core::unroller::ReasoningFlow;
+use n9_core::unroller::UnrollerFlow;
 use n9_core::{ChatRequest, ChatResponse, RouterLink};
 use std::collections::HashMap;
 use ui9::names::Fqn;
@@ -45,7 +45,8 @@ impl Agent for ChatControlLoop {
 }
 
 impl ChatControlLoop {
-    pub async fn create_tracer(&mut self, ctx: &mut Context<Self>) -> Result<Link<ReasoningFlow>> {
+    // TODO: Rename to `create_unroller`
+    pub async fn create_tracer(&mut self, ctx: &mut Context<Self>) -> Result<Link<UnrollerFlow>> {
         let uuid = Uuid::new_v4();
         let fqn = self.key.push(uuid);
         let tracer = TraceAgent::new(fqn.clone());

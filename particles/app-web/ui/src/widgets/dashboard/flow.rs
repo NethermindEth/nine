@@ -1,5 +1,5 @@
 use derive_more::{Deref, DerefMut, From, Into};
-use n9_core::unroller::ReasoningFlow;
+use n9_core::unroller::UnrollerFlow;
 use serde::{Deserialize, Serialize};
 use ui9::names::Fqn;
 use ui9_dui::{Flow, FqnLink, Link, Listener, Publisher, Subscriber, Tracer, Unified};
@@ -25,7 +25,7 @@ impl DashboardSub {
         self.action(msg);
     }
 
-    pub fn open_traces(&self, traces: Option<Link<ReasoningFlow>>) {
+    pub fn open_traces(&self, traces: Option<Link<UnrollerFlow>>) {
         let msg = DashboardMessage::SetActiveTraces { traces };
         self.action(msg);
     }
@@ -46,7 +46,7 @@ impl DashboardPub {}
 pub struct Dashboard {
     pub active_peer: Option<PeerId>,
     pub active_chat: Option<FqnLink>,
-    pub active_traces: Option<Link<ReasoningFlow>>,
+    pub active_traces: Option<Link<UnrollerFlow>>,
 }
 
 impl Unified for Dashboard {
@@ -80,5 +80,5 @@ impl Flow for Dashboard {
 pub enum DashboardMessage {
     SetActivePeer { peer: Option<PeerId> },
     SetActiveChat { chat: Option<FqnLink> },
-    SetActiveTraces { traces: Option<Link<ReasoningFlow>> },
+    SetActiveTraces { traces: Option<Link<UnrollerFlow>> },
 }

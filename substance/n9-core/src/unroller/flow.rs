@@ -8,111 +8,111 @@ use ui9_dui::publisher::{Publisher, Tracer};
 use ui9_dui::subscriber::{Listener, Subscriber};
 
 #[derive(Deref, DerefMut, From, Into)]
-pub struct ReasoningSub {
-    listener: Listener<ReasoningFlow>,
+pub struct UnrollerSub {
+    listener: Listener<UnrollerFlow>,
 }
 
-impl ReasoningSub {
+impl UnrollerSub {
     pub fn request(&self, request: ToolingChatRequest) {
         let operation = Operation::Request(request);
-        let action = ReasoningAction::Operation(operation);
+        let action = UnrollerAction::Operation(operation);
         self.action(action);
     }
 
     pub fn response(&self, response: ToolingChatResponse) {
         let operation = Operation::Response(response);
-        let action = ReasoningAction::Operation(operation);
+        let action = UnrollerAction::Operation(operation);
         self.action(action);
     }
 
     pub fn tool_call(&self, call: ToolCall) {
         let operation = Operation::ToolCall(call);
-        let action = ReasoningAction::Operation(operation);
+        let action = UnrollerAction::Operation(operation);
         self.action(action);
     }
 
     pub fn tool_call_result(&self, response: ToolResult) {
         let operation = Operation::ToolResult(response);
-        let action = ReasoningAction::Operation(operation);
+        let action = UnrollerAction::Operation(operation);
         self.action(action);
     }
 
     pub fn done(&self) {
-        let action = ReasoningAction::Done;
+        let action = UnrollerAction::Done;
         self.action(action);
     }
 
     // TODO: Take out to the separate service
 
     pub fn show(&self, id: OperationId) {
-        let action = ReasoningAction::Show(id);
+        let action = UnrollerAction::Show(id);
         self.action(action);
     }
 }
 
-impl Subscriber for ReasoningFlow {
-    type Driver = ReasoningSub;
+impl Subscriber for UnrollerFlow {
+    type Driver = UnrollerSub;
 }
 
 #[derive(Deref, DerefMut, From, Into)]
-pub struct ReasoningPub {
-    tracer: Tracer<ReasoningFlow>,
+pub struct UnrollerPub {
+    tracer: Tracer<UnrollerFlow>,
 }
 
-impl ReasoningPub {
+impl UnrollerPub {
     pub fn operation(&self, info: OperationInfo) {
-        let event = ReasoningEvent::Add(info);
+        let event = UnrollerEvent::Add(info);
         self.event(event);
     }
 
     pub fn complete(&self) {
-        let event = ReasoningEvent::Complete;
+        let event = UnrollerEvent::Complete;
         self.event(event);
     }
 
     pub fn show(&self, operation: Option<OperationDetails>) {
-        let event = ReasoningEvent::Show(operation);
+        let event = UnrollerEvent::Show(operation);
         self.event(event);
     }
 }
 
-impl Publisher for ReasoningFlow {
-    type Driver = ReasoningPub;
+impl Publisher for UnrollerFlow {
+    type Driver = UnrollerPub;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct ReasoningStat {
+pub struct UnrollerStat {
     pub calls: u32,
     pub requests: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ReasoningFlow {
+pub struct UnrollerFlow {
     pub operations: Vec<OperationInfo>,
     pub operation: Option<OperationDetails>,
-    pub stat: ReasoningStat,
+    pub stat: UnrollerStat,
     // TODO: Add Reason (or error)
     pub completed: bool,
 }
 
-impl Default for ReasoningFlow {
+impl Default for UnrollerFlow {
     fn default() -> Self {
         Self {
             operations: Vec::new(),
             operation: None,
-            stat: ReasoningStat::default(),
+            stat: UnrollerStat::default(),
             completed: false,
         }
     }
 }
 
-impl Flow for ReasoningFlow {
-    type Event = ReasoningEvent;
-    type Action = ReasoningAction;
+impl Flow for UnrollerFlow {
+    type Event = UnrollerEvent;
+    type Action = UnrollerAction;
 
     fn apply(&mut self, event: Self::Event) {
         match event {
-            ReasoningEvent::Add(operation) => {
+            UnrollerEvent::Add(operation) => {
                 match &operation.op_type {
                     OperationType::Request => {
                         self.stat.requests += 1;
@@ -124,10 +124,10 @@ impl Flow for ReasoningFlow {
                 }
                 self.operations.push(operation);
             }
-            ReasoningEvent::Complete => {
+            UnrollerEvent::Complete => {
                 self.completed = true;
             }
-            ReasoningEvent::Show(operation) => {
+            UnrollerEvent::Show(operation) => {
                 self.operation = operation;
             }
         }
@@ -157,14 +157,14 @@ pub struct OperationDetails {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum ReasoningEvent {
+pub enum UnrollerEvent {
     Add(OperationInfo),
     Complete,
     Show(Option<OperationDetails>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum ReasoningAction {
+pub enum UnrollerAction {
     Show(Uuid),
     Operation(Operation),
     Done,
@@ -190,12 +190,12 @@ impl Operation {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ReasoningInfo {
+pub struct UnrollerInfo {
     pub model: String,
-    pub records: Vec<ReasoningRecord>,
+    pub records: Vec<UnrollerRecord>,
 }
 
-impl ReasoningInfo {
+impl UnrollerInfo {
     fn new(model: String) -> Self {
         Self {
             model,
@@ -205,7 +205,7 @@ impl ReasoningInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ReasoningRecord {
+pub struct UnrollerRecord {
     pub timestamp: NaiveDateTime,
 }
 

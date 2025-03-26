@@ -4,14 +4,14 @@ use chrono::Utc;
 use crb::agent::{Agent, Context, DoAsync, Next, OnEvent};
 use crb::superagent::StreamSession;
 use n9_core::unroller::{
-    Operation, OperationDetails, OperationId, OperationInfo, ReasoningAction, ReasoningFlow,
+    Operation, OperationDetails, OperationId, OperationInfo, UnrollerAction, UnrollerFlow,
 };
 use std::collections::HashMap;
 use ui9::names::Fqn;
 use ui9_dui::{Act, Pub};
 
 pub struct TraceAgent {
-    tracer: Pub<ReasoningFlow>,
+    tracer: Pub<UnrollerFlow>,
     operations: HashMap<OperationId, Operation>,
 }
 
@@ -43,10 +43,10 @@ impl DoAsync<Initialize> for TraceAgent {
 }
 
 #[async_trait]
-impl OnEvent<Act<ReasoningFlow>> for TraceAgent {
-    async fn handle(&mut self, msg: Act<ReasoningFlow>, ctx: &mut Context<Self>) -> Result<()> {
+impl OnEvent<Act<UnrollerFlow>> for TraceAgent {
+    async fn handle(&mut self, msg: Act<UnrollerFlow>, ctx: &mut Context<Self>) -> Result<()> {
         match msg.action {
-            ReasoningAction::Operation(operation) => {
+            UnrollerAction::Operation(operation) => {
                 let id = OperationId::new_v4();
                 let info = OperationInfo {
                     id,
@@ -58,10 +58,10 @@ impl OnEvent<Act<ReasoningFlow>> for TraceAgent {
                 self.tracer.operation(info);
                 self.load(id);
             }
-            ReasoningAction::Done => {
+            UnrollerAction::Done => {
                 self.tracer.complete();
             }
-            ReasoningAction::Show(id) => {
+            UnrollerAction::Show(id) => {
                 self.load(id);
             }
         }

@@ -2,6 +2,6 @@ mod flow;
 mod session;
 
 pub use flow::{
-    Operation, OperationDetails, OperationId, OperationInfo, ReasoningAction, ReasoningFlow,
+    Operation, OperationDetails, OperationId, OperationInfo, UnrollerAction, UnrollerFlow,
 };
-pub use session::{ReasoningSession, SessionLink};
+pub use session::{SessionLink, UnrollerSession};

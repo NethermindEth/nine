@@ -2,7 +2,7 @@ use crate::render::{double, SubComponent, SubContext, SubWidget};
 use crate::widgets;
 use crate::widgets::dashboard::Dashboard;
 use n9_control_session::{ChatControl, ChatRequest, ChatResponse, ChatTurn};
-use n9_core::unroller::ReasoningFlow;
+use n9_core::unroller::UnrollerFlow;
 use std::mem::swap;
 use ui9_dui::{FqnLink, Link};
 use ui9_markdown::MarkdownRender;
@@ -19,7 +19,7 @@ pub struct ChatComponent {
 pub enum Msg {
     UpdateText(String),
     Send,
-    OpenTraces(Link<ReasoningFlow>),
+    OpenTraces(Link<UnrollerFlow>),
 }
 
 impl SubComponent for ChatComponent {
@@ -124,7 +124,7 @@ impl ChatComponent {
                 let link = FqnLink::from(tracer.clone());
                 Some(html! {
                     <div class="widget-chat-reasoning">
-                        <widgets::ReasoningSummary {link} />
+                        <widgets::UnrollerSummary {link} />
                         <div {onclick} class="widget-chat-reasoning-open">{ "Open traces" }</div>
                     </div>
                 })

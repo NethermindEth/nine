@@ -1,6 +1,6 @@
+use super::flow::UnrollerFlow;
 use crate::router::types::{ChatRequest, ChatResponse, Message, Role, ToolCall};
 use crate::router::RouterLink;
-use super::flow::ReasoningFlow;
 use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, AgentSession, Context, Next, StopAddress};
@@ -13,11 +13,11 @@ use ui9_net::ConnectExt;
 
 #[derive(Deref, DerefMut)]
 pub struct SessionLink {
-    address: StopAddress<ReasoningSession>,
+    address: StopAddress<UnrollerSession>,
 }
 
-impl From<Address<ReasoningSession>> for SessionLink {
-    fn from(address: Address<ReasoningSession>) -> Self {
+impl From<Address<UnrollerSession>> for SessionLink {
+    fn from(address: Address<UnrollerSession>) -> Self {
         Self {
             address: address.to_stop_address(),
         }
@@ -26,32 +26,32 @@ impl From<Address<ReasoningSession>> for SessionLink {
 
 impl SessionLink {
     pub fn chat(&self, chat: Fqn, request: ChatRequest) -> Fetcher<ChatResponse> {
-        let request = ReasoningRequest { request, chat };
+        let request = UnrollerRequest { request, chat };
         self.interact(request)
     }
 }
 
-pub struct ReasoningRequest {
+pub struct UnrollerRequest {
     pub request: ChatRequest,
     pub chat: Fqn,
 }
 
-impl Request for ReasoningRequest {
+impl Request for UnrollerRequest {
     type Response = ChatResponse;
 }
 
-pub struct ReasoningSession {
+pub struct UnrollerSession {
     router: RouterLink,
-    link: Option<Link<ReasoningFlow>>,
+    link: Option<Link<UnrollerFlow>>,
 }
 
-impl ReasoningSession {
-    pub fn new(router: RouterLink, link: Option<Link<ReasoningFlow>>) -> Self {
+impl UnrollerSession {
+    pub fn new(router: RouterLink, link: Option<Link<UnrollerFlow>>) -> Self {
         Self { router, link }
     }
 }
 
-impl Agent for ReasoningSession {
+impl Agent for UnrollerSession {
     type Context = AgentSession<Self>;
 
     fn begin(&mut self) -> Next<Self> {
@@ -60,10 +60,10 @@ impl Agent for ReasoningSession {
 }
 
 #[async_trait]
-impl OnRequest<ReasoningRequest> for ReasoningSession {
+impl OnRequest<UnrollerRequest> for UnrollerSession {
     async fn on_request(
         &mut self,
-        request: ReasoningRequest,
+        request: UnrollerRequest,
         _ctx: &mut Context<Self>,
     ) -> Result<ChatResponse> {
         let router = self.router.clone();
@@ -86,7 +86,7 @@ struct RequestPerformer {
     request: ChatRequest,
     chat: Fqn,
     one_more_step: bool,
-    tracer: Option<Sub<ReasoningFlow>>,
+    tracer: Option<Sub<UnrollerFlow>>,
 }
 
 impl RequestPerformer {
@@ -94,7 +94,7 @@ impl RequestPerformer {
         router: RouterLink,
         request: ChatRequest,
         chat: Fqn,
-        link: Option<Link<ReasoningFlow>>,
+        link: Option<Link<UnrollerFlow>>,
     ) -> Self {
         let tracer = link.map(Sub::connect);
         Self {
@@ -174,7 +174,7 @@ struct Caller<'a> {
     chat: Fqn,
     router: RouterLink,
     tool_call: ToolCall,
-    tracer: Option<&'a Sub<ReasoningFlow>>,
+    tracer: Option<&'a Sub<UnrollerFlow>>,
 }
 
 impl<'a> Caller<'a> {

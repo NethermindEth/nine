@@ -56,7 +56,7 @@ impl Connector {
         Self {
             key,
             swarm: Slot::empty(),
-            topic: gossipsub::IdentTopic::new("n9"),
+            topic: gossipsub::IdentTopic::new("nine"),
             interval: Interval::new(),
         }
     }
@@ -182,13 +182,14 @@ impl OnEvent<mdns::Event> for Connector {
 impl OnEvent<gossipsub::Event> for Connector {
     async fn handle(&mut self, event: gossipsub::Event, _ctx: &mut Context<Self>) -> Result<()> {
         use gossipsub::Event::*;
+        log::info!("Got message: {event:?}");
         if let Message {
             propagation_source,
             message_id,
             message,
         } = event
         {
-            log::trace!(
+            log::info!(
                 "Got message: '{}' with id: {message_id} from peer: {propagation_source}",
                 String::from_utf8_lossy(&message.data),
             );
@@ -258,6 +259,7 @@ impl OnEvent<Bootstrap> for Connector {
 #[async_trait]
 impl OnEvent<Tick> for Connector {
     async fn handle(&mut self, _event: Tick, _ctx: &mut Context<Self>) -> Result<()> {
+        log::info!("Sending a discovery update");
         let topic = self.topic.clone();
         let swarm = self.swarm.get_mut()?;
         swarm

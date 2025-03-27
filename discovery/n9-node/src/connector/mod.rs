@@ -8,20 +8,18 @@ pub mod swarm_web;
 #[cfg(feature = "web")]
 use swarm_web as swarm_impl;
 
-pub mod behaviour;
-pub mod keypair;
+mod behaviour;
+mod keypair;
 
 use anyhow::Result;
 use async_trait::async_trait;
 use behaviour::{NineBehaviour, NineBehaviourEvent};
-use crb::agent::{
-    Address, Agent, AgentContext, AgentSession, Context, DoAsync, ManagedContext, Next, OnEvent,
-};
+use crb::agent::{Address, Agent, AgentContext, Context, DoAsync, ManagedContext, Next, OnEvent};
 use crb::core::Slot;
-use crb::superagent::{Fetcher, InteractExt, OnRequest, Request};
+use crb::superagent::{Fetcher, InteractExt, Interval, OnRequest, Request, StreamSession, Tick};
 use derive_more::{Deref, DerefMut, From};
 use futures::stream::StreamExt;
-use keypair::Key;
+pub use keypair::Key;
 use libp2p::{gossipsub, swarm::SwarmEvent, Multiaddr, Swarm};
 use libp2p_request_response::{self as request_response};
 use libp2p_stream as stream;
@@ -49,6 +47,8 @@ impl ConnectorLink {
 pub struct Connector {
     key: Key,
     swarm: Slot<Swarm<NineBehaviour>>,
+    topic: gossipsub::IdentTopic,
+    interval: Interval,
 }
 
 impl Connector {
@@ -56,13 +56,15 @@ impl Connector {
         Self {
             key,
             swarm: Slot::empty(),
+            topic: gossipsub::IdentTopic::new("n9"),
+            interval: Interval::new(),
         }
     }
 }
 
 #[async_trait]
 impl Agent for Connector {
-    type Context = AgentSession<Self>;
+    type Context = StreamSession<Self>;
 
     fn begin(&mut self) -> Next<Self> {
         Next::do_async(Initialize)
@@ -90,11 +92,12 @@ pub struct Initialize;
 
 #[async_trait]
 impl DoAsync<Initialize> for Connector {
-    async fn handle(&mut self, _: Initialize, _ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let mut swarm = swarm_impl::swarm(&self.key).await?;
+    async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
+        self.interval.set_interval_ms(5_000)?;
+        ctx.consume(self.interval.events()?);
 
-        let topic = gossipsub::IdentTopic::new("n9");
-        swarm.behaviour_mut().gossipsub.subscribe(&topic)?;
+        let mut swarm = swarm_impl::swarm(&self.key).await?;
+        swarm.behaviour_mut().gossipsub.subscribe(&self.topic)?;
 
         #[cfg(feature = "tcp")]
         {
@@ -157,13 +160,13 @@ impl OnEvent<mdns::Event> for Connector {
         match event {
             Discovered(list) => {
                 for (peer_id, _multiaddr) in list {
-                    log::trace!("UI9 node discovered: {peer_id}");
+                    log::trace!("Nine node discovered: {peer_id}");
                     swarm.behaviour_mut().gossipsub.add_explicit_peer(&peer_id);
                 }
             }
             Expired(list) => {
                 for (peer_id, _multiaddr) in list {
-                    log::trace!("UI9 node exipred: {peer_id}");
+                    log::trace!("Nine node exipred: {peer_id}");
                     swarm
                         .behaviour_mut()
                         .gossipsub
@@ -248,6 +251,19 @@ impl OnEvent<Bootstrap> for Connector {
         let addr = event.address;
         log::info!("Dialing {addr}");
         self.swarm.get_mut()?.dial(addr)?;
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl OnEvent<Tick> for Connector {
+    async fn handle(&mut self, _event: Tick, _ctx: &mut Context<Self>) -> Result<()> {
+        let topic = self.topic.clone();
+        let swarm = self.swarm.get_mut()?;
+        swarm
+            .behaviour_mut()
+            .gossipsub
+            .publish(topic, "state".as_bytes())?;
         Ok(())
     }
 }

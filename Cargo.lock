@@ -5920,6 +5920,7 @@ dependencies = [
  "async-trait",
  "crb",
  "derive_more 2.0.1",
+ "env_logger",
  "futures",
  "libp2p",
  "libp2p-request-response",

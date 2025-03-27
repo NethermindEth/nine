@@ -12,10 +12,13 @@ anyhow.workspace = true
 async-trait.workspace = true
 crb.workspace = true
 derive_more.workspace = true
+futures.workspace = true
 libp2p.workspace = true
 libp2p-stream.workspace = true
 libp2p-request-response = { version = "0.28.0", features = ["cbor"] }
 log.workspace = true
+tokio = { workspace = true, features = ["macros"] }
+tokio-util = { version = "0.7.14", features = ["codec", "compat"] }
 
 [features]
 default = ["std"]

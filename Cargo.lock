@@ -5920,10 +5920,13 @@ dependencies = [
  "async-trait",
  "crb",
  "derive_more 2.0.1",
+ "futures",
  "libp2p",
  "libp2p-request-response",
  "libp2p-stream",
  "log",
+ "tokio",
+ "tokio-util",
 ]
 
 [[package]]

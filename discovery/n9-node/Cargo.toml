@@ -1,0 +1,41 @@
+[package]
+name = "n9-node"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+crb.workspace = true
+derive_more.workspace = true
+libp2p.workspace = true
+libp2p-stream.workspace = true
+libp2p-request-response = { version = "0.28.0", features = ["cbor"] }
+log.workspace = true
+
+[features]
+default = ["std"]
+std = [
+    "mdns",
+    "tcp",
+    "crb/std",
+]
+web = [
+    "crb/web",
+    "libp2p/wasm-bindgen",
+    "libp2p/websocket-websys",
+]
+mdns = [
+    "libp2p/mdns",
+]
+tcp = [
+    "libp2p/tcp",
+    "libp2p/tokio",
+    "libp2p/quic",
+    "libp2p/websocket",
+    "libp2p/dns",
+]

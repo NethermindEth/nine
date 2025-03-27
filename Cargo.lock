@@ -5913,6 +5913,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "n9-node"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "crb",
+ "derive_more 2.0.1",
+ "libp2p",
+ "libp2p-request-response",
+ "libp2p-stream",
+ "log",
+]
+
+[[package]]
 name = "n9-runtime-wasm"
 version = "0.0.1"
 dependencies = [

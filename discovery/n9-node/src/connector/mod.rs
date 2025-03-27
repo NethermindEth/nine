@@ -10,6 +10,7 @@ use swarm_web as swarm_impl;
 
 mod behaviour;
 mod keypair;
+mod protocol;
 
 use anyhow::Result;
 use async_trait::async_trait;
@@ -199,12 +200,8 @@ impl OnEvent<gossipsub::Event> for Connector {
 }
 
 #[async_trait]
-impl OnEvent<request_response::Event<(), ()>> for Connector {
-    async fn handle(
-        &mut self,
-        event: request_response::Event<(), ()>,
-        _ctx: &mut Context<Self>,
-    ) -> Result<()> {
+impl OnEvent<protocol::Event> for Connector {
+    async fn handle(&mut self, event: protocol::Event, _ctx: &mut Context<Self>) -> Result<()> {
         use request_response::{Event, Message};
         match event {
             Event::Message { message, .. } => match message {

@@ -1,3 +1,4 @@
+use super::protocol;
 use anyhow::{Error, Result};
 use libp2p::{gossipsub, identity::Keypair, swarm::NetworkBehaviour, StreamProtocol};
 use libp2p_request_response::{self as request_response, ProtocolSupport};
@@ -15,7 +16,7 @@ pub struct NineBehaviour {
     pub gossipsub: gossipsub::Behaviour,
     #[cfg(feature = "mdns")]
     pub mdns: mdns::tokio::Behaviour,
-    pub request_response: request_response::cbor::Behaviour<(), ()>,
+    pub request_response: protocol::Behaviour,
     pub stream: stream::Behaviour,
 }
 

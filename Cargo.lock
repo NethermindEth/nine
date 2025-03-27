@@ -5926,6 +5926,7 @@ dependencies = [
  "libp2p-request-response",
  "libp2p-stream",
  "log",
+ "serde",
  "tokio",
  "tokio-util",
 ]

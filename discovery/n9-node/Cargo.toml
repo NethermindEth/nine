@@ -13,6 +13,7 @@ async-trait.workspace = true
 crb.workspace = true
 derive_more.workspace = true
 env_logger.workspace = true
+flexbuffers.workspace = true
 futures.workspace = true
 libp2p.workspace = true
 libp2p-stream.workspace = true

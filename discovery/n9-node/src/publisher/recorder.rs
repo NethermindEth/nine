@@ -1,10 +1,39 @@
+use super::Query;
 use crate::atom::State;
-use crb::agent::{Agent, AgentSession};
+use anyhow::{anyhow, Result};
+use async_trait::async_trait;
+use crb::agent::{Agent, AgentSession, Context};
+use crb::core::mpsc;
+use crb::superagent::{OnRequest, Request};
+use std::marker::PhantomData;
 
 pub struct Recorder<S: State> {
     state: S,
+    query_tx: mpsc::UnboundedSender<Query<S>>,
+    query_rx: Option<mpsc::UnboundedReceiver<Query<S>>>,
 }
 
 impl<S: State> Agent for Recorder<S> {
     type Context = AgentSession<Self>;
+}
+
+pub struct Queries<S> {
+    _type: PhantomData<S>,
+}
+
+impl<S: State> Request for Queries<S> {
+    type Response = mpsc::UnboundedReceiver<Query<S>>;
+}
+
+#[async_trait]
+impl<S: State> OnRequest<Queries<S>> for Recorder<S> {
+    async fn on_request(
+        &mut self,
+        _: Queries<S>,
+        _ctx: &mut Context<Self>,
+    ) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
+        self.query_rx
+            .take()
+            .ok_or_else(|| anyhow!("A queries receiver has taken already."))
+    }
 }

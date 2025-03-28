@@ -17,13 +17,16 @@ use async_trait::async_trait;
 use behaviour::{NineBehaviour, NineBehaviourEvent};
 use crb::agent::{Address, Agent, AgentContext, Context, DoAsync, ManagedContext, Next, OnEvent};
 use crb::core::Slot;
-use crb::superagent::{Fetcher, InteractExt, Interval, OnRequest, Request, StreamSession, Tick};
+use crb::superagent::{
+    Fetcher, InteractExt, Interaction, Interval, OnRequest, Request, Responder, StreamSession, Tick,
+};
 use derive_more::{Deref, DerefMut, From};
 use futures::stream::StreamExt;
 pub use keypair::Key;
 use libp2p::{gossipsub, swarm::SwarmEvent, Multiaddr, Swarm};
-use libp2p_request_response::{self as request_response};
+use libp2p_request_response::{self as request_response, OutboundRequestId};
 use libp2p_stream as stream;
+use std::collections::HashMap;
 use tokio::select;
 
 #[cfg(feature = "mdns")]
@@ -50,6 +53,7 @@ pub struct Connector {
     swarm: Slot<Swarm<NineBehaviour>>,
     topic: gossipsub::IdentTopic,
     interval: Interval,
+    requests: HashMap<OutboundRequestId, Responder<protocol::Response>>,
 }
 
 impl Connector {
@@ -59,6 +63,7 @@ impl Connector {
             swarm: Slot::empty(),
             topic: gossipsub::IdentTopic::new("nine"),
             interval: Interval::new(),
+            requests: HashMap::new(),
         }
     }
 }
@@ -213,13 +218,14 @@ impl OnEvent<protocol::Event> for Connector {
                 }
             },
             other => {
-                log::warn!("Not handeled request_reponse event: {other:?}");
+                log::warn!("Not handeled request_response event: {other:?}");
             }
         }
         Ok(())
     }
 }
 
+// TODO: Consider to return a stream
 pub struct GetControl;
 
 impl Request for GetControl {
@@ -236,6 +242,30 @@ impl OnRequest<GetControl> for Connector {
         let swarm = self.swarm.get_mut()?;
         let control = swarm.behaviour_mut().stream.new_control();
         Ok(control)
+    }
+}
+
+impl Request for protocol::Request {
+    type Response = protocol::Response;
+}
+
+#[async_trait]
+impl OnRequest<protocol::Request> for Connector {
+    async fn handle(
+        &mut self,
+        interaction: Interaction<protocol::Request>,
+        _ctx: &mut Context<Self>,
+    ) -> Result<()> {
+        let request = interaction.interplay.request;
+        let peer_id = request.atom_id.peer_id;
+        let swarm = self.swarm.get_mut()?;
+        let out_id = swarm
+            .behaviour_mut()
+            .request_response
+            .send_request(&peer_id, request);
+        let responder = interaction.interplay.responder;
+        self.requests.insert(out_id, responder);
+        Ok(())
     }
 }
 

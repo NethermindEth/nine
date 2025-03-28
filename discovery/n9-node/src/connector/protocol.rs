@@ -1,4 +1,4 @@
-use crate::ids::AtomId;
+use crate::atom::AtomId;
 use libp2p_request_response::{self as request_response};
 use serde::{Deserialize, Serialize};
 

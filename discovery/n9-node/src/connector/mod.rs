@@ -12,7 +12,7 @@ mod behaviour;
 mod keypair;
 mod protocol;
 
-use crate::ids::AtomId;
+use crate::atom::AtomId;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use behaviour::{NineBehaviour, NineBehaviourEvent};

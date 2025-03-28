@@ -12,13 +12,15 @@ mod behaviour;
 mod keypair;
 mod protocol;
 
+use crate::ids::AtomId;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use behaviour::{NineBehaviour, NineBehaviourEvent};
 use crb::agent::{Address, Agent, AgentContext, Context, DoAsync, ManagedContext, Next, OnEvent};
-use crb::core::Slot;
+use crb::core::{Slot, Unique};
 use crb::superagent::{
-    Fetcher, InteractExt, Interaction, Interval, OnRequest, Request, Responder, StreamSession, Tick,
+    Fetcher, InteractExt, Interaction, Interval, ManageSubscription, OnRequest, Request, Responder,
+    StreamSession, Subscription, Tick,
 };
 use derive_more::{Deref, DerefMut, From};
 use futures::stream::StreamExt;
@@ -54,6 +56,7 @@ pub struct Connector {
     topic: gossipsub::IdentTopic,
     interval: Interval,
     requests: HashMap<OutboundRequestId, Responder<protocol::Response>>,
+    providers: HashMap<AtomId, Unique<AtomProvider>>,
 }
 
 impl Connector {
@@ -64,6 +67,7 @@ impl Connector {
             topic: gossipsub::IdentTopic::new("nine"),
             interval: Interval::new(),
             requests: HashMap::new(),
+            providers: HashMap::new(),
         }
     }
 }
@@ -302,6 +306,36 @@ impl OnEvent<Tick> for Connector {
             .behaviour_mut()
             .gossipsub
             .publish(topic, "state".as_bytes())?;
+        Ok(())
+    }
+}
+
+pub struct AtomProvider {
+    pub atom_id: AtomId,
+}
+
+impl Subscription for AtomProvider {
+    type State = ();
+}
+
+#[async_trait]
+impl ManageSubscription<AtomProvider> for Connector {
+    async fn subscribe(
+        &mut self,
+        id: Unique<AtomProvider>,
+        _ctx: &mut Context<Self>,
+    ) -> Result<()> {
+        let atom_id = id.atom_id.clone();
+        self.providers.insert(atom_id, id);
+        Ok(())
+    }
+
+    async fn unsubscribe(
+        &mut self,
+        id: Unique<AtomProvider>,
+        _ctx: &mut Context<Self>,
+    ) -> Result<()> {
+        self.providers.remove(&id.atom_id);
         Ok(())
     }
 }

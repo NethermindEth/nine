@@ -12,7 +12,7 @@ mod behaviour;
 mod keypair;
 mod protocol;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use behaviour::{NineBehaviour, NineBehaviourEvent};
 use crb::agent::{Address, Agent, AgentContext, Context, DoAsync, ManagedContext, Next, OnEvent};
@@ -209,14 +209,23 @@ impl OnEvent<protocol::Event> for Connector {
     async fn handle(&mut self, event: protocol::Event, _ctx: &mut Context<Self>) -> Result<()> {
         use request_response::{Event, Message};
         match event {
-            Event::Message { message, .. } => match message {
-                Message::Request { request, .. } => {
-                    log::warn!("Not handeled request event: {request:?}");
+            Event::Message { message, .. } => {
+                match message {
+                    Message::Request { request, .. } => {
+                        // TODO: Forward to a recorder
+                        log::warn!("Not handeled request event: {request:?}");
+                    }
+                    Message::Response {
+                        request_id,
+                        response,
+                    } => {
+                        self.requests
+                            .remove(&request_id)
+                            .ok_or_else(|| anyhow!("Response for an unknown request {request_id}"))?
+                            .send(response)?;
+                    }
                 }
-                Message::Response { response, .. } => {
-                    log::warn!("Not handeled response event: {response:?}");
-                }
-            },
+            }
             other => {
                 log::warn!("Not handeled request_response event: {other:?}");
             }

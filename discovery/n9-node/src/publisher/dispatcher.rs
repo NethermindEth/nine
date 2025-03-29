@@ -1,9 +1,11 @@
-use super::recorder::Recorder;
+use super::recorder::{Queries, Recorder};
+use super::server::HubServer;
 use super::Query;
 use crate::atom::State;
-use anyhow::Result;
+use anyhow::{Error, Result};
 use crb::agent::Address;
 use crb::core::mpsc;
+use crb::superagent::InteractExt;
 use std::sync::Arc;
 
 pub struct Dispatcher<S: State> {
@@ -11,9 +13,16 @@ pub struct Dispatcher<S: State> {
 }
 
 impl<S: State> Dispatcher<S> {
+    pub fn new(state: S) -> Self {
+        let recorder = HubServer::spawn_recorder(state);
+        Self {
+            recorder: Arc::new(recorder),
+        }
+    }
+
     pub async fn queries(&mut self) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
-        // TODO: Send a request to get a receiver
-        todo!()
+        let request = Queries::new();
+        self.recorder.interact(request).await.map_err(Error::from)
     }
 }
 

@@ -17,8 +17,25 @@ impl<S: State> Agent for Recorder<S> {
     type Context = AgentSession<Self>;
 }
 
+impl<S: State> Recorder<S> {
+    pub fn new(state: S) -> Self {
+        let (tx, rx) = mpsc::unbounded_channel();
+        Self {
+            state,
+            query_tx: tx,
+            query_rx: Some(rx),
+        }
+    }
+}
+
 pub struct Queries<S> {
     _type: PhantomData<S>,
+}
+
+impl<S: State> Queries<S> {
+    pub fn new() -> Self {
+        Self { _type: PhantomData }
+    }
 }
 
 impl<S: State> Request for Queries<S> {

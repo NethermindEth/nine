@@ -1,16 +1,20 @@
 use super::Query;
 use crate::atom::State;
+use crate::atom::{PackedDelta, PackedState};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, OnEvent};
-use crb::core::mpsc;
-use crb::superagent::{OnRequest, Request};
+use crb::core::{mpsc, Unique};
+use crb::send::Recipient;
+use crb::superagent::{ManageSubscription, OnRequest, Request, Subscription};
+use std::collections::HashSet;
 use std::marker::PhantomData;
 
 pub struct Recorder<S: State> {
     state: S,
     query_tx: mpsc::UnboundedSender<Query<S>>,
     query_rx: Option<mpsc::UnboundedReceiver<Query<S>>>,
+    subscribers: HashSet<Unique<DeltaFlow>>,
 }
 
 impl<S: State> Agent for Recorder<S> {
@@ -24,6 +28,7 @@ impl<S: State> Recorder<S> {
             state,
             query_tx: tx,
             query_rx: Some(rx),
+            subscribers: HashSet::new(),
         }
     }
 }
@@ -69,6 +74,37 @@ impl<S: State> Delta<S> {
 impl<S: State> OnEvent<Delta<S>> for Recorder<S> {
     async fn handle(&mut self, event: Delta<S>, _ctx: &mut Context<Self>) -> Result<()> {
         // self.distribute(update.event)?;
+        Ok(())
+    }
+}
+
+pub struct DeltaFlow {
+    recipient: Recipient<PackedDelta>,
+}
+
+impl Subscription for DeltaFlow {
+    type State = PackedState;
+}
+
+#[async_trait]
+impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
+    async fn subscribe(
+        &mut self,
+        sub: Unique<DeltaFlow>,
+        _ctx: &mut Context<Self>,
+    ) -> Result<PackedState> {
+        let state = self.state.divide();
+        let packed_state = state.pack_state()?;
+        self.subscribers.insert(sub);
+        Ok(packed_state)
+    }
+
+    async fn unsubscribe(
+        &mut self,
+        sub: Unique<DeltaFlow>,
+        _ctx: &mut Context<Self>,
+    ) -> Result<()> {
+        self.subscribers.remove(&sub);
         Ok(())
     }
 }

@@ -8,3 +8,6 @@ use crate::atom::State;
 pub struct Query<S: State> {
     pub query: S::Query,
 }
+
+/// An id of a replicated state.
+pub struct StateId(usize);

@@ -2,7 +2,7 @@
 // 4. Add state_instance_id to send deltas directly
 // 5. Provide state_instance_id with a query
 
-use super::encoding::{FlexCodec, PackedAction, PackedEvent, PackedState, ProtocolCodec};
+use super::encoding::{FlexCodec, PackedDelta, PackedQuery, PackedState, ProtocolCodec};
 use anyhow::Result;
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -48,22 +48,22 @@ pub trait State: DataFraction {
     }
 
     /// Packs the delta.
-    fn pack_delta(delta: &Self::Delta) -> Result<PackedEvent> {
+    fn pack_delta(delta: &Self::Delta) -> Result<PackedDelta> {
         FlexCodec::encode(delta)
     }
 
     /// Unpacks the delta.
-    fn unpack_delta(data: &PackedEvent) -> Result<Self::Delta> {
+    fn unpack_delta(data: &PackedDelta) -> Result<Self::Delta> {
         FlexCodec::decode(data)
     }
 
     /// Packs the action.
-    fn pack_query(query: &Self::Query) -> Result<PackedAction> {
+    fn pack_query(query: &Self::Query) -> Result<PackedQuery> {
         FlexCodec::encode(query)
     }
 
     /// Unpacks the query.
-    fn unpack_query(data: &PackedAction) -> Result<Self::Query> {
+    fn unpack_query(data: &PackedQuery) -> Result<Self::Query> {
         FlexCodec::decode(data)
     }
 }

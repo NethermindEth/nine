@@ -64,5 +64,5 @@ macro_rules! packed {
 }
 
 packed!(PackedState);
-packed!(PackedEvent);
-packed!(PackedAction);
+packed!(PackedDelta);
+packed!(PackedQuery);

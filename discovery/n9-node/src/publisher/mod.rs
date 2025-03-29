@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 /// A wrapper needed to implement a generic handler
 pub struct Query<S: State> {
+    pub from: StateId,
     pub query: S::Query,
 }
 

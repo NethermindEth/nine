@@ -1,6 +1,5 @@
 use super::{Query, StateId};
-use crate::atom::State;
-use crate::atom::{PackedDelta, PackedState};
+use crate::atom::{PackedDelta, PackedQuery, PackedState, State};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, OnEvent};
@@ -60,20 +59,20 @@ impl<S: State> OnRequest<Queries<S>> for Recorder<S> {
     }
 }
 
-pub struct Delta<S: State> {
+pub struct SendDelta<S: State> {
     state_id: Option<StateId>,
     delta: S::Delta,
 }
 
-impl<S: State> Delta<S> {
+impl<S: State> SendDelta<S> {
     pub fn new(state_id: Option<StateId>, delta: S::Delta) -> Self {
         Self { state_id, delta }
     }
 }
 
 #[async_trait]
-impl<S: State> OnEvent<Delta<S>> for Recorder<S> {
-    async fn handle(&mut self, event: Delta<S>, _ctx: &mut Context<Self>) -> Result<()> {
+impl<S: State> OnEvent<SendDelta<S>> for Recorder<S> {
+    async fn handle(&mut self, event: SendDelta<S>, _ctx: &mut Context<Self>) -> Result<()> {
         let packed_delta = S::pack_delta(&event.delta)?;
         if let Some(state_id) = event.state_id {
             if let Some(sub) = self.subscribers.get(&state_id) {
@@ -123,6 +122,26 @@ impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
         _ctx: &mut Context<Self>,
     ) -> Result<()> {
         self.subscribers.remove(&sub.state_id);
+        Ok(())
+    }
+}
+
+pub struct ProcessQuery {
+    from: StateId,
+    query: PackedQuery,
+}
+
+impl Request for ProcessQuery {
+    type Response = ();
+}
+
+#[async_trait]
+impl<S: State> OnRequest<ProcessQuery> for Recorder<S> {
+    async fn on_request(&mut self, request: ProcessQuery, _ctx: &mut Context<Self>) -> Result<()> {
+        let ProcessQuery { from, query } = request;
+        let query = S::unpack_query(&query)?;
+        let msg = Query { from, query };
+        self.query_tx.send(msg)?;
         Ok(())
     }
 }

@@ -1,4 +1,4 @@
-use super::recorder::{Delta, Queries, Recorder};
+use super::recorder::{Queries, Recorder, SendDelta};
 use super::server::HubServer;
 use super::{Query, StateId};
 use crate::atom::State;
@@ -26,12 +26,12 @@ impl<S: State> Dispatcher<S> {
     }
 
     pub fn broadcast(&self, delta: S::Delta) -> Result<()> {
-        let event = Delta::new(None, delta);
+        let event = SendDelta::new(None, delta);
         self.recorder.event(event)
     }
 
     pub fn direct(&self, state_id: StateId, delta: S::Delta) -> Result<()> {
-        let event = Delta::new(Some(state_id), delta);
+        let event = SendDelta::new(Some(state_id), delta);
         self.recorder.event(event)
     }
 }

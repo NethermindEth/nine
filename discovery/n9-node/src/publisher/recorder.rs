@@ -2,12 +2,56 @@ use super::{Query, StateId};
 use crate::atom::{PackedDelta, PackedQuery, PackedState, State};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use crb::agent::{Agent, AgentSession, Context, OnEvent};
+use crb::agent::{Address, Agent, AgentSession, Context, OnEvent, UniAddress};
 use crb::core::{mpsc, Unique};
 use crb::send::{Recipient, Sender};
-use crb::superagent::{ManageSubscription, OnRequest, Request, Subscription};
+use crb::superagent::{
+    Fetcher, InteractExt, ManageSubscription, OnRequest, Request, StateEntry, SubscribeExt,
+    Subscription,
+};
 use std::collections::HashMap;
 use std::marker::PhantomData;
+
+#[derive(Clone)]
+pub struct RecorderLink {
+    address: UniAddress<dyn TypelessRecorder>,
+}
+
+impl RecorderLink {
+    pub fn new(address: impl TypelessRecorder) -> Self {
+        Self {
+            address: UniAddress::new(address),
+        }
+    }
+
+    pub async fn subscribe(
+        &mut self,
+        recipient: Recipient<PackedDelta>,
+    ) -> Result<StateEntry<DeltaFlow>> {
+        let state_id = StateId::unique();
+        let msg = DeltaFlow {
+            state_id,
+            recipient,
+        };
+        let state = self.address.subscribe(msg).await?;
+        Ok(state)
+    }
+
+    pub fn query(&mut self, from: StateId, query: PackedQuery) -> Fetcher<()> {
+        let query = ProcessQuery { from, query };
+        self.address.interact(query)
+    }
+}
+
+pub trait TypelessRecorder
+where
+    Self: Sync + Send + 'static,
+    Self: SubscribeExt<DeltaFlow>,
+    Self: InteractExt<ProcessQuery>,
+{
+}
+
+impl<S: State> TypelessRecorder for Address<Recorder<S>> {}
 
 pub struct Recorder<S: State> {
     state: S,

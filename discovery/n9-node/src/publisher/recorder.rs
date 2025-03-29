@@ -1,20 +1,20 @@
-use super::Query;
+use super::{Query, StateId};
 use crate::atom::State;
 use crate::atom::{PackedDelta, PackedState};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, OnEvent};
 use crb::core::{mpsc, Unique};
-use crb::send::Recipient;
+use crb::send::{Recipient, Sender};
 use crb::superagent::{ManageSubscription, OnRequest, Request, Subscription};
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::marker::PhantomData;
 
 pub struct Recorder<S: State> {
     state: S,
     query_tx: mpsc::UnboundedSender<Query<S>>,
     query_rx: Option<mpsc::UnboundedReceiver<Query<S>>>,
-    subscribers: HashSet<Unique<DeltaFlow>>,
+    subscribers: HashMap<StateId, Unique<DeltaFlow>>,
 }
 
 impl<S: State> Agent for Recorder<S> {
@@ -28,7 +28,7 @@ impl<S: State> Recorder<S> {
             state,
             query_tx: tx,
             query_rx: Some(rx),
-            subscribers: HashSet::new(),
+            subscribers: HashMap::new(),
         }
     }
 }
@@ -61,24 +61,41 @@ impl<S: State> OnRequest<Queries<S>> for Recorder<S> {
 }
 
 pub struct Delta<S: State> {
+    state_id: Option<StateId>,
     delta: S::Delta,
 }
 
 impl<S: State> Delta<S> {
-    pub fn new(delta: S::Delta) -> Self {
-        Self { delta }
+    pub fn new(state_id: Option<StateId>, delta: S::Delta) -> Self {
+        Self { state_id, delta }
     }
 }
 
 #[async_trait]
 impl<S: State> OnEvent<Delta<S>> for Recorder<S> {
     async fn handle(&mut self, event: Delta<S>, _ctx: &mut Context<Self>) -> Result<()> {
-        // self.distribute(update.event)?;
-        Ok(())
+        let packed_delta = S::pack_delta(&event.delta)?;
+        if let Some(state_id) = event.state_id {
+            if let Some(sub) = self.subscribers.get(&state_id) {
+                sub.recipient.send(packed_delta)
+            } else {
+                Err(anyhow!(
+                    "No state with id {state_id:?} to send a delta directly"
+                ))
+            }
+        } else {
+            self.state.apply(event.delta);
+            for (_id, sub) in &self.subscribers {
+                // TODO: Collect errors
+                sub.recipient.send(packed_delta.clone()).ok();
+            }
+            Ok(()) // TODO: Multi-result
+        }
     }
 }
 
 pub struct DeltaFlow {
+    state_id: StateId,
     recipient: Recipient<PackedDelta>,
 }
 
@@ -93,9 +110,10 @@ impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
         sub: Unique<DeltaFlow>,
         _ctx: &mut Context<Self>,
     ) -> Result<PackedState> {
+        let state_id = sub.state_id.clone();
         let state = self.state.divide();
         let packed_state = state.pack_state()?;
-        self.subscribers.insert(sub);
+        self.subscribers.insert(state_id, sub);
         Ok(packed_state)
     }
 
@@ -104,7 +122,7 @@ impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
         sub: Unique<DeltaFlow>,
         _ctx: &mut Context<Self>,
     ) -> Result<()> {
-        self.subscribers.remove(&sub);
+        self.subscribers.remove(&sub.state_id);
         Ok(())
     }
 }

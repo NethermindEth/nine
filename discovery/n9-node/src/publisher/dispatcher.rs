@@ -1,6 +1,6 @@
 use super::recorder::{Delta, Queries, Recorder};
 use super::server::HubServer;
-use super::Query;
+use super::{Query, StateId};
 use crate::atom::State;
 use anyhow::{Error, Result};
 use crb::agent::Address;
@@ -25,8 +25,13 @@ impl<S: State> Dispatcher<S> {
         self.recorder.interact(request).await.map_err(Error::from)
     }
 
-    pub fn event(&self, delta: S::Delta) -> Result<()> {
-        let event = Delta::new(delta);
+    pub fn broadcast(&self, delta: S::Delta) -> Result<()> {
+        let event = Delta::new(None, delta);
+        self.recorder.event(event)
+    }
+
+    pub fn direct(&self, state_id: StateId, delta: S::Delta) -> Result<()> {
+        let event = Delta::new(Some(state_id), delta);
         self.recorder.event(event)
     }
 }

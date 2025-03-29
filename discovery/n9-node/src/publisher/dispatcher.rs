@@ -1,4 +1,4 @@
-use super::recorder::{Queries, Recorder};
+use super::recorder::{Delta, Queries, Recorder};
 use super::server::HubServer;
 use super::Query;
 use crate::atom::State;
@@ -23,6 +23,11 @@ impl<S: State> Dispatcher<S> {
     pub async fn queries(&mut self) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
         let request = Queries::new();
         self.recorder.interact(request).await.map_err(Error::from)
+    }
+
+    pub fn event(&self, delta: S::Delta) -> Result<()> {
+        let event = Delta::new(delta);
+        self.recorder.event(event)
     }
 }
 

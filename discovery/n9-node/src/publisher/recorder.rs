@@ -2,7 +2,7 @@ use super::Query;
 use crate::atom::State;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use crb::agent::{Agent, AgentSession, Context};
+use crb::agent::{Agent, AgentSession, Context, OnEvent};
 use crb::core::mpsc;
 use crb::superagent::{OnRequest, Request};
 use std::marker::PhantomData;
@@ -52,5 +52,23 @@ impl<S: State> OnRequest<Queries<S>> for Recorder<S> {
         self.query_rx
             .take()
             .ok_or_else(|| anyhow!("A queries receiver has taken already."))
+    }
+}
+
+pub struct Delta<S: State> {
+    delta: S::Delta,
+}
+
+impl<S: State> Delta<S> {
+    pub fn new(delta: S::Delta) -> Self {
+        Self { delta }
+    }
+}
+
+#[async_trait]
+impl<S: State> OnEvent<Delta<S>> for Recorder<S> {
+    async fn handle(&mut self, event: Delta<S>, _ctx: &mut Context<Self>) -> Result<()> {
+        // self.distribute(update.event)?;
+        Ok(())
     }
 }

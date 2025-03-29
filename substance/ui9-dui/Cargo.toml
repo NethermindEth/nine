@@ -15,7 +15,7 @@ futures.workspace = true
 libp2p.workspace = true
 log.workspace = true
 serde.workspace = true
-tokio-stream.workspace = true # TODO: Consider moving this out
+tokio-stream.workspace = true
 ui9.workspace = true
 ui9-codec.workspace = true
 

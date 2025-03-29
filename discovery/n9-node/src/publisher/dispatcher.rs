@@ -2,10 +2,11 @@ use super::recorder::{Queries, Recorder, SendDelta};
 use super::server::HubServer;
 use super::{Query, StateId};
 use crate::atom::State;
+use crate::utils::drainer_from_mpsc;
 use anyhow::{Error, Result};
 use crb::agent::Address;
 use crb::core::mpsc;
-use crb::superagent::InteractExt;
+use crb::superagent::{Drainer, InteractExt};
 use std::sync::Arc;
 
 pub struct Dispatcher<S: State> {
@@ -20,9 +21,13 @@ impl<S: State> Dispatcher<S> {
         }
     }
 
-    pub async fn queries(&mut self) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
+    pub async fn receiver(&mut self) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
         let request = Queries::new();
         self.recorder.interact(request).await.map_err(Error::from)
+    }
+
+    pub async fn queries(&mut self) -> Result<Drainer<Query<S>>> {
+        self.receiver().await.map(drainer_from_mpsc)
     }
 
     pub fn broadcast(&self, delta: S::Delta) -> Result<()> {

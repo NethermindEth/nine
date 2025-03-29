@@ -20,7 +20,8 @@ libp2p-stream.workspace = true
 libp2p-request-response = { version = "0.28.0", features = ["cbor"] }
 log.workspace = true
 tokio = { workspace = true, features = ["macros"] }
-tokio-util = { version = "0.7.14", features = ["codec", "compat"] }
+tokio-stream.workspace = true
+tokio-util = { workspace = true , features = ["codec", "compat"] }
 serde.workspace = true
 
 [features]

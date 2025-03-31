@@ -1,4 +1,4 @@
-use super::recorder::{Queries, Recorder, SendDelta};
+use super::recorder::{GetQueriesChannel, Recorder, SendDelta};
 use super::server::HubServer;
 use super::{Query, StateId};
 use crate::atom::State;
@@ -25,7 +25,7 @@ impl<S: State> Dispatcher<S> {
     }
 
     pub async fn receiver(&mut self) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
-        let request = Queries::new();
+        let request = GetQueriesChannel::new();
         self.inner
             .recorder
             .interact(request)

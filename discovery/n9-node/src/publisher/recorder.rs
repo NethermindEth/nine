@@ -76,25 +76,25 @@ impl<S: State> Agent for Recorder<S> {
     type Context = AgentSession<Self>;
 }
 
-pub struct Queries<S> {
+pub struct GetQueriesChannel<S> {
     _type: PhantomData<S>,
 }
 
-impl<S: State> Queries<S> {
+impl<S: State> GetQueriesChannel<S> {
     pub fn new() -> Self {
         Self { _type: PhantomData }
     }
 }
 
-impl<S: State> Request for Queries<S> {
+impl<S: State> Request for GetQueriesChannel<S> {
     type Response = mpsc::UnboundedReceiver<Query<S>>;
 }
 
 #[async_trait]
-impl<S: State> OnRequest<Queries<S>> for Recorder<S> {
+impl<S: State> OnRequest<GetQueriesChannel<S>> for Recorder<S> {
     async fn on_request(
         &mut self,
-        _: Queries<S>,
+        _: GetQueriesChannel<S>,
         _ctx: &mut Context<Self>,
     ) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
         self.query_rx

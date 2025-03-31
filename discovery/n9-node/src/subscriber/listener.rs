@@ -1,5 +1,5 @@
 use super::client::HubClient;
-use super::player::{Deltas, Player};
+use super::player::{GetDeltasChannel, Player};
 use super::StateEvent;
 use crate::atom::State;
 use crate::utils::drainer_from_mpsc;
@@ -24,7 +24,7 @@ impl<S: State> Listener<S> {
     }
 
     pub async fn receiver(&mut self) -> Result<mpsc::UnboundedReceiver<StateEvent<S>>> {
-        let request = Deltas::new();
+        let request = GetDeltasChannel::new();
         self.inner
             .player
             .interact(request)

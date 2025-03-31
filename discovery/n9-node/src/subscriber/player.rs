@@ -42,25 +42,25 @@ impl<S: State> DoAsync<Initialize> for Player<S> {
     }
 }
 
-pub struct Deltas<S> {
+pub struct GetDeltasChannel<S> {
     _type: PhantomData<S>,
 }
 
-impl<S: State> Deltas<S> {
+impl<S: State> GetDeltasChannel<S> {
     pub fn new() -> Self {
         Self { _type: PhantomData }
     }
 }
 
-impl<S: State> Request for Deltas<S> {
+impl<S: State> Request for GetDeltasChannel<S> {
     type Response = mpsc::UnboundedReceiver<StateEvent<S>>;
 }
 
 #[async_trait]
-impl<S: State> OnRequest<Deltas<S>> for Player<S> {
+impl<S: State> OnRequest<GetDeltasChannel<S>> for Player<S> {
     async fn on_request(
         &mut self,
-        _: Deltas<S>,
+        _: GetDeltasChannel<S>,
         _ctx: &mut Context<Self>,
     ) -> Result<mpsc::UnboundedReceiver<StateEvent<S>>> {
         self.event_rx

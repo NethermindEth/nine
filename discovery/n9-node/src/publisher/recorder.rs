@@ -60,10 +60,6 @@ pub struct Recorder<S: State> {
     subscribers: HashMap<StateId, Unique<DeltaFlow>>,
 }
 
-impl<S: State> Agent for Recorder<S> {
-    type Context = AgentSession<Self>;
-}
-
 impl<S: State> Recorder<S> {
     pub fn new(state: S) -> Self {
         let (tx, rx) = mpsc::unbounded_channel();
@@ -74,6 +70,10 @@ impl<S: State> Recorder<S> {
             subscribers: HashMap::new(),
         }
     }
+}
+
+impl<S: State> Agent for Recorder<S> {
+    type Context = AgentSession<Self>;
 }
 
 pub struct Queries<S> {

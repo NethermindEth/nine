@@ -1,3 +1,4 @@
+use super::client::HubClient;
 use super::player::{Deltas, Player};
 use super::StateEvent;
 use crate::atom::State;
@@ -14,6 +15,14 @@ pub struct Listener<S: State> {
 }
 
 impl<S: State> Listener<S> {
+    pub fn new() -> Self {
+        let player = HubClient::spawn_player::<S>();
+        let inner = ListenerInner::from(player);
+        Self {
+            inner: Arc::new(inner),
+        }
+    }
+
     pub async fn receiver(&mut self) -> Result<mpsc::UnboundedReceiver<StateEvent<S>>> {
         let request = Deltas::new();
         self.inner

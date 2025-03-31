@@ -14,6 +14,17 @@ pub struct Player<S: State> {
     event_rx: Option<mpsc::UnboundedReceiver<StateEvent<S>>>,
 }
 
+impl<S: State> Player<S> {
+    pub fn new() -> Self {
+        let (tx, rx) = mpsc::unbounded_channel();
+        Self {
+            state_tx: None,
+            event_tx: tx,
+            event_rx: Some(rx),
+        }
+    }
+}
+
 impl<S: State> Agent for Player<S> {
     type Context = AgentSession<Self>;
 

@@ -1,9 +1,8 @@
 use super::StateEvent;
 use crate::atom::State;
-use crate::publisher::Query;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
+use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
 use crb::core::{mpsc, watch};
 use crb::superagent::{OnRequest, Request};
 use std::marker::PhantomData;
@@ -66,5 +65,24 @@ impl<S: State> OnRequest<GetDeltasChannel<S>> for Player<S> {
         self.event_rx
             .take()
             .ok_or_else(|| anyhow!("A deltas receiver has taken already."))
+    }
+}
+
+pub struct SendQuery<S: State> {
+    query: S::Query,
+}
+
+impl<S: State> SendQuery<S> {
+    pub fn new(query: S::Query) -> Self {
+        Self { query }
+    }
+}
+
+#[async_trait]
+impl<S: State> OnEvent<SendQuery<S>> for Player<S> {
+    async fn handle(&mut self, event: SendQuery<S>, _ctx: &mut Context<Self>) -> Result<()> {
+        let packed_query = S::pack_query(&event.query)?;
+        // TODO: Forward to a recorder
+        Ok(())
     }
 }

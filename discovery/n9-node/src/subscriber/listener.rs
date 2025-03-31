@@ -1,5 +1,5 @@
 use super::client::HubClient;
-use super::player::{GetDeltasChannel, Player};
+use super::player::{GetDeltasChannel, Player, SendQuery};
 use super::StateEvent;
 use crate::atom::State;
 use crate::utils::drainer_from_mpsc;
@@ -34,6 +34,11 @@ impl<S: State> Listener<S> {
 
     pub async fn events(&mut self) -> Result<Drainer<StateEvent<S>>> {
         self.receiver().await.map(drainer_from_mpsc)
+    }
+
+    pub fn query(&self, query: S::Query) -> Result<()> {
+        let event = SendQuery::new(query);
+        self.inner.player.event(event)
     }
 }
 

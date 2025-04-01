@@ -10,11 +10,10 @@ use std::sync::LazyLock;
 static PUB_BRIDGE: LazyLock<EventBridge<Delegate>> = LazyLock::new(|| EventBridge::new());
 
 impl HubClient {
-    pub fn spawn_player<S>() -> Address<Player<S>>
+    pub fn spawn_player<S>(player: Player<S>) -> Address<Player<S>>
     where
         S: State,
     {
-        let player = Player::new();
         let runtime = RunAgent::new(player);
         let address = runtime.address();
         let delegate = Delegate {

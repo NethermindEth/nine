@@ -12,9 +12,18 @@ pub struct AtomId {
     pub path: Vec<ElementId>,
 }
 
+impl AtomId {
+    pub fn typed<S>(self) -> TypedAtomId<S> {
+        TypedAtomId {
+            atom_id: self,
+            _type: PhantomData,
+        }
+    }
+}
+
 #[derive(Deref)]
-pub struct TypedAtomId<A> {
+pub struct TypedAtomId<S> {
     #[deref]
     pub atom_id: AtomId,
-    _type: PhantomData<A>,
+    _type: PhantomData<S>,
 }

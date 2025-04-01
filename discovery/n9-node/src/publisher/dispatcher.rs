@@ -1,7 +1,7 @@
 use super::recorder::{GetQueriesChannel, Recorder, SendDelta};
 use super::server::HubServer;
 use super::{Query, StateId};
-use crate::atom::State;
+use crate::atom::{AtomId, State};
 use crate::utils::drainer_from_mpsc;
 use anyhow::{Error, Result};
 use crb::agent::Address;
@@ -16,8 +16,9 @@ pub struct Dispatcher<S: State> {
 }
 
 impl<S: State> Dispatcher<S> {
-    pub fn new(state: S) -> Self {
-        let recorder = HubServer::spawn_recorder(state);
+    pub fn new(atom_id: AtomId, state: S) -> Self {
+        let recorder = Recorder::new(state);
+        let recorder = HubServer::spawn_recorder(recorder);
         let inner = DispatcherInner::from(recorder);
         Self {
             inner: Arc::new(inner),

@@ -1,5 +1,6 @@
 use super::{Projection, StateEvent};
-use crate::atom::{PackedDelta, State};
+use crate::atom::{PackedDelta, State, TypedAtomId};
+use crate::node::Node;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
@@ -8,15 +9,17 @@ use crb::superagent::{OnRequest, Request};
 use std::marker::PhantomData;
 
 pub struct Player<S: State> {
+    atom_id: TypedAtomId<S>,
     state_tx: Option<watch::Sender<S>>,
     event_tx: mpsc::UnboundedSender<StateEvent<S>>,
     event_rx: Option<mpsc::UnboundedReceiver<StateEvent<S>>>,
 }
 
 impl<S: State> Player<S> {
-    pub fn new() -> Self {
+    pub fn new(atom_id: TypedAtomId<S>) -> Self {
         let (tx, rx) = mpsc::unbounded_channel();
         Self {
+            atom_id,
             state_tx: None,
             event_tx: tx,
             event_rx: Some(rx),
@@ -37,6 +40,7 @@ struct Initialize;
 #[async_trait]
 impl<S: State> DoAsync<Initialize> for Player<S> {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
+        let node = Node::link()?;
         Ok(Next::events())
     }
 }

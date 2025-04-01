@@ -1,7 +1,7 @@
 use super::client::HubClient;
 use super::player::{GetDeltasChannel, Player, SendQuery};
 use super::StateEvent;
-use crate::atom::State;
+use crate::atom::{AtomId, State};
 use crate::utils::drainer_from_mpsc;
 use anyhow::{Error, Result};
 use crb::agent::Address;
@@ -15,8 +15,9 @@ pub struct Listener<S: State> {
 }
 
 impl<S: State> Listener<S> {
-    pub fn new() -> Self {
-        let player = HubClient::spawn_player::<S>();
+    pub fn new(atom_id: AtomId) -> Self {
+        let player = Player::new(atom_id.typed());
+        let player = HubClient::spawn_player::<S>(player);
         let inner = ListenerInner::from(player);
         Self {
             inner: Arc::new(inner),

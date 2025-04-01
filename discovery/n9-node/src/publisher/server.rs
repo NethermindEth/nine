@@ -16,11 +16,10 @@ pub struct HubServerLink {
 }
 
 impl HubServer {
-    pub fn spawn_recorder<S>(state: S) -> Address<Recorder<S>>
+    pub fn spawn_recorder<S>(recorder: Recorder<S>) -> Address<Recorder<S>>
     where
         S: State,
     {
-        let recorder = Recorder::new(state);
         let runtime = RunAgent::new(recorder);
         let address = runtime.address();
         let delegate = Delegate {

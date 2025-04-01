@@ -1,15 +1,13 @@
+use super::aqn::Aqn;
 use derive_more::Deref;
 use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 
-pub type ElementId = String;
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AtomId {
     pub peer_id: PeerId,
-    // TODO: Replace with Fqn
-    pub path: Vec<ElementId>,
+    pub path: Aqn,
 }
 
 impl AtomId {
@@ -21,6 +19,7 @@ impl AtomId {
     }
 }
 
+// TODO: Consider renaming to `Link`
 #[derive(Deref)]
 pub struct TypedAtomId<S> {
     #[deref]

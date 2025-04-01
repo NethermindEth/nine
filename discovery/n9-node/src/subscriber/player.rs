@@ -9,17 +9,17 @@ use crb::superagent::{OnRequest, Request};
 use std::marker::PhantomData;
 
 pub struct Player<S: State> {
-    atom_id: TypedAtomId<S>,
+    atom: TypedAtomId<S>,
     state_tx: Option<watch::Sender<S>>,
     event_tx: mpsc::UnboundedSender<StateEvent<S>>,
     event_rx: Option<mpsc::UnboundedReceiver<StateEvent<S>>>,
 }
 
 impl<S: State> Player<S> {
-    pub fn new(atom_id: TypedAtomId<S>) -> Self {
+    pub fn new(atom: TypedAtomId<S>) -> Self {
         let (tx, rx) = mpsc::unbounded_channel();
         Self {
-            atom_id,
+            atom,
             state_tx: None,
             event_tx: tx,
             event_rx: Some(rx),
@@ -41,6 +41,24 @@ struct Initialize;
 impl<S: State> DoAsync<Initialize> for Player<S> {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let node = Node::link()?;
+        if self.atom.same_peer(node.peer) {
+            let aqn = self.atom.path.clone();
+            /*
+            let mut recorder = node.server.discover(aqn).await?;
+            let recipient = ctx.recipient();
+            let state_entry = recorder.subscribe(recipient).await?;
+
+            // Assign the initial state
+            let unpacked_state = F::unpack_state(&state_entry.state)?;
+            self.state.allocate_state(unpacked_state);
+
+            // Store subscription handle and a link to forward actions
+            self.recorder.fill(recorder)?;
+            self.entry.fill(state_entry.entry)?;
+            */
+        } else {
+            // Use a connector
+        }
         Ok(Next::events())
     }
 }

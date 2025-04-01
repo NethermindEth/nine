@@ -11,7 +11,7 @@ use std::sync::OnceLock;
 static NODE: OnceLock<NodeLink> = OnceLock::new();
 
 pub struct NodeLink {
-    pub peer_id: PeerId,
+    pub peer: PeerId,
     pub node: Address<Node>,
     pub server: HubServerLink,
     pub connector: ConnectorLink,
@@ -65,7 +65,7 @@ struct Initialize;
 impl DoAsync<Initialize> for Node {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let key = Key::generate();
-        let peer_id = key.peer;
+        let peer = key.peer;
 
         let mut stacker = Stacker::new();
 
@@ -76,7 +76,7 @@ impl DoAsync<Initialize> for Node {
         let server = stacker.schedule(server, ());
 
         let link = NodeLink {
-            peer_id,
+            peer,
             node: ctx.to_address(),
             server: server.equip(),
             connector: connector.equip(),

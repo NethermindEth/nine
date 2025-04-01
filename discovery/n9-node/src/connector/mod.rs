@@ -272,7 +272,7 @@ impl OnRequest<protocol::Request> for Connector {
         _ctx: &mut Context<Self>,
     ) -> Result<()> {
         let request = interaction.interplay.request;
-        let peer_id = request.atom_id.peer_id;
+        let peer_id = request.atom_id.peer;
         let swarm = self.swarm.get_mut()?;
         let out_id = swarm
             .behaviour_mut()

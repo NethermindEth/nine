@@ -6,14 +6,18 @@ use std::marker::PhantomData;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AtomId {
-    pub peer_id: PeerId,
+    pub peer: PeerId,
     pub path: Aqn,
 }
 
 impl AtomId {
+    pub fn same_peer(&self, peer: PeerId) -> bool {
+        self.peer == peer
+    }
+
     pub fn typed<S>(self) -> TypedAtomId<S> {
         TypedAtomId {
-            atom_id: self,
+            atom: self,
             _type: PhantomData,
         }
     }
@@ -23,6 +27,6 @@ impl AtomId {
 #[derive(Deref)]
 pub struct TypedAtomId<S> {
     #[deref]
-    pub atom_id: AtomId,
+    pub atom: AtomId,
     _type: PhantomData<S>,
 }

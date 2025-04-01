@@ -18,7 +18,8 @@ pub struct Dispatcher<S: State> {
 impl<S: State> Dispatcher<S> {
     pub fn new(atom_id: AtomId, state: S) -> Self {
         let recorder = Recorder::new(state);
-        let recorder = HubServer::spawn_recorder(recorder);
+        let aqn = atom_id.path;
+        let recorder = HubServer::spawn_recorder(aqn, recorder);
         let inner = DispatcherInner::from(recorder);
         Self {
             inner: Arc::new(inner),

@@ -1,5 +1,5 @@
 use super::StateEvent;
-use crate::atom::State;
+use crate::atom::{PackedDelta, State};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
@@ -84,5 +84,46 @@ impl<S: State> OnEvent<SendQuery<S>> for Player<S> {
         let packed_query = S::pack_query(&event.query)?;
         // TODO: Forward to a recorder
         Ok(())
+    }
+}
+
+pub struct ProcessDelta {
+    delta: PackedDelta,
+}
+
+#[async_trait]
+impl<S: State> OnEvent<ProcessDelta> for Player<S> {
+    async fn handle(&mut self, event: ProcessDelta, _ctx: &mut Context<Self>) -> Result<()> {
+        let delta = S::unpack_delta(&event.delta)?;
+        // self.state.apply_delta(delta);
+        Ok(())
+    }
+}
+
+struct PlayerState<S: State> {
+    state_tx: Option<watch::Sender<S>>,
+    event_tx: mpsc::UnboundedSender<StateEvent<S>>,
+}
+
+impl<S: State> PlayerState<S> {
+    pub fn apply_event(&mut self, delta: S::Delta) -> Result<()> {
+        let state_tx = self
+            .state_tx
+            .as_mut()
+            .ok_or_else(|| anyhow!("No state to apply a delta"))?;
+        state_tx.send_modify(|state| {
+            state.apply(delta.clone());
+        });
+        self.send(StateEvent::Delta(delta))?;
+        Ok(())
+    }
+
+    fn send(&self, event: StateEvent<S>) -> Result<()> {
+        if self.event_tx.is_closed() {
+            Err(anyhow!("State deltas channel is closed"))
+        } else {
+            self.event_tx.send(event)?;
+            Ok(())
+        }
     }
 }

@@ -95,18 +95,13 @@ pub struct ProcessDelta {
 impl<S: State> OnEvent<ProcessDelta> for Player<S> {
     async fn handle(&mut self, event: ProcessDelta, _ctx: &mut Context<Self>) -> Result<()> {
         let delta = S::unpack_delta(&event.delta)?;
-        // self.state.apply_delta(delta);
+        self.apply_delta(delta)?;
         Ok(())
     }
 }
 
-struct PlayerState<S: State> {
-    state_tx: Option<watch::Sender<S>>,
-    event_tx: mpsc::UnboundedSender<StateEvent<S>>,
-}
-
-impl<S: State> PlayerState<S> {
-    pub fn apply_event(&mut self, delta: S::Delta) -> Result<()> {
+impl<S: State> Player<S> {
+    pub fn apply_delta(&mut self, delta: S::Delta) -> Result<()> {
         let state_tx = self
             .state_tx
             .as_mut()

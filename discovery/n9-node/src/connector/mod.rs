@@ -12,6 +12,9 @@ mod behaviour;
 mod keypair;
 mod protocol;
 
+pub use keypair::Key;
+pub use libp2p::PeerId;
+
 use crate::atom::AtomId;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -24,7 +27,6 @@ use crb::superagent::{
 };
 use derive_more::{Deref, DerefMut, From};
 use futures::stream::StreamExt;
-pub use keypair::Key;
 use libp2p::{gossipsub, swarm::SwarmEvent, Multiaddr, Swarm};
 use libp2p_request_response::{self as request_response, OutboundRequestId};
 use libp2p_stream as stream;

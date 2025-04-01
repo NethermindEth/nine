@@ -50,6 +50,7 @@ n9-kit = { version = "0.0.1", path = "substance/n9-kit" }
 n9-std = { version = "0.0.1", path = "substance/n9-std" }
 libp2p = { version = "0.55.0", default-features = false, features = ["gossipsub", "macros", "noise", "plaintext", "serde", "quic", "yamux"] }
 libp2p-stream = "0.3.0-alpha"
+nom = "8.0.0"
 futures-bounded = "0.2.4"
 log = "0.4.27"
 regex = "1.11.1"

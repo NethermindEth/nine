@@ -4,8 +4,9 @@ use crate::subscriber::HubClient;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{
-    Address, Agent, AgentSession, Context, DoAsync, Equip, Next, Standalone, ToAddress,
+    Address, Agent, AgentSession, Context, DoAsync, Equip, Next, Standalone, ToAddress, OnEvent, RunAgent,
 };
+use crb::runtime::Runtime;
 use crb::superagent::{PingExt, Stacker, Supervisor, SupervisorSession};
 use std::sync::OnceLock;
 
@@ -27,6 +28,19 @@ impl Node {
 
     pub fn link() -> Result<&'static NodeLink> {
         NODE.get().ok_or_else(|| anyhow!("Node is not assigned"))
+    }
+
+    pub fn add<A>(agent: A) -> Result<()>
+    where
+        A: Agent,
+        A::Context: Default,
+    {
+        let runtime = RunAgent::new(agent);
+        let event = Delegate {
+            runtime: Box::new(runtime),
+        };
+        Self::link()?.node.event(event)?;
+        Ok(())
     }
 
     pub async fn bootstrap() -> Result<()> {
@@ -91,5 +105,17 @@ impl DoAsync<Initialize> for Node {
         stacker.spawn_scheduled(ctx);
 
         Ok(Next::events())
+    }
+}
+
+struct Delegate {
+    runtime: Box<dyn Runtime>,
+}
+
+#[async_trait]
+impl OnEvent<Delegate> for Node {
+    async fn handle(&mut self, event: Delegate, ctx: &mut Context<Self>) -> Result<()> {
+        ctx.spawn_trackable(event.runtime, ());
+        Ok(())
     }
 }

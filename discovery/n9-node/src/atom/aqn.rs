@@ -6,7 +6,6 @@ use nom::{
 };
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::iter;
 use std::str::FromStr;
 use thiserror::Error;
 

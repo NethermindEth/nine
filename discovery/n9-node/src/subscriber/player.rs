@@ -12,15 +12,19 @@ use std::marker::PhantomData;
 struct Binding {
     state_id: StateId,
     recorder: RecorderLink,
+    #[allow(unused)]
     entry: Entry<DeltaFlow>,
 }
 
 pub struct Player<S: State> {
     atom: TypedAtomId<S>,
-    state_tx: Option<watch::Sender<S>>,
+    /// A sender for state events: new_state, delta, lost.
     event_tx: mpsc::UnboundedSender<StateEvent<S>>,
+    /// A receiver for state events that is used by a listener.
     event_rx: Option<mpsc::UnboundedReceiver<StateEvent<S>>>,
     binding: Slot<Binding>,
+    /// A sender for a projected state, when it's unpacked
+    state_tx: Option<watch::Sender<S>>,
 }
 
 impl<S: State> Player<S> {
@@ -28,10 +32,10 @@ impl<S: State> Player<S> {
         let (tx, rx) = mpsc::unbounded_channel();
         Self {
             atom,
-            state_tx: None,
             event_tx: tx,
             event_rx: Some(rx),
             binding: Slot::empty(),
+            state_tx: None,
         }
     }
 }

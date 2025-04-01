@@ -2,6 +2,7 @@ mod client;
 mod listener;
 mod player;
 
+pub use client::HubClient;
 pub use listener::Listener;
 
 use crate::atom::{AtomId, State};

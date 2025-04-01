@@ -1,5 +1,6 @@
 use crate::connector::{Connector, ConnectorLink, Key, PeerId};
 use crate::publisher::{HubServer, HubServerLink};
+use crate::subscriber::HubClient;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{
@@ -74,6 +75,9 @@ impl DoAsync<Initialize> for Node {
 
         let server = HubServer::new();
         let server = stacker.schedule(server, ());
+
+        let client = HubClient::new();
+        let _client = stacker.schedule(client, ());
 
         let link = NodeLink {
             peer,

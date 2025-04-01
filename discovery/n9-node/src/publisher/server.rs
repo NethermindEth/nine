@@ -6,7 +6,8 @@ use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, DoAsync, Next, OnEvent, RunAgent};
 use crb::runtime::{InteractiveRuntime, Runtime};
 use crb::superagent::{
-    EventBridge, InteractExt, OnRequest, Request, StreamSession, Supervisor, SupervisorSession,
+    EventBridge, InteractExt, OnRequest, Relation, Request, StreamSession, Supervisor,
+    SupervisorSession,
 };
 use derive_more::{Deref, DerefMut, From};
 use std::collections::HashMap;
@@ -46,12 +47,14 @@ impl HubServer {
 
 pub struct HubServer {
     recorders: HashMap<Aqn, RecorderLink>,
+    relations: HashMap<Relation<Self>, Aqn>,
 }
 
 impl HubServer {
     pub fn new() -> Self {
         Self {
             recorders: HashMap::new(),
+            relations: HashMap::new(),
         }
     }
 }
@@ -59,6 +62,12 @@ impl HubServer {
 impl Supervisor for HubServer {
     type BasedOn = StreamSession<Self>;
     type GroupBy = ();
+
+    fn finished(&mut self, rel: &Relation<Self>, _ctx: &mut Context<Self>) {
+        if let Some(fqn) = self.relations.remove(rel) {
+            self.recorders.remove(&fqn);
+        }
+    }
 }
 
 impl Agent for HubServer {
@@ -93,8 +102,8 @@ impl OnEvent<Delegate> for HubServer {
         if self.recorders.contains_key(path) {
             Err(anyhow!("Recorder {path} already registered"))
         } else {
-            ctx.spawn_trackable(event.runtime, ());
-            // self.relations.insert(rel, path.clone());
+            let rel = ctx.spawn_trackable(event.runtime, ());
+            self.relations.insert(rel, path.clone());
             self.recorders.insert(path.clone(), event.link);
             Ok(())
         }

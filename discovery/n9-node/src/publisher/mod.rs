@@ -2,6 +2,8 @@ mod dispatcher;
 mod recorder;
 mod server;
 
+pub use server::{HubServer, HubServerLink};
+
 use crate::atom::State;
 use crb::core::uuid::Uuid;
 use serde::{Deserialize, Serialize};

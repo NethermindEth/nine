@@ -12,3 +12,4 @@ anyhow.workspace = true
 env_logger.workspace = true
 n9-node = { workspace = true, features = ["std"] }
 tokio = { workspace = true, features = ["signal"] }
+config-toml.path = "../../discovery/config-toml"

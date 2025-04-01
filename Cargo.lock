@@ -1372,6 +1372,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "config-toml"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "crb",
+ "derive_more 2.0.1",
+ "dirs",
+ "log",
+ "notify",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "console_error_panic_hook"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9550,6 +9565,7 @@ name = "trading-agent"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "config-toml",
  "env_logger",
  "n9-node",
  "tokio",

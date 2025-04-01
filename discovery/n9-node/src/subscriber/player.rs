@@ -69,6 +69,7 @@ impl<S: State> DoAsync<Initialize> for Player<S> {
             };
             self.binding.fill(binding)?;
         } else {
+            return Err(anyhow!("Not implemented: p2p player connections"));
             // Use a connector
         }
         Ok(Next::events())

@@ -1,18 +1,26 @@
 use super::{Projection, StateEvent};
 use crate::atom::{PackedDelta, State, TypedAtomId};
 use crate::node::Node;
+use crate::publisher::{DeltaFlow, RecorderLink, StateId};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Agent, AgentSession, Context, DoAsync, Next, OnEvent};
-use crb::core::{mpsc, watch};
-use crb::superagent::{OnRequest, Request};
+use crb::core::{mpsc, watch, Slot};
+use crb::superagent::{Entry, OnRequest, Request};
 use std::marker::PhantomData;
+
+struct Binding {
+    state_id: StateId,
+    recorder: RecorderLink,
+    entry: Entry<DeltaFlow>,
+}
 
 pub struct Player<S: State> {
     atom: TypedAtomId<S>,
     state_tx: Option<watch::Sender<S>>,
     event_tx: mpsc::UnboundedSender<StateEvent<S>>,
     event_rx: Option<mpsc::UnboundedReceiver<StateEvent<S>>>,
+    binding: Slot<Binding>,
 }
 
 impl<S: State> Player<S> {
@@ -23,6 +31,7 @@ impl<S: State> Player<S> {
             state_tx: None,
             event_tx: tx,
             event_rx: Some(rx),
+            binding: Slot::empty(),
         }
     }
 }
@@ -43,19 +52,22 @@ impl<S: State> DoAsync<Initialize> for Player<S> {
         let node = Node::link()?;
         if self.atom.same_peer(node.peer) {
             let aqn = self.atom.path.clone();
-            /*
             let mut recorder = node.server.discover(aqn).await?;
             let recipient = ctx.recipient();
             let state_entry = recorder.subscribe(recipient).await?;
 
             // Assign the initial state
-            let unpacked_state = F::unpack_state(&state_entry.state)?;
-            self.state.allocate_state(unpacked_state);
+            let state_init = state_entry.state;
+            let unpacked_state = S::unpack_state(&state_init.state)?;
+            self.allocate_state(unpacked_state)?;
 
             // Store subscription handle and a link to forward actions
-            self.recorder.fill(recorder)?;
-            self.entry.fill(state_entry.entry)?;
-            */
+            let binding = Binding {
+                state_id: state_init.state_id,
+                recorder,
+                entry: state_entry.entry,
+            };
+            self.binding.fill(binding)?;
         } else {
             // Use a connector
         }
@@ -103,20 +115,20 @@ impl<S: State> SendQuery<S> {
 #[async_trait]
 impl<S: State> OnEvent<SendQuery<S>> for Player<S> {
     async fn handle(&mut self, event: SendQuery<S>, _ctx: &mut Context<Self>) -> Result<()> {
+        let binding = self.binding.get_mut()?;
         let packed_query = S::pack_query(&event.query)?;
-        // TODO: Forward to a recorder
+        binding
+            .recorder
+            .query(binding.state_id, packed_query)
+            .await?;
         Ok(())
     }
 }
 
-pub struct ProcessDelta {
-    delta: PackedDelta,
-}
-
 #[async_trait]
-impl<S: State> OnEvent<ProcessDelta> for Player<S> {
-    async fn handle(&mut self, event: ProcessDelta, _ctx: &mut Context<Self>) -> Result<()> {
-        let delta = S::unpack_delta(&event.delta)?;
+impl<S: State> OnEvent<PackedDelta> for Player<S> {
+    async fn handle(&mut self, delta: PackedDelta, _ctx: &mut Context<Self>) -> Result<()> {
+        let delta = S::unpack_delta(&delta)?;
         self.apply_delta(delta)?;
         Ok(())
     }

@@ -2,6 +2,7 @@ mod dispatcher;
 mod recorder;
 mod server;
 
+pub use recorder::{DeltaFlow, RecorderLink};
 pub use server::{HubServer, HubServerLink};
 
 use crate::atom::State;
@@ -15,7 +16,7 @@ pub struct Query<S: State> {
 }
 
 /// An id of a replicated state.
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Deserialize, Serialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct StateId(Uuid);
 
 impl StateId {

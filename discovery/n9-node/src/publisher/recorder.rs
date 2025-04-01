@@ -142,8 +142,13 @@ pub struct DeltaFlow {
     recipient: Recipient<PackedDelta>,
 }
 
+pub struct StateInit {
+    pub state_id: StateId,
+    pub state: PackedState,
+}
+
 impl Subscription for DeltaFlow {
-    type State = PackedState;
+    type State = StateInit;
 }
 
 #[async_trait]
@@ -152,12 +157,16 @@ impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
         &mut self,
         sub: Unique<DeltaFlow>,
         _ctx: &mut Context<Self>,
-    ) -> Result<PackedState> {
-        let state_id = sub.state_id.clone();
+    ) -> Result<StateInit> {
+        let state_id = sub.state_id;
         let state = self.state.divide();
         let packed_state = state.pack_state()?;
         self.subscribers.insert(state_id, sub);
-        Ok(packed_state)
+        let state_init = StateInit {
+            state_id,
+            state: packed_state,
+        };
+        Ok(state_init)
     }
 
     async fn unsubscribe(

@@ -1,4 +1,4 @@
-use super::StateEvent;
+use super::{Projection, StateEvent};
 use crate::atom::{PackedDelta, State};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -101,7 +101,19 @@ impl<S: State> OnEvent<ProcessDelta> for Player<S> {
 }
 
 impl<S: State> Player<S> {
-    pub fn apply_delta(&mut self, delta: S::Delta) -> Result<()> {
+    fn allocate_state(&mut self, new_state: S) -> Result<()> {
+        let (state, state_tx) = Projection::new(new_state);
+        self.state_tx = Some(state_tx);
+        let event = StateEvent::State(state);
+        self.send(event)
+    }
+
+    fn deallocate_state(&mut self) -> Result<()> {
+        self.state_tx.take();
+        self.send(StateEvent::Lost)
+    }
+
+    fn apply_delta(&mut self, delta: S::Delta) -> Result<()> {
         let state_tx = self
             .state_tx
             .as_mut()

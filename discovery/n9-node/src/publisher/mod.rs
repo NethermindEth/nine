@@ -21,7 +21,7 @@ pub struct Pub<P: Publisher> {
 }
 
 impl<P: Publisher> Pub<P> {
-    pub fn new(atom_id: AtomId) -> Self {
+    pub fn connect(atom_id: AtomId) -> Self {
         let state = P::default();
         let dispatcher = Dispatcher::<P>::new(atom_id, state);
         Self {

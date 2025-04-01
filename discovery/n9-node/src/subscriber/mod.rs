@@ -2,8 +2,30 @@ mod client;
 mod listener;
 mod player;
 
-use crate::atom::State;
+pub use listener::Listener;
+
+use crate::atom::{AtomId, State};
 use crb::core::watch;
+use derive_more::{Deref, DerefMut};
+use std::ops::DerefMut;
+
+pub trait Subscriber: State + Default {
+    type Driver: From<Listener<Self>> + DerefMut<Target = Listener<Self>> + Send;
+}
+
+#[derive(Deref, DerefMut)]
+pub struct Sub<P: Subscriber> {
+    driver: P::Driver,
+}
+
+impl<P: Subscriber> Sub<P> {
+    pub fn connect(atom_id: AtomId) -> Self {
+        let listener = Listener::<P>::new(atom_id);
+        Self {
+            driver: P::Driver::from(listener),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub enum StateEvent<S: State> {

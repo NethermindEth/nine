@@ -2,8 +2,10 @@ use crate::connector::{Connector, ConnectorLink, Key, PeerId};
 use crate::publisher::{HubServer, HubServerLink};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use crb::agent::{Address, Agent, AgentSession, Context, DoAsync, Equip, Next, ToAddress};
-use crb::superagent::{Stacker, Supervisor, SupervisorSession};
+use crb::agent::{
+    Address, Agent, AgentSession, Context, DoAsync, Equip, Next, Standalone, ToAddress,
+};
+use crb::superagent::{PingExt, Stacker, Supervisor, SupervisorSession};
 use std::sync::OnceLock;
 
 static NODE: OnceLock<NodeLink> = OnceLock::new();
@@ -16,6 +18,33 @@ pub struct NodeLink {
 }
 
 pub struct Node {}
+
+impl Node {
+    fn new() -> Self {
+        Self {}
+    }
+
+    pub fn link() -> Result<&'static NodeLink> {
+        NODE.get().ok_or_else(|| anyhow!("Node is not assigned"))
+    }
+
+    pub async fn bootstrap() -> Result<()> {
+        let node = Self::new();
+        node.spawn().ping().await?;
+        Ok(())
+    }
+
+    pub async fn shutdown() -> Result<()> {
+        if let Some(link) = NODE.get() {
+            let mut node = link.node.clone();
+            node.interrupt()?;
+            node.join().await?;
+        }
+        Ok(())
+    }
+}
+
+impl Standalone for Node {}
 
 impl Supervisor for Node {
     type BasedOn = AgentSession<Self>;

@@ -1,15 +1,13 @@
 use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::{Agent, Context, Next, DoAsync};
+use crb::agent::{Agent, Context, DoAsync, Next};
 use crb::superagent::StreamSession;
 
-pub struct ConfigToml {
-}
+pub struct ConfigToml {}
 
 impl ConfigToml {
     pub fn new() -> Self {
-        Self {
-        }
+        Self {}
     }
 }
 

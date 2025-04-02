@@ -1381,7 +1381,9 @@ dependencies = [
  "derive_more 2.0.1",
  "dirs",
  "log",
+ "n9-node",
  "notify",
+ "serde",
  "tokio",
  "toml",
 ]

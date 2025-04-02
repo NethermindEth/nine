@@ -4,7 +4,8 @@ use crate::subscriber::HubClient;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{
-    Address, Agent, AgentSession, Context, DoAsync, Equip, Next, Standalone, ToAddress, OnEvent, RunAgent,
+    Address, Agent, AgentSession, Context, DoAsync, Equip, Next, OnEvent, RunAgent, Standalone,
+    ToAddress,
 };
 use crb::runtime::Runtime;
 use crb::superagent::{PingExt, Stacker, Supervisor, SupervisorSession};

@@ -1,4 +1,4 @@
-use super::{Query, StateId};
+use super::{PubEvent, PubValue, StateId};
 use crate::atom::{PackedDelta, PackedQuery, PackedState, State};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -56,9 +56,9 @@ impl<S: State> TypelessRecorder for Address<Recorder<S>> {}
 pub struct Recorder<S: State> {
     state: S,
 
-    query_tx: mpsc::UnboundedSender<Query<S>>,
+    query_tx: mpsc::UnboundedSender<PubEvent<S>>,
     // TODO: Add a timer that will drop rxs (or self-consume and drop)
-    query_rx: Option<mpsc::UnboundedReceiver<Query<S>>>,
+    query_rx: Option<mpsc::UnboundedReceiver<PubEvent<S>>>,
 
     subscribers: HashMap<StateId, Unique<DeltaFlow>>,
 }
@@ -90,7 +90,7 @@ impl<S: State> GetQueriesChannel<S> {
 }
 
 impl<S: State> Request for GetQueriesChannel<S> {
-    type Response = mpsc::UnboundedReceiver<Query<S>>;
+    type Response = mpsc::UnboundedReceiver<PubEvent<S>>;
 }
 
 #[async_trait]
@@ -99,7 +99,7 @@ impl<S: State> OnRequest<GetQueriesChannel<S>> for Recorder<S> {
         &mut self,
         _: GetQueriesChannel<S>,
         _ctx: &mut Context<Self>,
-    ) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
+    ) -> Result<mpsc::UnboundedReceiver<PubEvent<S>>> {
         self.query_rx
             .take()
             .ok_or_else(|| anyhow!("A queries receiver has taken already."))
@@ -161,15 +161,22 @@ impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
         sub: Unique<DeltaFlow>,
         _ctx: &mut Context<Self>,
     ) -> Result<StateInit> {
-        let state_id = sub.state_id;
+        let from = sub.state_id;
         let state = self.state.divide();
         let packed_state = state.pack_state()?;
-        self.subscribers.insert(state_id, sub);
+
+        // Register an element
+        self.subscribers.insert(from, sub);
+        let msg = PubEvent {
+            from,
+            value: PubValue::Connected,
+        };
+        self.query_tx.send(msg)?;
+
         let state_init = StateInit {
-            state_id,
+            state_id: from,
             state: packed_state,
         };
-        // TODO: Send a notification to a separate flow
         Ok(state_init)
     }
 
@@ -178,8 +185,14 @@ impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
         sub: Unique<DeltaFlow>,
         _ctx: &mut Context<Self>,
     ) -> Result<()> {
-        // TODO: Send a notification to a separate flow
-        self.subscribers.remove(&sub.state_id);
+        // Unregister an element
+        let from = sub.state_id;
+        let msg = PubEvent {
+            from,
+            value: PubValue::Disconnected,
+        };
+        self.query_tx.send(msg)?;
+        self.subscribers.remove(&from);
         Ok(())
     }
 }
@@ -197,9 +210,18 @@ impl Request for ProcessQuery {
 impl<S: State> OnRequest<ProcessQuery> for Recorder<S> {
     async fn on_request(&mut self, request: ProcessQuery, _ctx: &mut Context<Self>) -> Result<()> {
         let ProcessQuery { from, query } = request;
-        let value = S::unpack_query(&query)?;
-        let msg = Query { from, value };
-        self.query_tx.send(msg)?;
-        Ok(())
+        if self.subscribers.contains_key(&from) {
+            let value = S::unpack_query(&query)?;
+            let msg = PubEvent {
+                from,
+                value: PubValue::Query(value),
+            };
+            self.query_tx.send(msg)?;
+            Ok(())
+        } else {
+            Err(anyhow!(
+                "Received a query from a not listed subscriber: {from}"
+            ))
+        }
     }
 }

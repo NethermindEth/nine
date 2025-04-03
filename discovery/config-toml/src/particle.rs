@@ -4,7 +4,7 @@ use anyhow::Result;
 use async_trait::async_trait;
 use crb::agent::{Agent, Context, DoAsync, Next, OnEvent};
 use crb::superagent::{StreamSession, Supervisor, SupervisorSession};
-use n9_node::{AtomId, Pub, Query};
+use n9_node::{AtomId, Pub, PubEvent, PubValue};
 
 pub struct ConfigToml {
     state: Pub<ConfigState>,
@@ -46,14 +46,25 @@ impl DoAsync<Initialize> for ConfigToml {
 }
 
 #[async_trait]
-impl OnEvent<Query<ConfigState>> for ConfigToml {
-    async fn handle(&mut self, query: Query<ConfigState>, ctx: &mut Context<Self>) -> Result<()> {
+impl OnEvent<PubEvent<ConfigState>> for ConfigToml {
+    async fn handle(
+        &mut self,
+        query: PubEvent<ConfigState>,
+        ctx: &mut Context<Self>,
+    ) -> Result<()> {
         let id = query.from;
         match query.value {
-            ConfigQuery::GetConfig {
-                namespace,
-                template,
-            } => {}
+            PubValue::Connected => {}
+            PubValue::Query(query) => {
+                //
+                match query {
+                    ConfigQuery::GetConfig {
+                        namespace,
+                        template,
+                    } => {}
+                }
+            }
+            PubValue::Disconnected => {}
         }
         Ok(())
     }

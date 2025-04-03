@@ -8,7 +8,7 @@ pub use server::{HubServer, HubServerLink};
 
 use crate::atom::{AtomId, State};
 use crb::core::uuid::Uuid;
-use derive_more::{Deref, DerefMut};
+use derive_more::{Deref, DerefMut, Display};
 use serde::{Deserialize, Serialize};
 
 pub trait Publisher: State {
@@ -38,13 +38,21 @@ impl<P: Publisher> Pub<P> {
 }
 
 /// A wrapper needed to implement a generic handler
-pub struct Query<S: State> {
+pub struct PubEvent<S: State> {
     pub from: StateId,
-    pub value: S::Query,
+    pub value: PubValue<S>,
+}
+
+pub enum PubValue<S: State> {
+    Connected,
+    Query(S::Query),
+    Disconnected,
 }
 
 /// An id of a replicated state.
-#[derive(Deserialize, Serialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(
+    Deserialize, Serialize, Clone, Copy, Debug, Display, PartialEq, Eq, PartialOrd, Ord, Hash,
+)]
 pub struct StateId(Uuid);
 
 impl StateId {

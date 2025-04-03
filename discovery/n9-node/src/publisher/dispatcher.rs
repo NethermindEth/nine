@@ -1,6 +1,6 @@
 use super::recorder::{GetQueriesChannel, Recorder, SendDelta};
 use super::server::HubServer;
-use super::{Query, StateId};
+use super::{PubEvent, StateId};
 use crate::atom::{AtomId, State};
 use crate::utils::drainer_from_mpsc;
 use anyhow::{Error, Result};
@@ -26,7 +26,7 @@ impl<S: State> Dispatcher<S> {
         }
     }
 
-    pub async fn receiver(&mut self) -> Result<mpsc::UnboundedReceiver<Query<S>>> {
+    pub async fn receiver(&mut self) -> Result<mpsc::UnboundedReceiver<PubEvent<S>>> {
         let request = GetQueriesChannel::new();
         self.inner
             .recorder
@@ -35,7 +35,7 @@ impl<S: State> Dispatcher<S> {
             .map_err(Error::from)
     }
 
-    pub async fn queries(&mut self) -> Result<Drainer<Query<S>>> {
+    pub async fn queries(&mut self) -> Result<Drainer<PubEvent<S>>> {
         self.receiver().await.map(drainer_from_mpsc)
     }
 

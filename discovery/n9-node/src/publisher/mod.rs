@@ -11,7 +11,7 @@ use crb::core::uuid::Uuid;
 use derive_more::{Deref, DerefMut};
 use serde::{Deserialize, Serialize};
 
-pub trait Publisher: State + Default {
+pub trait Publisher: State {
     type Driver: From<Dispatcher<Self>> + Send;
 }
 
@@ -21,8 +21,15 @@ pub struct Pub<P: Publisher> {
 }
 
 impl<P: Publisher> Pub<P> {
-    pub fn connect(atom_id: AtomId) -> Self {
+    pub fn connect(atom_id: AtomId) -> Self
+    where
+        P: Default,
+    {
         let state = P::default();
+        Self::connect_init(atom_id, state)
+    }
+
+    pub fn connect_init(atom_id: AtomId, state: P) -> Self {
         let dispatcher = Dispatcher::<P>::new(atom_id, state);
         Self {
             driver: P::Driver::from(dispatcher),

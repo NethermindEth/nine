@@ -1,8 +1,27 @@
-use n9_node::atom::State;
+use derive_more::{Deref, DerefMut, From, Into};
+use n9_node::{Dispatcher, Listener, Publisher, State, Subscriber};
 use serde::{Deserialize, Serialize};
 use toml::Value;
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deref, DerefMut, From, Into)]
+pub struct ConfigSub {
+    listener: Listener<Config>,
+}
+
+impl Subscriber for Config {
+    type Driver = ConfigSub;
+}
+
+#[derive(Deref, DerefMut, From, Into)]
+pub struct ConfigPub {
+    dispatcher: Dispatcher<Config>,
+}
+
+impl Publisher for Config {
+    type Driver = ConfigPub;
+}
+
+#[derive(Deserialize, Serialize, Default, Clone)]
 pub struct Config {
     config: Option<Value>,
 }

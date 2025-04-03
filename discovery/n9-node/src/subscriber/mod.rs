@@ -10,7 +10,7 @@ use crb::core::watch;
 use derive_more::{Deref, DerefMut};
 use std::ops::DerefMut;
 
-pub trait Subscriber: State + Default {
+pub trait Subscriber: State {
     type Driver: From<Listener<Self>> + DerefMut<Target = Listener<Self>> + Send;
 }
 

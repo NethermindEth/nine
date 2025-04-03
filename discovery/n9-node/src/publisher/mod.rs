@@ -40,7 +40,7 @@ impl<P: Publisher> Pub<P> {
 /// A wrapper needed to implement a generic handler
 pub struct Query<S: State> {
     pub from: StateId,
-    pub query: S::Query,
+    pub value: S::Query,
 }
 
 /// An id of a replicated state.

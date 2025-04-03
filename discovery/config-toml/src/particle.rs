@@ -1,10 +1,10 @@
 use crate::loader::ConfigLoader;
-use crate::state::ConfigState;
+use crate::state::{ConfigQuery, ConfigState};
 use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::{Agent, AgentSession, Context, DoAsync, Next};
-use crb::superagent::{Supervisor, SupervisorSession};
-use n9_node::{AtomId, Pub};
+use crb::agent::{Agent, Context, DoAsync, Next, OnEvent};
+use crb::superagent::{StreamSession, Supervisor, SupervisorSession};
+use n9_node::{AtomId, Pub, Query};
 
 pub struct ConfigToml {
     state: Pub<ConfigState>,
@@ -20,7 +20,7 @@ impl ConfigToml {
 }
 
 impl Supervisor for ConfigToml {
-    type BasedOn = AgentSession<Self>;
+    type BasedOn = StreamSession<Self>;
     type GroupBy = ();
 }
 
@@ -39,6 +39,22 @@ impl DoAsync<Initialize> for ConfigToml {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
         let loader = ConfigLoader::new();
         ctx.spawn_agent(loader, ());
+        let queries = self.state.queries().await?;
+        ctx.consume(queries);
         Ok(Next::events())
+    }
+}
+
+#[async_trait]
+impl OnEvent<Query<ConfigState>> for ConfigToml {
+    async fn handle(&mut self, query: Query<ConfigState>, ctx: &mut Context<Self>) -> Result<()> {
+        let id = query.from;
+        match query.value {
+            ConfigQuery::GetConfig {
+                namespace,
+                template,
+            } => {}
+        }
+        Ok(())
     }
 }

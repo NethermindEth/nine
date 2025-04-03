@@ -192,8 +192,8 @@ impl Request for ProcessQuery {
 impl<S: State> OnRequest<ProcessQuery> for Recorder<S> {
     async fn on_request(&mut self, request: ProcessQuery, _ctx: &mut Context<Self>) -> Result<()> {
         let ProcessQuery { from, query } = request;
-        let query = S::unpack_query(&query)?;
-        let msg = Query { from, query };
+        let value = S::unpack_query(&query)?;
+        let msg = Query { from, value };
         self.query_tx.send(msg)?;
         Ok(())
     }

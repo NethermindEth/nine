@@ -33,6 +33,12 @@ pub struct Aqn {
 }
 
 impl Aqn {
+    pub fn root(ident: &str) -> Self {
+        Self {
+            components: vec![ident.to_string()],
+        }
+    }
+
     pub fn from_iter<'a>(components: impl IntoIterator<Item = &'a str>) -> Self {
         let components = components.into_iter().map(String::from).collect();
         Aqn { components }

@@ -28,7 +28,8 @@ impl Node {
     }
 
     pub fn link() -> Result<&'static NodeLink> {
-        NODE.get().ok_or_else(|| anyhow!("Node is not assigned"))
+        NODE.get()
+            .ok_or_else(|| anyhow!("Node is not assigned: start an instance first."))
     }
 
     pub fn add<A>(agent: A) -> Result<()>
@@ -80,12 +81,12 @@ struct Initialize;
 #[async_trait]
 impl DoAsync<Initialize> for Node {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let key = Key::generate();
+        let key = Key::instance();
         let peer = key.peer;
 
         let mut stacker = Stacker::new();
 
-        let connector = Connector::new(key);
+        let connector = Connector::new(key.clone());
         let connector = stacker.schedule(connector, ());
 
         let server = HubServer::new();

@@ -5,28 +5,28 @@ use toml::Value;
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ConfigSub {
-    listener: Listener<Config>,
+    listener: Listener<ConfigState>,
 }
 
-impl Subscriber for Config {
+impl Subscriber for ConfigState {
     type Driver = ConfigSub;
 }
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ConfigPub {
-    dispatcher: Dispatcher<Config>,
+    dispatcher: Dispatcher<ConfigState>,
 }
 
-impl Publisher for Config {
+impl Publisher for ConfigState {
     type Driver = ConfigPub;
 }
 
 #[derive(Deserialize, Serialize, Default, Clone)]
-pub struct Config {
+pub struct ConfigState {
     config: Option<Value>,
 }
 
-impl State for Config {
+impl State for ConfigState {
     type Delta = ConfigDelta;
     type Query = ConfigQuery;
 

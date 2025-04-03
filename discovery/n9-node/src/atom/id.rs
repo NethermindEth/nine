@@ -1,4 +1,5 @@
 use super::aqn::Aqn;
+use crate::connector::Key;
 use derive_more::Deref;
 use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
@@ -11,6 +12,13 @@ pub struct AtomId {
 }
 
 impl AtomId {
+    pub fn local(ident: &str) -> Self {
+        Self {
+            peer: Key::instance().peer,
+            path: Aqn::root(ident),
+        }
+    }
+
     pub fn same_peer(&self, peer: PeerId) -> bool {
         self.peer == peer
     }

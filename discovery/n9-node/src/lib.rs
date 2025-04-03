@@ -5,7 +5,7 @@ pub mod publisher;
 pub mod subscriber;
 pub mod utils;
 
-pub use atom::State;
+pub use atom::{AtomId, State};
 pub use node::Node;
-pub use publisher::{Dispatcher, Publisher};
-pub use subscriber::{Listener, Subscriber};
+pub use publisher::{Dispatcher, Pub, Publisher};
+pub use subscriber::{Listener, Sub, Subscriber};

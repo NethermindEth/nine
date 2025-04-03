@@ -7,5 +7,5 @@ pub mod utils;
 
 pub use atom::{AtomId, State};
 pub use node::Node;
-pub use publisher::{Dispatcher, Pub, PubEvent, PubValue, Publisher};
+pub use publisher::{Dispatcher, Pub, PubEvent, PubValue, Publisher, StateId};
 pub use subscriber::{Listener, Sub, SubEvent, Subscriber};

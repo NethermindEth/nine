@@ -1,13 +1,24 @@
-use crate::loader::ConfigLoader;
+use crate::loader::{ConfigLoader, ConfigUpdates, NewConfig};
 use crate::state::{ConfigQuery, ConfigState};
 use anyhow::Result;
 use async_trait::async_trait;
-use crb::agent::{Agent, Context, DoAsync, Next, OnEvent};
-use crb::superagent::{StreamSession, Supervisor, SupervisorSession};
-use n9_node::{AtomId, Pub, PubEvent, PubValue};
+use crb::agent::{Address, Agent, Context, DoAsync, Equip, Next, OnEvent};
+use crb::core::Slot;
+use crb::superagent::{StreamSession, SubscribeExt, Supervisor, SupervisorSession};
+use n9_node::{AtomId, Pub, PubEvent, PubValue, StateId};
+use std::collections::HashMap;
+use toml::{Table, Value};
+
+struct Record {
+    namespace: String,
+    template: Value,
+}
 
 pub struct ConfigToml {
     state: Pub<ConfigState>,
+    loader: Slot<Address<ConfigLoader>>,
+    subscribers: HashMap<StateId, Record>,
+    config: Value,
 }
 
 impl ConfigToml {
@@ -15,6 +26,9 @@ impl ConfigToml {
         let id = AtomId::local("@n9-config-toml");
         Self {
             state: Pub::connect(id),
+            loader: Slot::empty(),
+            subscribers: HashMap::new(),
+            config: table(),
         }
     }
 }
@@ -37,8 +51,13 @@ struct Initialize;
 #[async_trait]
 impl DoAsync<Initialize> for ConfigToml {
     async fn handle(&mut self, _: Initialize, ctx: &mut Context<Self>) -> Result<Next<Self>> {
-        let loader = ConfigLoader::new();
-        ctx.spawn_agent(loader, ());
+        let actor = ConfigLoader::new();
+        let loader = ctx.spawn_agent(actor, ()).0;
+        let event = ConfigUpdates::for_listener(&ctx);
+        let state_entry = loader.subscribe(event).await?;
+        self.config = state_entry.state;
+        self.loader.fill(loader)?;
+
         let queries = self.state.queries().await?;
         ctx.consume(queries);
         Ok(Next::events())
@@ -61,11 +80,41 @@ impl OnEvent<PubEvent<ConfigState>> for ConfigToml {
                     ConfigQuery::GetConfig {
                         namespace,
                         template,
-                    } => {}
+                    } => {
+                        let record = Record {
+                            namespace,
+                            template,
+                        };
+                        self.subscribers.insert(id, record);
+                        self.distribute(id)?;
+                    }
                 }
             }
-            PubValue::Disconnected => {}
+            PubValue::Disconnected => {
+                self.subscribers.remove(&id);
+            }
         }
         Ok(())
     }
+}
+
+impl ConfigToml {
+    fn distribute(&self, id: StateId) -> Result<()> {
+        Ok(())
+    }
+}
+
+#[async_trait]
+impl OnEvent<NewConfig> for ConfigToml {
+    async fn handle(&mut self, query: NewConfig, ctx: &mut Context<Self>) -> Result<()> {
+        for id in self.subscribers.keys() {
+            // TODO: Absorb errors (a special macro)
+            self.distribute(*id).ok();
+        }
+        Ok(())
+    }
+}
+
+fn table() -> Value {
+    Value::Table(Table::new())
 }

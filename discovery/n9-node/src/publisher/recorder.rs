@@ -55,8 +55,11 @@ impl<S: State> TypelessRecorder for Address<Recorder<S>> {}
 
 pub struct Recorder<S: State> {
     state: S,
+
     query_tx: mpsc::UnboundedSender<Query<S>>,
+    // TODO: Add a timer that will drop rxs (or self-consume and drop)
     query_rx: Option<mpsc::UnboundedReceiver<Query<S>>>,
+
     subscribers: HashMap<StateId, Unique<DeltaFlow>>,
 }
 
@@ -166,6 +169,7 @@ impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
             state_id,
             state: packed_state,
         };
+        // TODO: Send a notification to a separate flow
         Ok(state_init)
     }
 
@@ -174,6 +178,7 @@ impl<S: State> ManageSubscription<DeltaFlow> for Recorder<S> {
         sub: Unique<DeltaFlow>,
         _ctx: &mut Context<Self>,
     ) -> Result<()> {
+        // TODO: Send a notification to a separate flow
         self.subscribers.remove(&sub.state_id);
         Ok(())
     }

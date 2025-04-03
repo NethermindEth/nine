@@ -1,6 +1,6 @@
 use super::client::HubClient;
 use super::player::{GetDeltasChannel, Player, SendQuery};
-use super::StateEvent;
+use super::SubEvent;
 use crate::atom::{AtomId, State};
 use crate::utils::drainer_from_mpsc;
 use anyhow::{Error, Result};
@@ -24,7 +24,7 @@ impl<S: State> Listener<S> {
         }
     }
 
-    pub async fn receiver(&mut self) -> Result<mpsc::UnboundedReceiver<StateEvent<S>>> {
+    pub async fn receiver(&mut self) -> Result<mpsc::UnboundedReceiver<SubEvent<S>>> {
         let request = GetDeltasChannel::new();
         self.inner
             .player
@@ -33,7 +33,7 @@ impl<S: State> Listener<S> {
             .map_err(Error::from)
     }
 
-    pub async fn events(&mut self) -> Result<Drainer<StateEvent<S>>> {
+    pub async fn events(&mut self) -> Result<Drainer<SubEvent<S>>> {
         self.receiver().await.map(drainer_from_mpsc)
     }
 

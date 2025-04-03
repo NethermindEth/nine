@@ -1,4 +1,4 @@
-use super::{Projection, StateEvent};
+use super::{Projection, SubEvent};
 use crate::atom::{PackedDelta, State, TypedAtomId};
 use crate::node::Node;
 use crate::publisher::{DeltaFlow, RecorderLink, StateId};
@@ -19,9 +19,9 @@ struct Binding {
 pub struct Player<S: State> {
     atom: TypedAtomId<S>,
     /// A sender for state events: new_state, delta, lost.
-    event_tx: mpsc::UnboundedSender<StateEvent<S>>,
+    event_tx: mpsc::UnboundedSender<SubEvent<S>>,
     /// A receiver for state events that is used by a listener.
-    event_rx: Option<mpsc::UnboundedReceiver<StateEvent<S>>>,
+    event_rx: Option<mpsc::UnboundedReceiver<SubEvent<S>>>,
     binding: Slot<Binding>,
     /// A sender for a projected state, when it's unpacked
     state_tx: Option<watch::Sender<S>>,
@@ -91,7 +91,7 @@ impl<S: State> GetDeltasChannel<S> {
 }
 
 impl<S: State> Request for GetDeltasChannel<S> {
-    type Response = mpsc::UnboundedReceiver<StateEvent<S>>;
+    type Response = mpsc::UnboundedReceiver<SubEvent<S>>;
 }
 
 #[async_trait]
@@ -100,7 +100,7 @@ impl<S: State> OnRequest<GetDeltasChannel<S>> for Player<S> {
         &mut self,
         _: GetDeltasChannel<S>,
         _ctx: &mut Context<Self>,
-    ) -> Result<mpsc::UnboundedReceiver<StateEvent<S>>> {
+    ) -> Result<mpsc::UnboundedReceiver<SubEvent<S>>> {
         self.event_rx
             .take()
             .ok_or_else(|| anyhow!("A deltas receiver has taken already."))
@@ -143,13 +143,13 @@ impl<S: State> Player<S> {
     fn allocate_state(&mut self, new_state: S) -> Result<()> {
         let (state, state_tx) = Projection::new(new_state);
         self.state_tx = Some(state_tx);
-        let event = StateEvent::State(state);
+        let event = SubEvent::State(state);
         self.send(event)
     }
 
     fn deallocate_state(&mut self) -> Result<()> {
         self.state_tx.take();
-        self.send(StateEvent::Lost)
+        self.send(SubEvent::Lost)
     }
 
     fn apply_delta(&mut self, delta: S::Delta) -> Result<()> {
@@ -160,11 +160,11 @@ impl<S: State> Player<S> {
         state_tx.send_modify(|state| {
             state.apply(delta.clone());
         });
-        self.send(StateEvent::Delta(delta))?;
+        self.send(SubEvent::Delta(delta))?;
         Ok(())
     }
 
-    fn send(&self, event: StateEvent<S>) -> Result<()> {
+    fn send(&self, event: SubEvent<S>) -> Result<()> {
         if self.event_tx.is_closed() {
             Err(anyhow!("State deltas channel is closed"))
         } else {

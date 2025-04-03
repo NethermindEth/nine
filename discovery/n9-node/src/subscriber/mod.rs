@@ -29,7 +29,7 @@ impl<P: Subscriber> Sub<P> {
 }
 
 #[derive(Debug)]
-pub enum StateEvent<S: State> {
+pub enum SubEvent<S: State> {
     State(Projection<S>),
     Delta(S::Delta),
     Lost,

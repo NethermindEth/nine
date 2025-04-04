@@ -4,12 +4,18 @@ use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use toml::Value;
 
 #[derive(Deref, DerefMut, From, Into)]
-pub struct ConfigSub {
-    listener: Listener<ConfigState>,
+pub struct ConfigSub<T>
+where
+    T: DataFraction,
+{
+    listener: Listener<ConfigState<T>>,
 }
 
-impl Subscriber for ConfigState {
-    type Driver = ConfigSub;
+impl<T> Subscriber for ConfigState<T>
+where
+    T: DataFraction,
+{
+    type Driver = ConfigSub<T>;
 }
 
 #[derive(Deref, DerefMut, From, Into)]

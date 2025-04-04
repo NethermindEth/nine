@@ -1,6 +1,6 @@
 use crate::loader::{ConfigLoader, ConfigUpdates, NewConfig};
-use crate::state::{ConfigQuery, ConfigState};
-use anyhow::Result;
+use crate::state::{ConfigDelta, ConfigQuery, ConfigState};
+use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use crb::agent::{Address, Agent, Context, DoAsync, Equip, Next, OnEvent};
 use crb::core::Slot;
@@ -100,8 +100,23 @@ impl OnEvent<PubEvent<ConfigState>> for ConfigToml {
 
 impl ConfigToml {
     fn distribute(&self, id: StateId) -> Result<()> {
+        let record = self
+            .subscribers
+            .get(&id)
+            .ok_or_else(|| anyhow!("No state with id {id}"))?;
+        let ns = &record.namespace;
+        let config = get_nested_value(&self.config, ns)
+            .ok_or_else(|| anyhow!("No value with path {ns} in a config."))?;
+        let delta = ConfigDelta::NewValue {
+            config: config.clone(),
+        };
+        self.state.direct(id, delta)?;
         Ok(())
     }
+}
+
+fn get_nested_value<'a>(value: &'a Value, path: &str) -> Option<&'a Value> {
+    path.split('.').fold(Some(value), |acc, key| acc?.get(key))
 }
 
 #[async_trait]

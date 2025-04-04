@@ -1,0 +1,18 @@
+[package]
+name = "model-openai"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+keywords.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+crb = { workspace = true, features = ["std"] }
+derive_more.workspace = true
+n9-node.workspace = true
+serde.workspace = true
+
+config-toml.path = "../config-toml"

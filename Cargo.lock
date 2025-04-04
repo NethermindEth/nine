@@ -5547,6 +5547,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "model-openai"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "config-toml",
+ "crb",
+ "derive_more 2.0.1",
+ "n9-node",
+ "serde",
+]
+
+[[package]]
 name = "moka"
 version = "0.12.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"

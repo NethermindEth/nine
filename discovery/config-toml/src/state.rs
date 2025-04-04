@@ -1,7 +1,9 @@
 use derive_more::{Deref, DerefMut, From, Into};
-use n9_node::{DataFraction, Dispatcher, Listener, Publisher, State, Subscriber};
+use n9_node::{DataFraction, Dispatcher, Listener, Projection, Publisher, State, Subscriber};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use toml::Value;
+
+pub type LiveConfig<T> = Projection<ConfigState<T>>;
 
 #[derive(Deref, DerefMut, From, Into)]
 pub struct ConfigSub<T>

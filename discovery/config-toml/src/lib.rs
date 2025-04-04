@@ -3,4 +3,4 @@ mod particle;
 mod state;
 
 pub use particle::ConfigToml;
-pub use state::ConfigState;
+pub use state::{ConfigState, LiveConfig};

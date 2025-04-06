@@ -12,4 +12,4 @@ anyhow.workspace = true
 async-trait.workspace = true
 crb = { workspace = true, features = ["std"] }
 n9-core.workspace = true
-rig-core = "0.8.0"
+rig-core = "0.11.0"

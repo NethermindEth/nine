@@ -9,7 +9,7 @@ repository.workspace = true
 anyhow.workspace = true
 async-trait.workspace = true
 crb = { workspace = true, features = ["std"] }
-crossterm = "0.28.1"
+crossterm = "0.29.0"
 n9-core.workspace = true
 n9-control-chat.workspace = true
 pulldown-cmark = "0.13.0"

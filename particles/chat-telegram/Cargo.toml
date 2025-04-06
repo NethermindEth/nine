@@ -11,4 +11,4 @@ crb = { workspace = true, features = ["std"] }
 derive_more.workspace = true
 n9-core.workspace = true
 serde.workspace = true
-teloxide-core = "0.10.1"
+teloxide-core = "0.11.2"

@@ -26,15 +26,15 @@ async-trait = "0.1.88"
 bytes = "1.10.1"
 chrono = { version = "0.4.40", features = ["serde"] }
 console-subscriber = "0.4.1"
-clap = { version = "4.5.34", features = ["derive"] }
-crb = { version = "0.0.31", default-features = false }
-crb-system = { version = "0.0.31" }
+clap = { version = "4.5.35", features = ["derive"] }
+crb = { version = "0.0.33", default-features = false }
+crb-system = { version = "0.0.33" }
 derive_more = { version = "2.0.1", features = ["full"] }
 dirs = "6.0.0"
 dotenvy = "0.15.7"
 eframe = "0.31.1"
 egui = "0.31.1"
-env_logger = "0.11.7"
+env_logger = "0.11.8"
 envy = "0.4.2"
 flexbuffers = "25.2.10"
 futures = "0.3.31"
@@ -61,9 +61,9 @@ schemars = { version = "0.8.22", features = ["derive"] }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 strum = { version = "0.27.1", features = ["derive"] }
-smallvec = "1.14.0"
+smallvec = "1.15.0"
 thiserror = "2.0.12"
-tokio = "1.44.1"
+tokio = "1.44.2"
 tokio-stream = "0.1.17"
 tokio-util = "0.7.14"
 toml = "0.8.20"

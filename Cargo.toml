@@ -21,14 +21,14 @@ repository = "https://github.com/NethermindEth/nine"
 keywords = ["ai", "ai-agent", "ethereum"]
 
 [workspace.dependencies]
-anyhow = "1.0.97"
+anyhow = "1.0.98"
 async-trait = "0.1.88"
 bytes = "1.10.1"
-chrono = { version = "0.4.40", features = ["serde"] }
+chrono = { version = "0.4.41", features = ["serde"] }
 console-subscriber = "0.4.1"
-clap = { version = "4.5.35", features = ["derive"] }
-crb = { version = "0.0.33", default-features = false }
-crb-system = { version = "0.0.33" }
+clap = { version = "4.5.37", features = ["derive"] }
+crb = { version = "0.0.38", default-features = false }
+crb-system = { version = "0.0.38" }
 derive_more = { version = "2.0.1", features = ["full"] }
 dirs = "6.0.0"
 dotenvy = "0.15.7"
@@ -53,7 +53,7 @@ notify = "8.0.0"
 libp2p = { version = "0.55.0", default-features = false, features = ["gossipsub", "macros", "noise", "plaintext", "serde", "quic", "yamux"] }
 libp2p-stream = "0.3.0-alpha"
 nom = "8.0.0"
-futures-bounded = "0.2.4"
+futures-bounded = "0.3.0"
 log = "0.4.27"
 regex = "1.11.1"
 schemars = { version = "0.8.22", features = ["derive"] }
@@ -64,8 +64,8 @@ smallvec = "1.15.0"
 thiserror = "2.0.12"
 tokio = "1.44.2"
 tokio-stream = "0.1.17"
-tokio-util = "0.7.14"
-toml = "0.8.20"
+tokio-util = "0.7.15"
+toml = "0.8.22"
 tracing = "0.1.41"
 tracing-subscriber = "0.3.19"
 typed-slab = "0.2.1"

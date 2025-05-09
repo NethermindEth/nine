@@ -1,19 +1,19 @@
-use n9::server::EthereumNodeRequest;
+use n9::server::EthereumService;
 use rmcp::{
     transport::stdio,
     ServiceExt,
 };
 
+use log::{info, error};
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let service = EthereumNodeRequest {
-        node_url: String::new(),
-    }.serve(stdio()).await.inspect_err(|e| {
-            println!("Error: {:?}", e);
-        })?;
+    let service = EthereumService {}.serve(stdio()).await.inspect_err(|e| {
+        error!("Error: {:?}", e);
+    })?;
 
-    println!("Server started, waiting for requests...");
+    info!("Server started, waiting for requests...");
     let quit_reason = service.waiting().await?;
-    println!("Server quit: {:?}", quit_reason);
+    info!("Server quit: {:?}", quit_reason);
     Ok(())
 }

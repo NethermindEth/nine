@@ -12,10 +12,12 @@ pub struct EthereumNodeRequest {
     )]
     pub node_url: String,
 }
+#[derive(Debug, Clone)]
+pub struct EthereumService;
 
 
 #[tool(tool_box)]
-impl EthereumNodeRequest {
+impl EthereumService {
     #[tool(description = "Get the latest Ethereum block information")]
     async fn get_latest_block(&self, #[tool(aggr)] request: EthereumNodeRequest) -> String {
         // Create a provider
@@ -49,7 +51,7 @@ impl EthereumNodeRequest {
 
 // impl call_tool and list_tool by querying static toolbox
 #[tool(tool_box)]
-impl ServerHandler for EthereumNodeRequest {
+impl ServerHandler for EthereumService {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
             instructions: Some("A simple server request for getting blockchain data".into()),

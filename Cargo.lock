@@ -2048,6 +2048,7 @@ version = "0.0.1"
 dependencies = [
  "chrono",
  "ethers",
+ "log",
  "rmcp",
  "serde",
  "tokio",

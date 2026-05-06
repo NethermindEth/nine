@@ -66,9 +66,9 @@ substance.add_particle::<TelegramParticle>()?;
 
 ## License
 
-This project is licensed under the [MIT license].
+This project is licensed under the [GNU license].
 
-[MIT license]: https://github.com/NethermindEth/nine/blob/trunk/LICENSE
+[GNU license]: https://github.com/NethermindEth/nine/blob/trunk/LICENSE
 
 ### Contribution
 
